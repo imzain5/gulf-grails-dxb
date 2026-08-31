@@ -1,4 +1,4 @@
-import Marquee from "./Marquee";
+import AnnouncementBar from "./AnnouncementBar";
 import SiteHeader from "./SiteHeader";
 import SiteFooter from "./SiteFooter";
 import WhatsAppFloat from "./WhatsAppFloat";
@@ -7,7 +7,7 @@ import ToastHost from "./ToastHost";
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <Marquee />
+      <AnnouncementBar />
       <SiteHeader />
       <main style={{ flex: 1 }}>{children}</main>
       <SiteFooter />

@@ -234,6 +234,24 @@ textarea.input { min-height: 90px; resize: vertical; }
 
 body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 
+/* — chrome —
+   The header and footer used the same 2px black rule as the product grids,
+   which put three heavy bands above every page. They are hairlines now; the
+   grids keep their own weight. */
+:root {
+  --gg-hair: color-mix(in srgb, #201e1d 13%, transparent);
+  --gg-hair-strong: color-mix(in srgb, #201e1d 24%, transparent);
+  --gg-hair-light: color-mix(in srgb, #f3f2f2 15%, transparent);
+}
+
+.gg-bag {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: 1px solid var(--color-text);
+  transition: background .22s var(--ease-out), color .22s var(--ease-out);
+}
+.gg-bag:hover { background: transparent; color: var(--color-text); }
+
 /* — the page shell every section aligns to — */
 .gg-wrap {
   max-width: var(--shell);

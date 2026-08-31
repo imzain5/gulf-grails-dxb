@@ -138,8 +138,8 @@ export default function SiteHeader() {
   };
 
   const iconBtn: React.CSSProperties = {
-    appearance: "none", flex: "none", width: 42, height: 42, display: "flex", alignItems: "center",
-    justifyContent: "center", border: "2px solid var(--color-divider)", background: "none",
+    appearance: "none", flex: "none", width: 40, height: 40, display: "flex", alignItems: "center",
+    justifyContent: "center", border: "1px solid var(--gg-hair-strong)", background: "none",
     cursor: "pointer", padding: 0, position: "relative", color: "var(--color-text)",
   };
 
@@ -153,8 +153,8 @@ export default function SiteHeader() {
         transition: "box-shadow .25s var(--ease-out)",
       }}
     >
-      <header style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ height: 76, display: "flex", alignItems: "center", gap: "clamp(10px,1.4vw,34px)" }}>
+      <header style={{ borderBottom: "1px solid var(--gg-hair)" }}>
+        <div className="gg-wrap" style={{ height: 68, display: "flex", alignItems: "center", gap: "clamp(10px,1.4vw,34px)" }}>
           {/* Drawer trigger — phones and tablets only. */}
           <button
             className="gg-mobile"
@@ -183,8 +183,8 @@ export default function SiteHeader() {
                 aria-expanded={menu === m.key}
                 style={{
                   appearance: "none", background: menu === m.key ? "var(--color-text)" : "transparent",
-                  border: 0, padding: "0 clamp(6px,.9vw,14px)", height: 76, font: "inherit", fontSize: 12,
-                  fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap",
+                  border: 0, padding: "0 clamp(6px,.9vw,14px)", height: 68, font: "inherit", fontSize: 11,
+                  fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", whiteSpace: "nowrap",
                   cursor: "pointer", color: menu === m.key ? "var(--color-bg)" : "var(--color-text)",
                   transition: "background .16s var(--ease-out), color .16s var(--ease-out)",
                 }}
@@ -198,8 +198,8 @@ export default function SiteHeader() {
               className="gg-hover-accent"
               style={{
                 appearance: "none", background: "none", border: 0, padding: "0 clamp(6px,.9vw,14px)",
-                height: 76, display: "flex", alignItems: "center", font: "inherit", fontSize: 12, fontWeight: 700,
-                letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap", cursor: "pointer", color: "inherit",
+                height: 68, display: "flex", alignItems: "center", font: "inherit", fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.18em", textTransform: "uppercase", whiteSpace: "nowrap", cursor: "pointer", color: "inherit",
               }}
             >
               Sell
@@ -213,8 +213,8 @@ export default function SiteHeader() {
                 role="search"
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
-                  border: `2px solid ${focused ? "var(--color-accent)" : "var(--color-divider)"}`,
-                  padding: "0 12px", height: 42, transition: "border-color .16s var(--ease-out)",
+                  border: `1px solid ${focused ? "var(--color-text)" : "var(--gg-hair-strong)"}`,
+                  padding: "0 12px", height: 40, transition: "border-color .22s var(--ease-out)",
                 }}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
@@ -299,9 +299,9 @@ export default function SiteHeader() {
 
             <Link
               href="/cart"
-              className="btn btn-primary"
               aria-label={`Bag, ${bag} item${bag === 1 ? "" : "s"}`}
-              style={{ flex: "none", height: 42, justifyContent: "flex-start", gap: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", fontSize: 11, position: "relative" }}
+              className="gg-bag"
+              style={{ flex: "none", height: 40, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, paddingInline: 16, fontFamily: "var(--font-heading)", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", fontSize: 10, position: "relative" }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2 4 6v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6l-2-4z" /><path d="M4 6h16" /><path d="M16 10a4 4 0 0 1-8 0" />
@@ -316,15 +316,15 @@ export default function SiteHeader() {
       {/* — desktop mega menu — */}
       {activeMenu && (
         <div className="gg-desktop" style={{
-          position: "absolute", left: 0, right: 0, top: 76, background: "var(--color-bg)",
-          borderBottom: "2px solid var(--color-text)", boxShadow: "var(--shadow-lg)", animation: "gg-fade .14s ease",
+          position: "absolute", left: 0, right: 0, top: 68, background: "var(--color-bg)",
+          borderBottom: "1px solid var(--gg-hair)", boxShadow: "var(--shadow-lg)", animation: "gg-fade .14s ease",
         }}>
           <div className="gg-wrap" style={{ padding: "32px var(--gutter) 36px", display: "grid", gridTemplateColumns: "repeat(4,1fr) 1.1fr", gap: 34 }}>
             {activeMenu.cols.map((col, ci) => (
               <div key={col.title + ci}>
                 <div style={{
                   fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase",
-                  color: "var(--color-accent)", paddingBottom: 12, borderBottom: "2px solid var(--color-text)", marginBottom: 14,
+                  color: "var(--color-accent)", paddingBottom: 12, borderBottom: "1px solid var(--gg-hair-strong)", marginBottom: 14,
                 }}>
                   {col.title}
                 </div>
@@ -361,23 +361,6 @@ export default function SiteHeader() {
           </div>
         </div>
       )}
-
-      {/* — trust bar: four columns on desktop, a scrolling rail on a phone — */}
-      <div style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-        <div className="gg-wrap gg-nowrap-scroll" style={{ padding: "9px var(--gutter)", display: "flex", gap: 20, overflowX: "auto" }}>
-          {TRUST_BAR.map((label, i) => (
-            <div
-              key={label}
-              style={{
-                display: "flex", alignItems: "center", gap: 9, fontSize: 11, fontWeight: 700,
-                letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap", flex: "1 0 auto",
-              }}
-            >
-              {TRUST_ICONS[i]}{label}
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
 
     {/* — mobile drawer — */}
