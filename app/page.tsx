@@ -1,252 +1,268 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PRODUCTS, FEATURED_IDS, findProduct } from "@/data/products";
-import { HOUSES, MARKET, REVIEWS, STEPS } from "@/data/content";
-import { STORY_SHOTS, INSTAGRAM_SHOTS } from "@/lib/editorial";
+import { PRODUCTS, findProduct } from "@/data/products";
+import { CHECKS, HOUSES, MARKET, REVIEWS } from "@/data/content";
+import { STORY_SHOTS } from "@/lib/editorial";
+import { money } from "@/lib/money";
 import { waLink } from "@/lib/whatsapp";
-import HeroCarousel from "@/components/home/HeroCarousel";
-import FridayDropBanner from "@/components/home/FridayDropBanner";
-import FeaturedProductCard from "@/components/FeaturedProductCard";
-import ProductCard from "@/components/ProductCard";
-import EditorialFrame from "@/components/EditorialFrame";
 import RecentlyViewed from "@/components/RecentlyViewed";
-import Reveal from "@/components/Reveal";
-
-function houseCount(fam: string): number {
-  return PRODUCTS.filter((p) => {
-    if (fam === "Dunk") return p.brand === "Nike";
-    if (fam === "Jordan 1") return p.brand === "Air Jordan";
-    return p.fam === fam;
-  }).length;
-}
+import HomeHero from "@/components/home/HomeHero";
+import DropStrip from "@/components/home/DropStrip";
+import CollectionGrid from "@/components/home/CollectionGrid";
+import CampaignBand from "@/components/home/CampaignBand";
+import Vault from "@/components/home/Vault";
+import EditorialGallery from "@/components/home/EditorialGallery";
+import Rise from "@/components/home/Rise";
 
 const ARROW = (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14" /><path d="m13 6 6 6-6 6" />
   </svg>
 );
 
-/** Section head: kicker on the left, a "see everything" link on the right. */
+/**
+ * A line of type doing the work a section header usually does.
+ *
+ * These are the page's punctuation: no card, no image, no button — a claim set
+ * large enough to be the only thing on screen, with a hairline under it. They
+ * are what turn a sequence of product rows into an editorial.
+ */
+function Statement({
+  children, note, ground = "paper",
+}: {
+  children: React.ReactNode;
+  note?: string;
+  ground?: "paper" | "ink";
+}) {
+  const dark = ground === "ink";
+  return (
+    <section
+      className={dark ? "hp-dark" : undefined}
+      style={{
+        background: dark ? undefined : "var(--color-bg)",
+        borderBottom: `1px solid ${dark ? "var(--hp-line-dark)" : "var(--hp-line)"}`,
+      }}
+    >
+      <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <Rise>
+          <h2 className="hp-display hp-statement" style={{ maxWidth: "16ch" }}>{children}</h2>
+          {note && (
+            <p className={`hp-body ${dark ? "hp-body-light" : ""}`} style={{ margin: "clamp(26px,3vw,44px) 0 0", maxWidth: "44ch" }}>
+              {note}
+            </p>
+          )}
+        </Rise>
+      </div>
+    </section>
+  );
+}
+
+/** Kicker + headline + one link out, shared by the product sections. */
 function SectionHead({
-  kicker, title, action,
+  kicker, title, action, note,
 }: {
   kicker: string;
   title: React.ReactNode;
   action?: { label: string; href: string };
+  note?: string;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-      <div style={{ minWidth: 0 }}>
-        <div className="gg-kicker" style={{ marginBottom: 14 }}>{kicker}</div>
-        <h2 className="gg-display gg-d2">{title}</h2>
+    <Rise>
+      <div
+        style={{
+          display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+          gap: "clamp(20px, 4vw, 60px)", flexWrap: "wrap", marginBottom: "clamp(34px, 4.4vw, 68px)",
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <div className="hp-label hp-label-accent" style={{ marginBottom: 20 }}>{kicker}</div>
+          <h2 className="hp-display hp-section-head" style={{ maxWidth: "18ch" }}>{title}</h2>
+          {note && <p className="hp-body" style={{ margin: "22px 0 0", maxWidth: "42ch" }}>{note}</p>}
+        </div>
+        {action && (
+          <Link href={action.href} className="hp-link" style={{ flex: "none" }}>
+            {action.label}
+            {ARROW}
+          </Link>
+        )}
       </div>
-      {action && (
-        <Link href={action.href} className="gg-arrow" style={{
-          display: "inline-flex", alignItems: "center", gap: 9, flex: "none",
-          fontSize: 12, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase",
-          color: "var(--color-accent)", paddingBottom: 4,
-        }}>
-          {action.label}
-          {ARROW}
-        </Link>
-      )}
-    </div>
+    </Rise>
   );
 }
 
 export default function HomePage() {
-  const featured = FEATURED_IDS.map(findProduct);
-  const homeGrid = PRODUCTS.filter((p) => !FEATURED_IDS.includes(p.id)).slice(0, 10);
+  // The vault is defined by price rather than a hand-kept list, so a new grail
+  // lands in it on its own.
+  const vault = [...PRODUCTS].filter((p) => p.price >= 10000).sort((a, b) => b.price - a.price).slice(0, 4);
+  const vaultIds = new Set(vault.map((p) => p.id));
+  const travis = PRODUCTS.filter((p) => p.fam === "Travis Scott");
+  const offWhite = PRODUCTS.filter((p) => p.fam === "Off-White");
+
+  // The curated row leads with the pairs carrying a badge, then fills.
+  const curated = [
+    ...PRODUCTS.filter((p) => p.drop && !vaultIds.has(p.id)),
+    ...PRODUCTS.filter((p) => !p.drop && !vaultIds.has(p.id)),
+  ].slice(0, 8);
+
+  const cheapest = Math.min(...PRODUCTS.map((p) => p.price));
 
   return (
     <div data-screen-label="Home">
-      <HeroCarousel />
-      <FridayDropBanner />
+      <HomeHero />
+      <DropStrip />
 
-      {/* ── shop by house ─────────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(30px,4vw,44px) var(--gutter) 0" }}>
-          <div className="gg-kicker" style={{ marginBottom: 20 }}>Shop by house</div>
-        </div>
-        <Reveal
-          className="gg-wrap gg-grid gg-houses"
-          style={{
-            padding: "0 var(--gutter) clamp(30px,4vw,44px)",
-            borderTop: "2px solid var(--color-text)",
-            borderLeft: "2px solid var(--color-text)",
-            "--cols": 5, "--cols-md": 3, "--cols-sm": 2, "--cols-xs": 2,
-          } as React.CSSProperties}
-        >
-          {HOUSES.map((h) => {
-            const face = findProduct(h.pid);
-            return (
-              <Link
-                key={h.key}
-                href={`/shop?fam=${encodeURIComponent(h.fam)}`}
-                className="gg-house-hover"
-                style={{
-                  border: 0, borderRight: "2px solid var(--color-text)", borderBottom: "2px solid var(--color-text)",
-                  background: "var(--color-neutral-100)", cursor: "pointer", padding: "22px 20px 18px", textAlign: "left",
-                  font: "inherit", color: "inherit", display: "flex", flexDirection: "column", gap: 6, minHeight: 236,
-                  position: "relative", overflow: "hidden", isolation: "isolate",
-                  transition: "background .18s var(--ease-out), color .18s var(--ease-out)",
-                }}
-              >
-                <span style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: "clamp(18px,1.6vw,22px)", letterSpacing: "-0.02em", textTransform: "uppercase" }}>
-                  {h.label}
-                </span>
-                <span className="gg-eyebrow" style={{ opacity: 0.6 }}>{houseCount(h.fam)} pairs</span>
+      <Statement note="Thirty pairs, physically in the Al Quoz stockroom. Not a marketplace and not a dropship line — if a size shows on this site, it is in our hands and photographed on our own table.">
+        The pairs you thought you missed.
+      </Statement>
 
-                {/* The house's signature pair, blended so the white studio
-                    background disappears into the tile rather than sitting on
-                    it as a box. */}
-                <span style={{ position: "relative", flex: 1, margin: "10px -6px 8px", minHeight: 88 }}>
-                  {face.photos && (
-                    <Image
-                      className="gg-photo"
-                      src={face.photos[0]}
-                      alt=""
-                      aria-hidden
-                      fill
-                      sizes="(max-width: 520px) 90vw, (max-width: 1180px) 30vw, 260px"
-                      style={{ objectFit: "contain" }}
-                    />
-                  )}
-                </span>
+      {travis.length > 0 && (
+        <CampaignBand
+          kicker="The Travis drop"
+          title={<>Cactus Jack,<br />on the shelf.</>}
+          body="The reversed swoosh that changed the hobby, and the low that outsells everything else we carry. Four Travis pairs in the stockroom right now, from the AED 2,900 Air Force 1 to the 2019 Mocha high."
+          href="/shop?fam=Travis+Scott"
+          cta="Explore the collection"
+          lead={findProduct("ts-aj1-high")}
+          support={travis.filter((p) => p.id !== "ts-aj1-high").slice(0, 3)}
+        />
+      )}
 
-                <span className="gg-arrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-accent)" }}>
-                  Shop {ARROW}
-                </span>
-              </Link>
-            );
-          })}
-        </Reveal>
-      </section>
+      {vault.length > 0 && <Vault products={vault} />}
 
-      {/* ── this week's grails ────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(34px,4vw,44px) var(--gutter) 22px" }}>
+      <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
           <SectionHead
-            kicker="This week's grails"
-            title={<>Three pairs that<br />won&apos;t be here Monday</>}
-            action={{ label: `See all ${PRODUCTS.length} pairs`, href: "/shop" }}
+            kicker="In the stockroom"
+            title="Ready to wear this week"
+            action={{ label: `All ${PRODUCTS.length} pairs`, href: "/shop" }}
           />
-        </div>
-        <div
-          className="gg-wrap gg-grid"
-          style={{
-            padding: "0 var(--gutter) clamp(32px,4vw,48px)",
-            borderLeft: "2px solid var(--color-text)",
-            "--cols": 3, "--cols-md": 3, "--cols-sm": 1,
-          } as React.CSSProperties}
-        >
-          {featured.map((p, i) => (
-            <Reveal key={p.id} delay={i * 90} style={{ display: "flex", minWidth: 0 }}>
-              <FeaturedProductCard product={p} />
-            </Reveal>
-          ))}
+          <CollectionGrid products={curated} columns={4} />
         </div>
       </section>
 
-      {/* ── grail index ───────────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-text)", color: "var(--color-bg)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(26px,3vw,34px) var(--gutter) clamp(28px,3vw,38px)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>Grail index — last 7 days</span>
-            <span style={{ width: 7, height: 7, background: "var(--color-accent)", animation: "gg-pulse 1.6s ease-in-out infinite", display: "inline-block" }} />
-            <span className="gg-eyebrow" style={{ color: "var(--color-neutral-400)" }}>Resale movement we track before we price</span>
-          </div>
+      {offWhite.length > 0 && (
+        <CampaignBand
+          kicker="The archive"
+          title={<>Virgil&apos;s ten,<br />and what followed.</>}
+          body="The Ten Chicago that started deconstruction, Lot 01 of the fifty-pair Dunk series, and the Volt Air Force 1 from the 2018 run. Held with their zip ties, tags and both lace sets."
+          href="/shop?fam=Off-White"
+          cta="See the archive"
+          lead={findProduct("ow-aj1")}
+          support={offWhite.filter((p) => p.id !== "ow-aj1").slice(0, 3)}
+          flip
+        />
+      )}
+
+      <Statement ground="ink" note="Al Quoz 1, Dubai. Viewing by appointment. Same-day delivery across the city, next day to every other emirate, and you pay the courier once the box is open and the pair is on your feet.">
+        Physically stocked in Dubai.
+      </Statement>
+
+      {/* ── authenticity, told visually ─────────────────────────────────── */}
+      <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
           <div
-            className="gg-grid"
-            style={{ borderTop: "1px solid var(--color-neutral-700)", "--cols": 4, "--cols-md": 2, "--cols-xs": 2 } as React.CSSProperties}
+            className="hp-asym"
+            style={{ "--hp-cols": "1fr 1.1fr", "--hp-gap": "clamp(34px, 5vw, 96px)", alignItems: "start" } as React.CSSProperties}
           >
-            {MARKET.map((m) => (
-              <div key={m.name} style={{ padding: "18px 20px", borderRight: "1px solid var(--color-neutral-700)", borderBottom: "1px solid var(--color-neutral-700)" }}>
-                <div className="gg-eyebrow" style={{ color: "var(--color-neutral-400)", fontWeight: 700 }}>{m.name}</div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
-                  <span className="gg-figure" style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "clamp(18px,1.8vw,22px)", letterSpacing: "-0.02em" }}>{m.price}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 800, letterSpacing: "0.06em", color: m.up ? "var(--color-accent-400)" : "var(--color-neutral-400)" }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: m.up ? "none" : "rotate(180deg)" }}>
-                      <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
-                    </svg>
-                    {m.delta}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="hp-sticky">
+              <Rise>
+                <div className="hp-label hp-label-accent" style={{ marginBottom: 20 }}>Authentication</div>
+                <h2 className="hp-display hp-section-head" style={{ marginBottom: 26 }}>
+                  Six checks,<br />every pair.
+                </h2>
+                <p className="hp-body" style={{ margin: "0 0 34px", maxWidth: "38ch" }}>
+                  Nothing is drop-shipped. Every pair passes through our hands, gets photographed and
+                  logged, and is checked against a known-good reference from the same production run.
+                  If a pair you buy from us is ever proven fake, you get a full refund plus the
+                  delivery fee.
+                </p>
+                <Link href="/trust" className="hp-link">
+                  How we verify
+                  {ARROW}
+                </Link>
+              </Rise>
 
-      {/* ── in stock now ──────────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(34px,4vw,44px) var(--gutter) 20px" }}>
-          <SectionHead kicker="The stockroom" title="In stock now" action={{ label: "Filter by size", href: "/shop" }} />
-        </div>
-        <div className="gg-wrap" style={{ padding: "22px var(--gutter) clamp(38px,4vw,56px)" }}>
-          <Reveal className="gg-cardgrid">
-            {homeGrid.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 4} />)}
-          </Reveal>
-          <div style={{ display: "flex", marginTop: 28 }}>
-            <Link href="/shop" className="gg-btn gg-btn-outline">
-              Load the full inventory ({PRODUCTS.length})
-              {ARROW}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── what customers say ────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(34px,4vw,48px) var(--gutter)" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 20, flexWrap: "wrap", marginBottom: 26 }}>
-            <div>
-              <div className="gg-kicker" style={{ marginBottom: 14 }}>312 reviews · 4.9 average</div>
-              <h2 className="gg-display gg-d2">Bought once,<br />then sent a friend</h2>
+              <Rise delay={120} variant="mask" className="hp-frame" style={{ marginTop: "clamp(30px, 4vw, 52px)", aspectRatio: "1 / 1" }}>
+                {/* The ground sits inside the reveal's clip layer so the opaque
+                    photo has something to multiply against. */}
+                <span style={{ position: "absolute", inset: 0, display: "block", background: "var(--color-bg)" }}>
+                  <Image
+                    className="gg-photo"
+                    src="/assets/air-dior-swoosh.webp"
+                    alt="The Dior Oblique swoosh, photographed on our table"
+                    fill
+                    sizes="(max-width: 900px) 100vw, 42vw"
+                    style={{ objectFit: "contain", padding: "4%" }}
+                  />
+                </span>
+              </Rise>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: "none" }} aria-label="4.9 out of 5">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <svg key={i} width="17" height="17" viewBox="0 0 24 24" fill="var(--color-accent)" aria-hidden>
-                  <path d="m12 2 3 6.9 7.5.7-5.6 5 1.6 7.4L12 18.2 5.5 22l1.6-7.4-5.6-5 7.5-.7z" />
-                </svg>
+
+            <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
+              {CHECKS.map((c, i) => (
+                <Rise as="li" key={c.n} delay={i * 60}>
+                  <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "clamp(18px, 2.6vw, 44px)", paddingBlock: "clamp(22px, 2.6vw, 34px)", borderTop: i === 0 ? "1px solid var(--hp-line)" : undefined, borderBottom: "1px solid var(--hp-line)" }}>
+                    <span className="gg-figure" style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", color: "var(--color-accent)", paddingTop: 4 }}>
+                      {c.n}
+                    </span>
+                    <div>
+                      <h3 className="hp-card-name" style={{ fontSize: "clamp(16px,1.5vw,20px)", marginBottom: 10 }}>{c.t}</h3>
+                      <p className="hp-body" style={{ margin: 0, fontSize: 14 }}>{c.d}</p>
+                    </div>
+                  </div>
+                </Rise>
               ))}
-            </div>
-          </div>
-          <div
-            className="gg-grid"
-            style={{ borderTop: "2px solid var(--color-text)", borderLeft: "2px solid var(--color-text)", "--cols": 3, "--cols-sm": 1 } as React.CSSProperties}
-          >
-            {REVIEWS.map((r, i) => (
-              <Reveal
-                key={r.name}
-                delay={i * 90}
-                style={{
-                  borderRight: "2px solid var(--color-text)", borderBottom: "2px solid var(--color-text)",
-                  padding: "26px 24px 24px", display: "flex", flexDirection: "column", gap: 14, background: "var(--color-bg)",
-                }}
-              >
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-accent)" aria-hidden style={{ flex: "none" }}>
-                  <path d="M9.5 6C6.5 7.6 5 10 5 13v5h6v-6H8.4c.2-1.7 1.1-2.9 2.7-3.7zm9 0C15.5 7.6 14 10 14 13v5h6v-6h-2.6c.2-1.7 1.1-2.9 2.7-3.7z" />
-                </svg>
-                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, flex: 1, textWrap: "pretty" }}>{r.quote}</p>
-                <div style={{ paddingTop: 14, borderTop: "2px solid var(--color-divider)" }}>
-                  <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 14 }}>{r.name} · {r.place}</div>
-                  <div className="gg-eyebrow" style={{ color: "var(--color-neutral-600)", marginTop: 4 }}>{r.pair}</div>
-                </div>
-              </Reveal>
-            ))}
+            </ol>
           </div>
         </div>
       </section>
 
-      {/* ── stories ───────────────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(34px,4vw,44px) var(--gutter) clamp(34px,4vw,48px)" }}>
-          <div className="gg-kicker" style={{ marginBottom: 20 }}>Stories</div>
+      {/* ── houses ──────────────────────────────────────────────────────── */}
+      <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+          <SectionHead kicker="By house" title="Where to start" />
           <div
-            className="gg-grid"
-            style={{ borderTop: "2px solid var(--color-text)", borderLeft: "2px solid var(--color-text)", "--cols": 2, "--cols-sm": 1 } as React.CSSProperties}
+            className="hp-grid"
+            style={{ "--n": 5, "--n-md": 3, "--n-sm": 2, "--n-xs": 2, "--hp-gap": "clamp(16px, 2vw, 34px)" } as React.CSSProperties}
           >
+            {HOUSES.map((h, i) => {
+              const face = findProduct(h.pid);
+              const count = PRODUCTS.filter((p) =>
+                h.fam === "Dunk" ? p.brand === "Nike" : h.fam === "Jordan 1" ? p.brand === "Air Jordan" : p.fam === h.fam,
+              ).length;
+              return (
+                <Rise key={h.key} delay={i * 60}>
+                  <Link href={`/shop?fam=${encodeURIComponent(h.fam)}`} className="hp-frame hp-zoom" style={{ color: "inherit", display: "block" }}>
+                    <span style={{ position: "relative", display: "block", aspectRatio: "1 / 1", background: "var(--hp-paper)" }}>
+                      {face.photos && (
+                        <Image
+                          className="gg-photo"
+                          src={face.photos[0]}
+                          alt=""
+                          aria-hidden
+                          fill
+                          sizes="(max-width: 760px) 50vw, 20vw"
+                          style={{ objectFit: "contain", padding: "10%" }}
+                        />
+                      )}
+                    </span>
+                    <span style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginTop: 16 }}>
+                      <span className="hp-card-name">{h.label}</span>
+                      <span className="hp-label" style={{ letterSpacing: "0.16em" }}>{count}</span>
+                    </span>
+                  </Link>
+                </Rise>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── journal ─────────────────────────────────────────────────────── */}
+      <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+          <SectionHead kicker="Journal" title="From the stockroom" />
+          <div className="hp-grid" style={{ "--n": 2, "--n-sm": 1, "--n-xs": 1, "--hp-gap": "clamp(28px, 4vw, 72px)" } as React.CSSProperties}>
             {[
               {
                 shot: STORY_SHOTS[0],
@@ -257,108 +273,145 @@ export default function HomePage() {
               },
               {
                 shot: STORY_SHOTS[1],
-                kicker: "Care guide",
+                kicker: "Care",
                 title: "Keeping white leather white in 45°C",
                 body: "Heat yellows midsoles faster than wear does. Never leave a pair in the car, never store them in direct sun, and keep the silica packs that come in the box.",
                 href: "/trust",
               },
-            ].map((s, i) => (
-              <Reveal
-                key={s.title}
-                delay={i * 100}
-                className="gg-story"
-                style={{
-                  borderRight: "2px solid var(--color-text)", borderBottom: "2px solid var(--color-text)",
-                  display: "grid", gridTemplateColumns: ".9fr 1.1fr", minWidth: 0,
-                }}
-              >
-                <EditorialFrame shot={s.shot} sizes="(max-width: 820px) 40vw, 280px" style={{ minHeight: 260, minWidth: 0 }} />
-                <div style={{ padding: "clamp(20px,2vw,26px) clamp(18px,2vw,24px)", display: "flex", flexDirection: "column" }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-accent)", marginBottom: 12 }}>{s.kicker}</div>
-                  <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "clamp(18px,1.7vw,22px)", lineHeight: 1.15, letterSpacing: "-0.02em", marginBottom: 10, textWrap: "pretty" }}>
-                    {s.title}
-                  </div>
-                  <div style={{ fontSize: 13, lineHeight: 1.55, color: "var(--color-neutral-700)", textWrap: "pretty" }}>{s.body}</div>
-                  <Link href={s.href} className="gg-arrow" style={{ marginTop: "auto", paddingTop: 16, alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-accent)" }}>
-                    Read {ARROW}
+            ].map((s, i) => {
+              const p = findProduct(s.shot.pid);
+              return (
+                <Rise key={s.title} delay={i * 110}>
+                  <Link href={s.href} style={{ color: "inherit", display: "block" }}>
+                    <span className="hp-frame hp-zoom" style={{ display: "block", aspectRatio: "16 / 10", background: "transparent" }}>
+                      {p.photos && (
+                        <Image
+                          className="gg-photo"
+                          src={p.photos[0]}
+                          alt=""
+                          aria-hidden
+                          fill
+                          sizes="(max-width: 760px) 100vw, 46vw"
+                          style={{ objectFit: "contain", padding: "5%" }}
+                        />
+                      )}
+                    </span>
+                    <span className="hp-label hp-label-accent" style={{ display: "block", margin: "24px 0 14px" }}>{s.kicker}</span>
+                    <span className="hp-display" style={{ display: "block", fontSize: "clamp(20px,2.1vw,30px)", lineHeight: 1.02, marginBottom: 14, letterSpacing: "-0.03em" }}>
+                      {s.title}
+                    </span>
+                    <span className="hp-body" style={{ display: "block", maxWidth: "46ch" }}>{s.body}</span>
                   </Link>
-                </div>
-              </Reveal>
-            ))}
+                </Rise>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ── how ordering works ────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(36px,4vw,48px) var(--gutter)" }}>
-          <div className="gg-kicker" style={{ marginBottom: 16 }}>How ordering works</div>
-          <h2 className="gg-display gg-d2" style={{ marginBottom: 32 }}>
-            No card. No account.<br />Four steps.
-          </h2>
-          <div
-            className="gg-grid"
-            style={{ borderTop: "2px solid var(--color-text)", "--cols": 4, "--cols-md": 2, "--cols-xs": 1 } as React.CSSProperties}
-          >
-            {STEPS.map((s, i) => (
-              <Reveal
-                key={s.n}
-                delay={i * 80}
-                style={{ padding: "24px 24px 28px 0", borderRight: "2px solid var(--color-divider)", minWidth: 0 }}
-              >
-                <div style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 15, letterSpacing: "0.1em", color: "var(--color-accent)", marginBottom: 14 }}>{s.n}</div>
-                <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 18, lineHeight: 1.2, marginBottom: 8 }}>{s.t}</div>
-                <div style={{ fontSize: 13, lineHeight: 1.55, color: "var(--color-neutral-700)", textWrap: "pretty" }}>{s.d}</div>
-              </Reveal>
-            ))}
+      <EditorialGallery />
+
+      {/* ── the index and the voices ────────────────────────────────────── */}
+      <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+          <div className="hp-asym" style={{ "--hp-cols": "1fr 1.15fr", "--hp-gap": "clamp(40px, 5vw, 104px)" } as React.CSSProperties}>
+            <div>
+              <Rise>
+                <div className="hp-label hp-label-accent" style={{ marginBottom: 20 }}>Grail index — last 7 days</div>
+                <h2 className="hp-display hp-section-head" style={{ marginBottom: 34, maxWidth: "12ch" }}>
+                  What the market did.
+                </h2>
+              </Rise>
+              {MARKET.map((m, i) => (
+                <Rise key={m.name} delay={i * 60}>
+                  <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, paddingBlock: 18, borderTop: i === 0 ? "1px solid var(--hp-line)" : undefined, borderBottom: "1px solid var(--hp-line)" }}>
+                    <span className="hp-label" style={{ letterSpacing: "0.14em", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {m.name}
+                    </span>
+                    <span style={{ display: "flex", alignItems: "baseline", gap: 14, flex: "none" }}>
+                      <span className="gg-figure" style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 15 }}>{m.price}</span>
+                      <span className="gg-figure" style={{ fontSize: 12, fontWeight: 700, minWidth: 46, textAlign: "right", color: m.up ? "var(--color-accent)" : "color-mix(in srgb, #201e1d 45%, transparent)" }}>
+                        {m.delta}
+                      </span>
+                    </span>
+                  </div>
+                </Rise>
+              ))}
+            </div>
+
+            <div>
+              <Rise>
+                <div className="hp-label hp-label-accent" style={{ marginBottom: 20 }}>312 reviews · 4.9 average</div>
+                <h2 className="hp-display hp-section-head" style={{ marginBottom: 34, maxWidth: "14ch" }}>
+                  Bought once, then sent a friend.
+                </h2>
+              </Rise>
+              {REVIEWS.map((r, i) => (
+                <Rise key={r.name} delay={i * 80}>
+                  <figure style={{ margin: 0, paddingBlock: "clamp(22px,2.4vw,30px)", borderTop: i === 0 ? "1px solid var(--hp-line)" : undefined, borderBottom: "1px solid var(--hp-line)" }}>
+                    <blockquote style={{ margin: 0 }}>
+                      <p style={{ margin: 0, fontSize: "clamp(15px,1.35vw,19px)", lineHeight: 1.5, letterSpacing: "-0.01em", textWrap: "pretty" }}>
+                        &ldquo;{r.quote}&rdquo;
+                      </p>
+                    </blockquote>
+                    <figcaption className="hp-label" style={{ marginTop: 16, letterSpacing: "0.18em" }}>
+                      {r.name} — {r.place} · {r.pair}
+                    </figcaption>
+                  </figure>
+                </Rise>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       <RecentlyViewed />
 
-      {/* ── the instagram wall ────────────────────────────────────────────── */}
-      <section style={{ borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(30px,3.4vw,40px) var(--gutter) 20px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
-          <h2 className="gg-display gg-d3">@gulfgrails</h2>
-          <span className="gg-eyebrow" style={{ color: "var(--color-neutral-600)" }}>Every pair we ship gets posted</span>
-        </div>
-        <div
-          className="gg-wrap gg-grid"
-          style={{
-            padding: "16px var(--gutter) clamp(34px,4vw,48px)",
-            borderTop: "2px solid var(--color-text)", borderLeft: "2px solid var(--color-text)",
-            "--cols": 6, "--cols-md": 3, "--cols-sm": 3, "--cols-xs": 2,
-          } as React.CSSProperties}
-        >
-          {INSTAGRAM_SHOTS.map((shot, i) => (
-            <EditorialFrame
-              key={i}
-              shot={shot}
-              sizes="(max-width: 520px) 50vw, (max-width: 1180px) 33vw, 260px"
-              style={{ borderRight: "2px solid var(--color-text)", borderBottom: "2px solid var(--color-text)", aspectRatio: "1/1", minWidth: 0 }}
-            />
-          ))}
-        </div>
-      </section>
+      {/* ── closing statement ───────────────────────────────────────────── */}
+      <section className="hp-dark">
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+          <Rise>
+            <div className="hp-label hp-label-accent" style={{ marginBottom: 26 }}>The Gulf Grails guarantee</div>
+            <h2 className="hp-display hp-statement" style={{ maxWidth: "15ch", marginBottom: "clamp(34px, 4vw, 60px)" }}>
+              Every pair verified, or your money back.
+            </h2>
+            <p className="hp-body hp-body-light" style={{ margin: "0 0 clamp(38px, 4.4vw, 62px)", maxWidth: "46ch" }}>
+              Cash on delivery anywhere in the UAE, or bank transfer if you prefer. Open the box at
+              the door, try both shoes on, and hand them straight back if the fit is wrong. No card,
+              no account, nothing charged online.
+            </p>
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+              <Link href="/shop" className="hp-btn hp-btn-light">
+                Shop the stockroom
+                {ARROW}
+              </Link>
+              <a
+                href={waLink("Hello Gulf Grails, I have a question about a pair.")}
+                target="_blank"
+                rel="noopener"
+                className="hp-btn"
+                style={{ background: "transparent", color: "var(--hp-paper)", borderColor: "color-mix(in srgb, #f3f2f2 34%, transparent)" }}
+              >
+                Message us
+                {ARROW}
+              </a>
+            </div>
 
-      {/* ── the guarantee ─────────────────────────────────────────────────── */}
-      <section style={{ background: "var(--color-accent)", color: "#fff", borderBottom: "2px solid var(--color-text)" }}>
-        <div className="gg-wrap" style={{ padding: "clamp(44px,6vw,64px) var(--gutter)" }}>
-          <div className="gg-kicker gg-kicker-plain" style={{ color: "#fff", opacity: 0.85, marginBottom: 22 }}>Gulf Grails guarantee</div>
-          <h2 className="gg-display" style={{ fontSize: "clamp(34px,6vw,96px)", lineHeight: 0.92, letterSpacing: "-0.045em", maxWidth: "22ch" }}>
-            Every pair verified. Or your money back.
-          </h2>
-          <div style={{ display: "flex", gap: 12, marginTop: 38, flexWrap: "wrap" }}>
-            <Link href="/trust" className="gg-btn gg-btn-invert">
-              How we verify
-              {ARROW}
-            </Link>
-            <a href={waLink("Hello Gulf Grails, I have a question about a pair.")} target="_blank" rel="noopener" className="gg-btn" style={{ background: "transparent", borderColor: "#fff", color: "#fff" }}>
-              Message us
-              {ARROW}
-            </a>
-          </div>
+            <hr className="hp-hair" style={{ margin: "clamp(46px, 5vw, 78px) 0 30px" }} />
+            <div style={{ display: "flex", gap: "clamp(20px, 4vw, 64px)", flexWrap: "wrap" }}>
+              {[
+                ["Al Quoz 1, Dubai", "Viewing by appointment"],
+                ["Same day in Dubai", "Next day UAE-wide"],
+                ["10am – 11pm", "On WhatsApp, every day"],
+                [`From ${money(cheapest)}`, `${PRODUCTS.length} pairs in stock`],
+              ].map(([a, b]) => (
+                <div key={a}>
+                  <div className="hp-card-name" style={{ fontSize: 14, marginBottom: 6 }}>{a}</div>
+                  <div className="hp-label">{b}</div>
+                </div>
+              ))}
+            </div>
+          </Rise>
         </div>
       </section>
     </div>
