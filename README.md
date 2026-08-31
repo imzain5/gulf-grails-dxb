@@ -57,40 +57,92 @@ handled follows from that:
 
 ### Adding or replacing a photo
 
-1. Put the file in `public/assets/products/` as a **`.jpg`** — the catalogue
-   photos are JPEGs and the extension has to match, or they get served with the
-   wrong Content-Type to anything that fetches them directly (Open Graph
-   scrapers especially). The naming convention is style code plus angle —
-   `DD1391-100-1.jpg` through `-4` — but the filename is only a label: the
-   `PHOTOS` map is what binds a file to a pair, and a few existing entries
-   don't match their SKU.
-2. Add the filename (without the extension) to that pair's entry in the
-   `PHOTOS` map in `data/products.ts`. Order is gallery order, and the first
-   entry is the card image.
+Photos are files in `public/assets/products/` plus one line in `data/products.ts`.
+There is no upload screen and no CMS — this is the whole pipeline.
 
-That's the whole pipeline. The map only ever lists files that exist on disk, so
-nothing renders a broken image; `PENDING_PHOTOS` is derived from the result
-rather than maintained by hand.
+1. **Shoot four angles**, in this order. Every pair in the catalogue follows it,
+   which is what makes the grid look like one shop rather than a marketplace:
 
-A pair with no photo yet falls back to `components/StudioPlate.tsx` — a
-contact-sheet plate with the style code set large — instead of a broken image
-or an empty box. **Two pairs are currently on the plate and need shooting:**
+   | # | Angle | What it shows |
+   | --- | --- | --- |
+   | 1 | **Lateral** | The whole shoe from its outer side, **toe pointing right**. This is the card image — get this one right and the grid stays consistent. |
+   | 2 | **Detail** | Close-up of the logo, swoosh or toe box |
+   | 3 | **Medial** | The whole shoe from its inner side, toe pointing left |
+   | 4 | **Sole** | The outsole, flat on |
 
-| Pair | Style code |
-| --- | --- |
-| Air Jordan 1 Retro High OG Black Toe Reimagined | `DZ5485-106` |
-| Yeezy Slide Slate Grey | `ID2350` |
+   Shoot on plain white, one shoe, roughly square, and leave a little margin —
+   the site crops in. 1200px on the long edge is plenty.
 
-Five more have fewer than four angles, so their galleries show fewer thumbnails
-until the rest arrive:
+2. **Save them as `.jpg`** into `public/assets/products/`, named style code plus
+   angle number: `DD1391-100-1.jpg` through `-4.jpg`.
 
-| Pair | Angles on file |
-| --- | --- |
-| Louis Vuitton x Nike Air Force 1 Low | 1 |
-| Air Jordan 1 Retro High OG Royal Reimagined | 1 |
-| Air Jordan 4 Retro Bred Reimagined | 1 |
-| Yeezy Foam Runner Onyx | 1 |
-| Air Jordan 4 Retro White Thunder | 2 |
+   The extension has to match the actual file format, or the photo gets served
+   with the wrong Content-Type to anything that fetches it directly — social
+   share cards especially. Don't rename a PNG to `.jpg`; re-export it.
+
+3. **Name the files** in that pair's row of the `PHOTOS` map in
+   `data/products.ts`, without the extension:
+
+   ```ts
+   "dunk-panda": ["DD1391-100-1", "DD1391-100-2", "DD1391-100-3", "DD1391-100-4"],
+   ```
+
+   Array order is gallery order, and the **first entry is the card image**. The
+   filename is only a label — this map is what binds a file to a pair, so a
+   filename that doesn't match the SKU still works (a few existing ones don't).
+
+**To replace one photo**, overwrite the file and keep the name — nothing else to
+change. **To reorder a gallery**, reorder the array. **Fewer than four** is fine;
+the gallery just shows fewer thumbnails.
+
+A pair shot differently can carry its own labels. The Air Dior has six in-house
+angles, so it overrides both the files and the labels in `PHOTO_OVERRIDES`:
+
+```ts
+"air-dior": {
+  photos: ["/assets/air-dior-lateral.webp", ...],
+  views:  ["Lateral", "Pair", "Medial", "Detail", "Heel", "Sole"],
+},
+```
+
+`views` must be the same length as `photos`. Without it, the labels come from
+`VIEWS` in `lib/sizes.ts`.
+
+### Adding a new pair to the inventory
+
+Add one row to the `RAW` array in `data/products.ts`. The columns are, in order:
+
+```ts
+["dunk-panda",            // id — the URL slug, /product/dunk-panda
+ "Nike",                  // brand, shown on the card
+ "Dunk",                  // fam — must match a FAMILY_FILTERS entry to be filterable
+ "Nike Dunk Low Retro Panda",   // name
+ "White / Black",         // colourway
+ "DD1391-100",            // style code
+ 2023,                    // release year — drives the "Newest" sort
+ 620,                     // your price, AED
+ 720,                     // market price, AED — the struck-through figure
+ [39,40,41,42,43,44,45,46],     // EU sizes in stock
+ 9,                       // total pairs in stock; 3 or fewer shows the red badge
+ "",                      // badge text, e.g. "Bestseller" — "" for none
+ "Short line for the card.",    // blurb
+ "Full paragraph for the product page.",   // desc
+ false],                  // premium — true adds the 8% bump on EU 42–44
+```
+
+Then add its photos per the steps above. That's it — the pair appears in the
+shop, the search, the sitemap and the structured data automatically.
+
+Two optional touches:
+
+- **Feature it on the homepage**: add its id to `FEATURED_IDS` at the bottom of
+  `data/products.ts` (keep that list at three).
+- **A fit note in the size guide**: add the id to `FIT_NOTES` in
+  `components/product/SizeGuide.tsx`, e.g. `"bal-triple-s": "Runs large..."`.
+  Without one it shows the generic note.
+
+If you add a whole new family, add it to `FAMILY_FILTERS` too, or the filter
+chip won't exist.
 
 ### Editorial slots
 
