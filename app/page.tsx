@@ -389,7 +389,10 @@ export default function HomePage() {
 
       {/* ── closing statement ───────────────────────────────────────────── */}
       <section className="hp-dark">
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <div
+          className="hp-shell"
+          style={{ paddingTop: "var(--hp-section)", paddingBottom: "var(--hp-section-tight)" }}
+        >
           <Rise>
             <div className="hp-label hp-label-accent" style={{ marginBottom: 26 }}>The Gulf Grails guarantee</div>
             <h2 className="hp-display hp-statement" style={{ maxWidth: "15ch", marginBottom: "clamp(34px, 4vw, 60px)" }}>
