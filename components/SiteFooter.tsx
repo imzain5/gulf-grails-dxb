@@ -22,7 +22,10 @@ export default function SiteFooter() {
 
   return (
     <footer style={{ borderTop: "2px solid var(--color-text)", background: "var(--color-text)", color: "var(--color-bg)" }}>
-      <div style={{ maxWidth: 1560, margin: "0 auto", padding: "48px 28px 32px", display: "grid", gridTemplateColumns: "1.1fr .7fr .7fr 1.3fr", gap: 36 }}>
+      <div
+        className="gg-wrap gg-cols"
+        style={{ padding: "clamp(34px,4vw,48px) var(--gutter) 32px", gap: "clamp(24px,3vw,36px)", "--cols": "1.1fr .7fr .7fr 1.3fr", "--cols-md": "1.2fr .8fr .8fr", "--cols-sm": "1fr 1fr", "--cols-xs": "minmax(0, 1fr)" } as React.CSSProperties}
+      >
         <div>
           <div style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 23, letterSpacing: "-0.035em", textTransform: "uppercase", marginBottom: 14 }}>
             Gulf Grails
@@ -57,7 +60,7 @@ export default function SiteFooter() {
             <Link href="/sell" className="gg-hover-accent-2" style={{ appearance: "none", background: "none", border: 0, padding: 0, font: "inherit", fontSize: 13, cursor: "pointer", color: "var(--color-bg)" }}>Sell to us</Link>
           </div>
         </div>
-        <div>
+        <div className="gg-footer-wide">
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-neutral-500)", marginBottom: 14 }}>Drop alerts</div>
           <div style={{ fontSize: 13, lineHeight: 1.55, color: "var(--color-neutral-400)", marginBottom: 14, textWrap: "pretty" }}>
             Restocks and new arrivals, once a week. No noise.
@@ -78,7 +81,7 @@ export default function SiteFooter() {
           </div>
         </div>
       </div>
-      <div style={{ maxWidth: 1560, margin: "0 auto", padding: "18px 28px 32px", borderTop: "1px solid var(--color-neutral-700)", display: "flex", justifyContent: "space-between", gap: 20, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-neutral-500)", flexWrap: "wrap" }}>
+      <div className="gg-wrap" style={{ padding: "18px var(--gutter) 32px", borderTop: "1px solid var(--color-neutral-700)", display: "flex", justifyContent: "space-between", gap: 20, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-neutral-500)", flexWrap: "wrap" }}>
         <span>© 2026 Gulf Grails · Dubai, UAE</span>
         <span>Not affiliated with Nike, adidas, Balenciaga or Dior. All pairs sourced on the secondary market.</span>
       </div>

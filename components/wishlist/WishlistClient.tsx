@@ -11,9 +11,9 @@ export default function WishlistClient() {
 
   return (
     <div data-screen-label="Saved">
-      <div style={{ maxWidth: 1560, margin: "0 auto", padding: "44px 28px 72px" }}>
-        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-accent)", marginBottom: 12 }}>Saved pairs</div>
-        <h1 style={{ margin: "0 0 30px", fontSize: "clamp(32px,4vw,56px)", lineHeight: 0.95, letterSpacing: "-0.04em", textTransform: "uppercase" }}>Your shortlist</h1>
+      <div className="gg-wrap" style={{ padding: "clamp(28px,4vw,44px) var(--gutter) clamp(48px,6vw,72px)" }}>
+        <div className="gg-kicker" style={{ marginBottom: 14 }}>Saved pairs</div>
+        <h1 className="gg-display gg-d1" style={{ marginBottom: 30, fontSize: "clamp(32px,4vw,56px)" }}>Your shortlist</h1>
 
         {list.length === 0 ? (
           <div style={{ border: "2px solid var(--color-text)", padding: "48px 32px" }}>
@@ -26,7 +26,7 @@ export default function WishlistClient() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(248px,1fr))", borderTop: "2px solid var(--color-text)", borderLeft: "2px solid var(--color-text)" }}>
+          <div className="gg-cardgrid">
             {list.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         )}

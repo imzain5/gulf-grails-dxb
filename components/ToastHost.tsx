@@ -8,7 +8,7 @@ export default function ToastHost() {
   if (!toast) return null;
   return (
     <div style={{
-      position: "fixed", left: 22, bottom: 22, zIndex: 85, background: "var(--color-text)",
+      position: "fixed", left: 22, bottom: 22, zIndex: 100, background: "var(--color-text)",
       color: "var(--color-bg)", border: "2px solid var(--color-text)", padding: "16px 20px",
       display: "flex", alignItems: "center", gap: 16, boxShadow: "var(--shadow-lg)", animation: "gg-rise .2s ease",
     }}>

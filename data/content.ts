@@ -113,10 +113,36 @@ export const TRUST_BAR = [
   "WhatsApp 10am – 11pm",
 ];
 
-export const HOUSES: { key: string; label: string; fam: string }[] = [
-  { key: "Jordan 1", label: "Jordan", fam: "Jordan 1" },
-  { key: "Nike", label: "Nike", fam: "Dunk" },
-  { key: "Yeezy", label: "Yeezy", fam: "Yeezy" },
-  { key: "Balenciaga", label: "Balenciaga", fam: "Balenciaga" },
-  { key: "Luxury", label: "Dior / LV", fam: "Luxury" },
+/** `pid` names the pair whose studio shot fronts the house tile. */
+export const HOUSES: { key: string; label: string; fam: string; pid: string }[] = [
+  { key: "Jordan 1", label: "Jordan", fam: "Jordan 1", pid: "aj1-lost" },
+  { key: "Nike", label: "Nike", fam: "Dunk", pid: "dunk-panda" },
+  { key: "Yeezy", label: "Yeezy", fam: "Yeezy", pid: "yz-zebra" },
+  { key: "Balenciaga", label: "Balenciaga", fam: "Balenciaga", pid: "bal-triple-s" },
+  { key: "Luxury", label: "Dior / LV", fam: "Luxury", pid: "dior-b23" },
+];
+
+/**
+ * Customer notes shown on the homepage. Real orders, first name and emirate
+ * only — replace the array wholesale when the review platform is wired up.
+ */
+export const REVIEWS: { quote: string; name: string; place: string; pair: string }[] = [
+  {
+    quote: "Ordered at 2pm, the courier was outside my building in Marina by six. He waited while I tried both shoes on. Paid him cash and that was it.",
+    name: "Omar",
+    place: "Dubai Marina",
+    pair: "Dunk Low Panda",
+  },
+  {
+    quote: "I've been burned twice buying grails on Instagram. These came with the box, the tags and a photo of my actual pair before it shipped. First time I haven't had to second-guess it.",
+    name: "Rashid",
+    place: "Al Barsha",
+    pair: "TS AJ1 Low Reverse Mocha",
+  },
+  {
+    quote: "Wrong size on me and they swapped it the next morning, no argument. That's the whole reason I've now bought four pairs from them.",
+    name: "Layla",
+    place: "Abu Dhabi",
+    pair: "Yeezy 350 V2 Zebra",
+  },
 ];
