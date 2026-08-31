@@ -5,10 +5,14 @@ import React, { useEffect, useRef, useState } from "react";
 /**
  * Fades a block up as it scrolls into view.
  *
- * Starts visible and only hides itself once the observer is confirmed to be
- * running, so the content is never stranded invisible — with JavaScript off,
- * an old browser, or a crawler, the page renders exactly as it would without
- * the effect. `prefers-reduced-motion` is handled in CSS.
+ * The hidden state is applied on the very first render rather than switched on
+ * from an effect — arming it later paints the content, hides it, then fades it
+ * back in, which reads as a flicker on load. The cost of that is that the
+ * markup ships with `opacity: 0`, so `app/layout.tsx` carries a `<noscript>`
+ * rule that turns the whole effect off when scripts don't run. Crawlers read
+ * the DOM rather than the paint, so the text is never hidden from them.
+ *
+ * `prefers-reduced-motion` is handled in globals.css, as is printing.
  */
 export default function Reveal({
   children,
@@ -25,16 +29,19 @@ export default function Reveal({
   style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLElement | null>(null);
-  const [armed, setArmed] = useState(false);
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    setArmed(true);
 
-    // Anything already on screen at mount reveals immediately rather than
-    // waiting for a scroll that may never come.
+    // No observer (an old browser, a test environment): show it and stop.
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setShown(true);
+      return;
+    }
+
+    // Anything already on screen at mount reveals on the observer's first
+    // callback rather than waiting for a scroll that may never come.
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -54,9 +61,7 @@ export default function Reveal({
     Tag,
     {
       ref: ref as React.Ref<never>,
-      className: [armed ? "gg-reveal" : "", armed && shown ? "gg-in" : "", className]
-        .filter(Boolean)
-        .join(" "),
+      className: ["gg-reveal", shown ? "gg-in" : "", className].filter(Boolean).join(" "),
       style: { ...style, ...(delay ? ({ "--delay": `${delay}ms` } as React.CSSProperties) : null) },
     },
     children,

@@ -69,7 +69,7 @@ export default function HomePage() {
           <div className="gg-kicker" style={{ marginBottom: 20 }}>Shop by house</div>
         </div>
         <Reveal
-          className="gg-wrap gg-grid"
+          className="gg-wrap gg-grid gg-houses"
           style={{
             padding: "0 var(--gutter) clamp(30px,4vw,44px)",
             borderTop: "2px solid var(--color-text)",

@@ -650,3 +650,16 @@ body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: 
 @media (max-width: 900px) {
   .gg-fab { width: 54px; height: 54px !important; padding: 0 !important; justify-content: center; }
 }
+
+/* Print, and any context that never scrolls: the reveal animation must not be
+   able to leave content invisible on paper. */
+@media print {
+  .gg-reveal { opacity: 1 !important; transform: none !important; }
+  .gg-scrim, .gg-drawer, .gg-fab { display: none !important; }
+}
+
+/* Five houses don't divide by two, so the last tile takes the whole row
+   rather than leaving a half-bordered hole at the end of the grid. */
+@media (max-width: 820px) {
+  .gg-houses > :last-child { grid-column: 1 / -1; }
+}

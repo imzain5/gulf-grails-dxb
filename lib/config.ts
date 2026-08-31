@@ -2,6 +2,9 @@
 // were exposed as component "props" you could tweak in a side panel; here
 // they're just constants — change them and redeploy.
 export const SITE_CONFIG = {
+  /** Canonical origin, no trailing slash. Used for canonical URLs, Open Graph
+      images, the sitemap and the structured data. Change this before launch. */
+  siteUrl: "https://gulfgrails.ae",
   whatsappNumber: "+971 55 689 2085",
   /** AED delivery fee for any emirate other than Dubai. Dubai is free. */
   deliveryFeeOutside: 30,
