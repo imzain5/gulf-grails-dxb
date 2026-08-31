@@ -57,9 +57,12 @@ handled follows from that:
 
 ### Adding or replacing a photo
 
-1. Put the file in `public/assets/products/`. The convention is style code plus
-   angle — `DD1391-100-1.webp` through `-4` — but the filename is only a label:
-   the `PHOTOS` map is what binds a file to a pair, and a few existing entries
+1. Put the file in `public/assets/products/` as a **`.jpg`** — the catalogue
+   photos are JPEGs and the extension has to match, or they get served with the
+   wrong Content-Type to anything that fetches them directly (Open Graph
+   scrapers especially). The naming convention is style code plus angle —
+   `DD1391-100-1.jpg` through `-4` — but the filename is only a label: the
+   `PHOTOS` map is what binds a file to a pair, and a few existing entries
    don't match their SKU.
 2. Add the filename (without the extension) to that pair's entry in the
    `PHOTOS` map in `data/products.ts`. Order is gallery order, and the first

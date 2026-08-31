@@ -61,6 +61,10 @@ const RAW: RawRow[] = [
 ];
 
 // Only files that are actually present in public/assets/products are listed.
+// The catalogue files are JPEGs — named .jpg so they are served with the right
+// Content-Type, which matters for anything that fetches them directly rather
+// than through next/image, Open Graph scrapers most of all. The six Air Dior
+// files in PHOTO_OVERRIDES are genuine WebP and keep that extension.
 // A product with fewer than six entries falls back to a designed studio plate
 // for the remaining gallery angles rather than a broken <img>; a product with
 // no entry at all (see PENDING_PHOTOS) renders the plate everywhere.
@@ -114,7 +118,7 @@ export const PRODUCTS: Product[] = RAW.map((r) => {
   const files = PHOTOS[id];
   return {
     id, brand, fam, name, colorway, sku, year, price, market, sizes, stock, drop, blurb, desc, premium,
-    photos: PHOTO_OVERRIDES[id] ?? (files ? files.map((f) => `/assets/products/${f}.webp`) : null),
+    photos: PHOTO_OVERRIDES[id] ?? (files ? files.map((f) => `/assets/products/${f}.jpg`) : null),
   };
 });
 
