@@ -3,8 +3,7 @@
 import Link from "next/link";
 import type { Product } from "@/data/products";
 import { money } from "@/lib/money";
-import ProductPhoto from "./ProductPhoto";
-import ImageSlot from "./ImageSlot";
+import { ProductCardPhoto } from "./ProductPhoto";
 import { useStore } from "@/context/StoreContext";
 
 export default function BundleCard({ product }: { product: Product }) {
@@ -15,12 +14,8 @@ export default function BundleCard({ product }: { product: Product }) {
       borderRight: "2px solid var(--color-text)", borderBottom: "2px solid var(--color-text)",
       display: "grid", gridTemplateColumns: "110px 1fr", background: "var(--color-bg)",
     }}>
-      <Link href={`/product/${product.id}`} style={{ background: "#fff", borderRight: "2px solid var(--color-divider)", minWidth: 0, position: "relative" }}>
-        {product.photos ? (
-          <ProductPhoto src={product.photos[0]} alt={product.name} padding={6} />
-        ) : (
-          <ImageSlot id={"gg-b-" + product.id} placeholder={product.name} />
-        )}
+      <Link href={`/product/${product.id}`} className="gg-plate" style={{ borderRight: "2px solid var(--color-divider)", minWidth: 0, position: "relative" }}>
+        <ProductCardPhoto product={product} padding={8} sizes="120px" />
       </Link>
       <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-neutral-600)" }}>

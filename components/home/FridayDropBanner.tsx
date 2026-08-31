@@ -35,18 +35,18 @@ export default function FridayDropBanner() {
 
   return (
     <section style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-accent)", color: "#fff" }}>
-      <div style={{ maxWidth: 1560, margin: "0 auto", padding: "20px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div className="gg-wrap gg-drop" style={{ padding: "clamp(14px,2vw,20px) var(--gutter)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
           <span style={{ width: 8, height: 8, background: "#fff", animation: "gg-pulse 1.5s ease-in-out infinite", display: "inline-block" }} />
-          <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 17, letterSpacing: "-0.01em", textTransform: "uppercase" }}>
+          <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "clamp(14px,1.5vw,17px)", letterSpacing: "-0.01em", textTransform: "uppercase" }}>
             Friday drop — Travis Scott Reverse Mocha restock
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div className="gg-drop-right" style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 10, alignItems: "baseline" }} suppressHydrationWarning>
             {(now ? countdown : [{ key: "d", v: "--", u: "days" }, { key: "h", v: "--", u: "hrs" }, { key: "m", v: "--", u: "min" }, { key: "s", v: "--", u: "sec" }]).map((c) => (
               <div key={c.key} style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                <span style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 24, letterSpacing: "-0.02em" }}>{c.v}</span>
+                <span className="gg-figure" style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: "clamp(20px,2.2vw,24px)", letterSpacing: "-0.02em" }}>{c.v}</span>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.8 }}>{c.u}</span>
               </div>
             ))}
@@ -55,7 +55,7 @@ export default function FridayDropBanner() {
             href={waLink("Hello Gulf Grails, add me to the Friday drop list.")}
             target="_blank" rel="noopener"
             className="btn"
-            style={{ background: "#fff", color: "var(--color-accent-700)", border: 0, height: 44, paddingInline: 18, fontSize: 11, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", justifyContent: "flex-start" }}
+            style={{ background: "#fff", color: "var(--color-accent-700)", border: 0, height: 44, paddingInline: 18, fontSize: 11, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", justifyContent: "center", whiteSpace: "nowrap" }}
           >
             Get on the list
           </a>

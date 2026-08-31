@@ -18,7 +18,7 @@ export interface Product {
   desc: string;
   /** Premium (collab/luxury) pairs get the hot-size price bump — see lib/sizes.ts. */
   premium: boolean;
-  /** Four real product photos, or null if none have been supplied yet. */
+  /** Real studio photos in gallery order, or null if none have been shot yet. */
   photos: string[] | null;
 }
 
@@ -60,9 +60,12 @@ const RAW: RawRow[] = [
   ["bal-runner", "Balenciaga", "Balenciaga", "Balenciaga Runner", "Grey / Black / Silver", "677403W3RB1", 2024, 4150, 4600, [41, 42, 43, 44, 45], 2, "", "The 90s trail runner rebuilt as luxury. Our loudest pair.", "Distressed mesh and suede on an exaggerated multi-layer sole, deliberately finished to look worn from the day it ships. Heaviest pair we carry and the one people notice first.", false],
 ];
 
+// Only files that are actually present in public/assets/products are listed.
+// A product with fewer than six entries falls back to a designed studio plate
+// for the remaining gallery angles rather than a broken <img>; a product with
+// no entry at all (see PENDING_PHOTOS) renders the plate everywhere.
 const PHOTOS: Record<string, string[]> = {
-  "air-dior": ["CN8607-002-1", "CN8607-002-2", "CN8607-002-3", "CN8607-002-4"],
-  "lv-af1": ["LV-AF1-WHT-1", "LV-AF1-WHT-2", "LV-AF1-WHT-3", "LV-AF1-WHT-4"],
+  "lv-af1": ["LV-AF1-WHT-1"],
   "dior-b23": ["B23-HT-OBL-1", "B23-HT-OBL-2", "B23-HT-OBL-3", "B23-HT-OBL-4"],
   "ts-aj1-high": ["CD4487-100-1", "CD4487-100-2", "CD4487-100-3", "CD4487-100-4"],
   "ts-aj1-low-rev": ["DM7866-162-1", "DM7866-162-2", "DM7866-162-3", "DM7866-162-4"],
@@ -73,12 +76,11 @@ const PHOTOS: Record<string, string[]> = {
   "ow-af1-volt": ["AO4606-700-1", "AO4606-700-2", "AO4606-700-3", "AO4606-700-4"],
   "aj1-lost": ["DZ5485-612-1", "DZ5485-612-2", "DZ5485-612-3", "DZ5485-612-4"],
   "aj1-bredtoe": ["555088-610-1", "555088-610-2", "555088-610-3", "555088-610-4"],
-  "aj1-royal": ["FB9891-041-1", "FB9891-041-2", "FB9891-041-3", "FB9891-041-4"],
-  "aj1-blacktoe": ["FZ5808-106-1", "FZ5808-106-2", "FZ5808-106-3", "FZ5808-106-4"],
+  "aj1-royal": ["FB9891-041-3"],
   "aj1-unc": ["DX6773-100-1", "DX6773-100-2", "DX6773-100-3", "DX6773-100-4"],
-  "aj4-bred": ["FV5029-006-1", "FV5029-006-2", "FV5029-006-3", "FV5029-006-4"],
+  "aj4-bred": ["FV5029-006-2"],
   "aj4-military": ["DH6927-111-1", "DH6927-111-2", "DH6927-111-3", "DH6927-111-4"],
-  "aj4-thunder": ["FV5029-700-1", "FV5029-700-2", "FV5029-700-3", "FV5029-700-4"],
+  "aj4-thunder": ["FV5029-700-2", "FV5029-700-3"],
   "dunk-panda": ["DD1391-100-1", "DD1391-100-2", "DD1391-100-3", "DD1391-100-4"],
   "dunk-greyfog": ["DD1391-103-1", "DD1391-103-2", "DD1391-103-3", "DD1391-103-4"],
   "dunk-purple": ["DD1391-104-1", "DD1391-104-2", "DD1391-104-3", "DD1391-104-4"],
@@ -86,8 +88,7 @@ const PHOTOS: Record<string, string[]> = {
   "yz-zebra": ["CP9654-1", "CP9654-2", "CP9654-3", "CP9654-4"],
   "yz-bred": ["CP9652-1", "CP9652-2", "CP9652-3", "CP9652-4"],
   "yz-700": ["B75571-1", "B75571-2", "B75571-3", "B75571-4"],
-  "yz-foam": ["HP8739-1", "HP8739-2", "HP8739-3", "HP8739-4"],
-  "yz-slide": ["ID2350-1", "ID2350-2", "ID2350-3", "ID2350-4"],
+  "yz-foam": ["HP8739-4"],
   "bal-triple-s": ["541624W2FA1-1", "541624W2FA1-2", "541624W2FA1-3", "541624W2FA1-4"],
   "bal-speed": ["654034W2DB1-1", "654034W2DB1-2", "654034W2DB1-3", "654034W2DB1-4"],
   "bal-runner": ["677403W3RB1-1", "677403W3RB1-2", "677403W3RB1-3", "677403W3RB1-4"],
@@ -116,6 +117,24 @@ export const PRODUCTS: Product[] = RAW.map((r) => {
     photos: PHOTO_OVERRIDES[id] ?? (files ? files.map((f) => `/assets/products/${f}.webp`) : null),
   };
 });
+
+/**
+ * Pairs the studio has not shot yet, derived rather than listed so it can never
+ * drift from the photo map. These render the designed studio plate in place of
+ * a photograph — see components/StudioPlate.tsx.
+ */
+export const PENDING_PHOTOS: ReadonlySet<string> = new Set(
+  PRODUCTS.filter((p) => !p.photos).map((p) => p.id),
+);
+
+/** The card/thumbnail shot, and the shot a card cross-fades to on hover. */
+export function coverPhoto(p: Product): string | null {
+  return p.photos?.[0] ?? null;
+}
+export function hoverPhoto(p: Product): string | null {
+  if (!p.photos || p.photos.length < 2) return null;
+  return p.photos[1];
+}
 
 export function findProduct(id: string): Product {
   return PRODUCTS.find((p) => p.id === id) ?? PRODUCTS[0];

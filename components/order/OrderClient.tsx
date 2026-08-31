@@ -12,7 +12,7 @@ export default function OrderClient() {
   if (!o) {
     return (
       <div data-screen-label="Confirmed">
-        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "44px 28px 72px" }}>
+        <div className="gg-wrap" style={{ maxWidth: 1180, padding: "clamp(28px,4vw,44px) var(--gutter) clamp(48px,6vw,72px)" }}>
           <div style={{ border: "2px solid var(--color-text)", padding: "48px 32px" }}>
             <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 24, marginBottom: 10 }}>No recent order here.</div>
             <div style={{ fontSize: 14, color: "var(--color-neutral-700)", maxWidth: "48ch", marginBottom: 22, textWrap: "pretty" }}>
@@ -29,7 +29,7 @@ export default function OrderClient() {
 
   return (
     <div data-screen-label="Confirmed">
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "44px 28px 72px" }}>
+      <div className="gg-wrap" style={{ maxWidth: 1180, padding: "clamp(28px,4vw,44px) var(--gutter) clamp(48px,6vw,72px)" }}>
         <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-accent)", marginBottom: 12 }}>Step 3 of 3 — order received</div>
         <h1 style={{ margin: "0 0 10px", fontSize: "clamp(32px,4.2vw,60px)", lineHeight: 0.95, letterSpacing: "-0.04em", textTransform: "uppercase" }}>Order {o.ref} is in.</h1>
         <p style={{ margin: "0 0 32px", fontSize: 16, lineHeight: 1.55, maxWidth: "56ch", color: "var(--color-neutral-800)", textWrap: "pretty" }}>

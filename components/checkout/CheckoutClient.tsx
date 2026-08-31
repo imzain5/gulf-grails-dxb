@@ -25,15 +25,15 @@ export default function CheckoutClient() {
 
   return (
     <div data-screen-label="Checkout">
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "44px 28px 72px" }}>
+      <div className="gg-wrap" style={{ maxWidth: 1180, padding: "clamp(28px,4vw,44px) var(--gutter) clamp(48px,6vw,72px)" }}>
         <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-accent)", marginBottom: 12 }}>Step 2 of 3</div>
-        <h1 style={{ margin: "0 0 30px", fontSize: "clamp(32px,4vw,56px)", lineHeight: 0.95, letterSpacing: "-0.04em", textTransform: "uppercase" }}>Delivery &amp; payment</h1>
+        <h1 className="gg-display" style={{ marginBottom: 30, fontSize: "clamp(28px,4vw,56px)", lineHeight: 0.95 }}>Delivery &amp; payment</h1>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.5fr .8fr", gap: 44, alignItems: "start" }}>
+        <div className="gg-cols" style={{ gap: "clamp(24px,3vw,44px)", alignItems: "start", "--cols": "1.5fr .8fr", "--cols-sm": "minmax(0, 1fr)" } as React.CSSProperties}>
           <div>
             <div style={{ borderTop: "2px solid var(--color-text)", paddingTop: 24 }}>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 18 }}>Where are we delivering?</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="gg-grid" style={{ gap: 16, "--cols": 2, "--cols-xs": 1 } as React.CSSProperties}>
                 <div className="field"><label>Full name</label><input className="input" style={{ borderWidth: 2, minHeight: 46 }} value={form.name} onChange={(e) => setForm({ name: e.target.value })} placeholder="As it should appear on the order" /></div>
                 <div className="field"><label>WhatsApp number</label><input className="input" style={{ borderWidth: 2, minHeight: 46 }} value={form.phone} onChange={(e) => setForm({ phone: e.target.value })} placeholder="+971 5X XXX XXXX" /></div>
                 <div className="field"><label>Emirate</label>
@@ -44,7 +44,7 @@ export default function CheckoutClient() {
                 <div className="field"><label>Area / neighbourhood</label><input className="input" style={{ borderWidth: 2, minHeight: 46 }} value={form.area} onChange={(e) => setForm({ area: e.target.value })} placeholder="e.g. Business Bay" /></div>
               </div>
               <div className="field" style={{ marginTop: 16 }}><label>Building, street, apartment</label><textarea className="input" style={{ borderWidth: 2, minHeight: 76 }} value={form.address} onChange={(e) => setForm({ address: e.target.value })} placeholder="Tower name, street, flat or villa number, any landmark" /></div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
+              <div className="gg-grid" style={{ gap: 16, marginTop: 16, "--cols": 2, "--cols-xs": 1 } as React.CSSProperties}>
                 <div className="field"><label>Preferred delivery window</label>
                   <select className="input" style={{ borderWidth: 2, minHeight: 46 }} value={form.window} onChange={(e) => setForm({ window: e.target.value })}>
                     {["Morning (9am – 12pm)", "Afternoon (12 – 5pm)", "Evening (5 – 9pm)", "As soon as possible"].map((w) => <option key={w} value={w}>{w}</option>)}
@@ -67,7 +67,7 @@ export default function CheckoutClient() {
 
             <div style={{ borderTop: "2px solid var(--color-text)", marginTop: 36, paddingTop: 24 }}>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 18 }}>How would you like to pay?</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="gg-grid" style={{ gap: 16, "--cols": 2, "--cols-xs": 1 } as React.CSSProperties}>
                 <div onClick={() => setPay("cod")} style={{ border: `2px solid ${pay === "cod" ? "var(--color-accent)" : "var(--color-divider)"}`, background: pay === "cod" ? "var(--color-accent-100)" : "transparent", padding: 20, cursor: "pointer", display: "flex", flexDirection: "column", gap: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <span style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 17 }}>Cash on delivery</span>

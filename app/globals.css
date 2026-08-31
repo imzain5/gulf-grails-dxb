@@ -199,3 +199,454 @@ textarea.input { min-height: 90px; resize: vertical; }
 .gg-nowrap-scroll { scrollbar-width: none; }
 .gg-nowrap-scroll::-webkit-scrollbar { display: none; }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STOREFRONT LAYER
+   Everything above is the ported Modernist design system. Everything below is
+   the Gulf Grails storefront's own layer: the responsive grid primitives the
+   pages compose with, the photographic treatment, and the motion language.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Rule weights. The hard 2px grid is the house style; it thins on small
+     screens so the layout doesn't read as a cage on a phone. */
+  --rule: 2px;
+  --rule-hair: 1px;
+  --gutter: 28px;
+  --shell: 1560px;
+
+  /* Editorial display sizes, fluid between phone and desktop. */
+  --d1: clamp(38px, 6.6vw, 96px);
+  --d2: clamp(30px, 3.6vw, 54px);
+  --d3: clamp(24px, 2.7vw, 38px);
+  --d4: clamp(20px, 2.1vw, 30px);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (max-width: 900px) {
+  :root { --rule: 2px; --gutter: 18px; }
+}
+@media (max-width: 520px) {
+  :root { --gutter: 14px; }
+}
+
+body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+/* — the page shell every section aligns to — */
+.gg-wrap {
+  max-width: var(--shell);
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
+}
+
+/* — editorial type — */
+.gg-display {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  margin: 0;
+  text-wrap: balance;
+}
+.gg-d1 { font-size: var(--d1); }
+.gg-d2 { font-size: var(--d2); letter-spacing: -0.035em; line-height: 0.94; }
+.gg-d3 { font-size: var(--d3); letter-spacing: -0.03em; line-height: 1; }
+.gg-d4 { font-size: var(--d4); letter-spacing: -0.025em; line-height: 1.05; }
+
+/* The small red label that opens almost every section. */
+.gg-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.gg-kicker::before {
+  content: "";
+  width: 22px;
+  height: var(--rule);
+  background: currentColor;
+  flex: none;
+}
+.gg-kicker-plain::before { display: none; }
+
+.gg-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.gg-mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* — responsive grid primitive —
+   Set the column counts per breakpoint with custom properties on the element:
+   style={{ "--cols": 5, "--cols-md": 3, "--cols-sm": 2, "--cols-xs": 1 }}
+   Unset steps inherit the next size up, so you only declare what changes. */
+.gg-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+}
+@media (max-width: 1180px) {
+  .gg-grid { grid-template-columns: repeat(var(--cols-md, var(--cols, 3)), minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+  .gg-grid { grid-template-columns: repeat(var(--cols-sm, var(--cols-md, var(--cols, 2))), minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .gg-grid { grid-template-columns: repeat(var(--cols-xs, var(--cols-sm, var(--cols-md, 1))), minmax(0, 1fr)); }
+}
+
+/* The same idea for asymmetric layouts: `.gg-cols` takes a full track list
+   rather than a column count, for the cases where the columns aren't equal
+   (a bag beside its summary, the footer). Values are used verbatim, so every
+   step must be a valid grid-template-columns value — "1fr", not "1". */
+.gg-cols {
+  display: grid;
+  grid-template-columns: var(--cols, 1fr 1fr);
+}
+@media (max-width: 1180px) {
+  .gg-cols { grid-template-columns: var(--cols-md, var(--cols, 1fr 1fr)); }
+}
+@media (max-width: 900px) {
+  .gg-cols { grid-template-columns: var(--cols-sm, var(--cols-md, var(--cols, 1fr))); }
+}
+@media (max-width: 560px) {
+  .gg-cols { grid-template-columns: var(--cols-xs, var(--cols-sm, var(--cols-md, var(--cols, 1fr)))); }
+}
+
+/* Auto-fill product grids: the card floor shrinks with the viewport so a phone
+   still shows two across rather than one enormous card. */
+.gg-cardgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--card, 248px), 1fr));
+  border-top: var(--rule) solid var(--color-text);
+  border-left: var(--rule) solid var(--color-text);
+}
+@media (max-width: 820px) { .gg-cardgrid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+@media (max-width: 560px) { .gg-cardgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 380px) { .gg-cardgrid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Two-column editorial split that stacks. --split sets the desktop ratio. */
+.gg-split {
+  display: grid;
+  grid-template-columns: var(--split, 1fr 1fr);
+}
+@media (max-width: 980px) {
+  .gg-split { grid-template-columns: minmax(0, 1fr); }
+  .gg-split > * { border-left: 0 !important; border-right: 0 !important; }
+  .gg-split-media { min-height: 58vw !important; border-top: var(--rule) solid var(--color-text); }
+}
+
+/* — the photographic plate —
+   Product shots are cut-outs on white. Floating them on a flat white box reads
+   cheap; a soft elliptical contact shadow under the shoe makes it sit on a
+   surface, which is the whole difference between a listing and a catalogue. */
+.gg-plate {
+  position: relative;
+  background:
+    radial-gradient(120% 90% at 50% 8%, #ffffff 0%, #fdfdfc 55%, #f4f2f1 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+.gg-plate::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  width: 62%;
+  height: 9%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, #201e1d 26%, transparent) 0%, transparent 72%);
+  filter: blur(7px);
+  pointer-events: none;
+  z-index: 0;
+}
+.gg-plate > * { position: relative; z-index: 1; }
+.gg-plate-flat::after { display: none; }
+
+/* A slow drift on hero photography — enough to feel alive, not enough to notice. */
+@keyframes gg-drift {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to   { transform: scale(1.05) translate3d(0, -1%, 0); }
+}
+.gg-drift { animation: gg-drift 18s var(--ease-in-out) infinite alternate; }
+
+/* — hover choreography on product cards — */
+.gg-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: inherit;
+  background: var(--color-neutral-100);
+  border-right: var(--rule) solid var(--color-text);
+  border-bottom: var(--rule) solid var(--color-text);
+  transition: background .22s var(--ease-out), transform .22s var(--ease-out);
+}
+.gg-card:hover { background: var(--color-bg); }
+@media (hover: hover) {
+  .gg-card:hover .gg-swap-b { opacity: 1; transform: scale(1); }
+  .gg-card:hover .gg-swap-a { opacity: 0; transform: scale(1.04); }
+  .gg-card:hover .gg-quick { transform: translateY(0); opacity: 1; }
+  .gg-card:hover .gg-card-name { color: var(--color-accent-700); }
+}
+.gg-swap-a, .gg-swap-b {
+  position: absolute;
+  inset: 0;
+  transition: opacity .4s var(--ease-out), transform .5s var(--ease-out);
+}
+.gg-swap-b { opacity: 0; transform: scale(1.05); }
+.gg-card-name { transition: color .18s var(--ease-out); }
+
+/* The size rail that rises out of the card edge on hover. */
+.gg-quick {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  gap: 0;
+  background: var(--color-text);
+  transform: translateY(101%);
+  opacity: 0;
+  transition: transform .26s var(--ease-out), opacity .2s var(--ease-out);
+}
+@media (hover: none) { .gg-quick { display: none; } }
+
+/* — scroll reveal —
+   Sections start 14px low and fade up as they cross into view. The class is
+   applied by components/Reveal.tsx, which no-ops when the observer is absent. */
+.gg-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+  transition-delay: var(--delay, 0ms);
+  will-change: opacity, transform;
+}
+.gg-reveal.gg-in { opacity: 1; transform: none; }
+
+/* — link and button motion — */
+.gg-arrow svg { transition: transform .24s var(--ease-out); }
+.gg-arrow:hover svg { transform: translateX(5px); }
+
+/* Underline that wipes in from the left rather than just appearing. */
+.gg-underline {
+  position: relative;
+  display: inline-block;
+  color: inherit;
+}
+.gg-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s var(--ease-out);
+}
+.gg-underline:hover::after { transform: scaleX(1); }
+
+/* The house button: solid slab, arrow that leans forward on hover. */
+.gg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  height: 54px;
+  padding-inline: 22px;
+  border: var(--rule) solid transparent;
+  background: var(--color-accent);
+  color: #fff;
+  transition: background .18s var(--ease-out), color .18s var(--ease-out), border-color .18s var(--ease-out);
+}
+.gg-btn:hover { background: var(--color-accent-700); color: #fff; }
+.gg-btn svg { flex: none; transition: transform .24s var(--ease-out); }
+.gg-btn:hover svg { transform: translateX(5px); }
+.gg-btn-outline { background: transparent; border-color: var(--color-text); color: var(--color-text); }
+.gg-btn-outline:hover { background: var(--color-text); color: var(--color-bg); }
+.gg-btn-invert { background: #fff; color: var(--color-accent-700); }
+.gg-btn-invert:hover { background: var(--color-text); color: #fff; }
+.gg-btn-sm { height: 44px; font-size: 11px; padding-inline: 16px; gap: 10px; }
+@media (max-width: 520px) { .gg-btn { height: 50px; font-size: 11px; padding-inline: 16px; } }
+
+/* — corner registration ticks, the recurring house mark — */
+.gg-ticks { position: relative; }
+.gg-ticks::before, .gg-ticks::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--color-accent);
+  pointer-events: none;
+}
+.gg-ticks::before { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+.gg-ticks::after { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+/* — sheets, drawers and modals — */
+.gg-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 90;  /* above the sticky header (70) and the WhatsApp button (60) */
+  background: color-mix(in srgb, #201e1d 62%, transparent);
+  backdrop-filter: blur(3px);
+  animation: gg-fade .2s ease;
+}
+.gg-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 95;
+  width: min(420px, 88vw);
+  background: var(--color-bg);
+  border-left: var(--rule) solid var(--color-text);
+  display: flex;
+  flex-direction: column;
+  animation: gg-slide-in .3s var(--ease-out);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@keyframes gg-slide-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes gg-pop { from { opacity: 0; transform: scale(.97) translateY(10px); } to { opacity: 1; transform: none; } }
+.gg-modal {
+  position: relative;
+  z-index: 95;
+  background: var(--color-bg);
+  border: var(--rule) solid var(--color-text);
+  box-shadow: var(--shadow-lg);
+  animation: gg-pop .24s var(--ease-out);
+  max-height: min(88vh, 900px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* — horizontal rails (recently viewed, mobile filter chips) — */
+.gg-rail {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.gg-rail::-webkit-scrollbar { display: none; }
+.gg-rail > * { scroll-snap-align: start; flex: none; }
+
+/* — the marquee, paused when the pointer is on it — */
+.gg-marquee-track { display: flex; width: max-content; animation: gg-marquee 42s linear infinite; }
+.gg-marquee:hover .gg-marquee-track { animation-play-state: paused; }
+
+/* — count-up figures keep their width so the layout can't jitter — */
+.gg-figure { font-variant-numeric: tabular-nums; }
+
+/* — desktop-only / mobile-only — */
+@media (max-width: 900px) { .gg-desktop { display: none !important; } }
+@media (min-width: 901px) { .gg-mobile { display: none !important; } }
+
+/* — small-screen typography and spacing corrections — */
+@media (max-width: 700px) {
+  h1 { font-size: 32px; }
+  h2 { font-size: 26px; }
+  .table { font-size: 13px; }
+  .table th, .table td { padding: 8px 6px; }
+}
+
+/* — respect the reduced-motion preference everywhere — */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .gg-reveal { opacity: 1; transform: none; }
+}
+
+/* The active hero pip fills as the autoplay clock runs down. */
+@keyframes gg-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* On a phone the hero leads with the photograph, then the copy, and the media
+   is capped so the headline is never pushed off the first screen. */
+@media (max-width: 980px) {
+  .gg-hero { min-height: 0 !important; }
+  .gg-hero > *:first-child { order: 2; }
+  .gg-hero > .gg-split-media {
+    order: 1;
+    min-height: min(52vh, 400px) !important;
+    border-top: 0;
+    border-bottom: var(--rule) solid var(--color-text);
+  }
+}
+
+/* Story tiles put the photo beside the copy on desktop and above it on a
+   phone, where a 40%-wide image column would leave the text unreadable. */
+@media (max-width: 620px) {
+  .gg-story { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+/* — why every product image multiplies —
+   The catalogue photos are opaque JPEGs with a white studio background baked
+   in, not cut-outs with alpha. Dropped straight onto a tinted ground they show
+   as white rectangles. Multiplying them against the backdrop makes white read
+   as transparent, which does three things at once: the shoe sits on whatever
+   ground the frame sets, the plate's contact shadow shows through beneath it,
+   and a tinted tile no longer needs a white box cut out of it. Grounds must
+   stay light for this — a dark ground is handled by insetting a white plate
+   instead (see EditorialFrame). */
+.gg-photo { mix-blend-mode: multiply; }
+
+@supports not (mix-blend-mode: multiply) {
+  .gg-photo { mix-blend-mode: normal; }
+}
+
+/* The newsletter column carries a form, so it takes the whole row once the
+   footer drops to two columns. */
+@media (max-width: 820px) {
+  .gg-footer-wide { grid-column: 1 / -1; }
+}
+
+/* A bag line drops its price under the details rather than squeezing three
+   columns into a phone width. */
+@media (max-width: 520px) {
+  .gg-line { grid-template-columns: 76px 1fr !important; gap: 14px !important; }
+  .gg-line > *:last-child { grid-column: 2; }
+}
+
+/* The drop banner is a headline, a clock and a CTA. Below the tablet break
+   they stop competing for one row. */
+@media (max-width: 860px) {
+  .gg-drop { flex-direction: column; align-items: flex-start !important; gap: 14px !important; }
+  .gg-drop-right { width: 100%; justify-content: space-between; }
+}
+@media (max-width: 460px) {
+  .gg-drop-right { flex-direction: column; align-items: stretch; gap: 12px !important; }
+  .gg-drop-right > a { width: 100%; }
+}
+
+/* The WhatsApp button keeps its label on desktop and becomes a disc on a
+   phone, where a wide pill sits on top of the copy it is meant to support. */
+@media (max-width: 900px) {
+  .gg-fab { width: 54px; height: 54px !important; padding: 0 !important; justify-content: center; }
+}
