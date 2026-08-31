@@ -7,20 +7,26 @@ import { VIEWS } from "@/lib/sizes";
 import StudioPlate from "@/components/StudioPlate";
 
 /**
- * The product gallery: one large frame, a thumbnail rail, and a zoom lens.
+ * The product gallery: one large frame, a thumbnail rail, and an opt-in zoom.
  *
- * The gallery walks only the angles that were actually shot rather than a
- * fixed six, so a pair with two photos shows two thumbnails instead of four
- * empty upload boxes. On a pointer device, hovering the main frame magnifies
- * it around the cursor — the closest thing to picking the shoe up, and the
- * detail people are really checking (stitching, swoosh edge, midsole paint) is
- * exactly what a 2.4× lens shows.
+ * The gallery walks only the angles that were actually shot, so a pair with two
+ * photos shows two thumbnails rather than four empty slots.
+ *
+ * Zoom is off until you turn it on. Magnifying on plain hover meant you could
+ * not look at a photo, or reach the next-image arrow, without the image jumping
+ * under the cursor — the lens is useful when you're inspecting stitching and
+ * in the way the rest of the time. With it on, moving onto any control drops
+ * back to full frame so the arrows stay usable.
  */
 export default function ProductGallery({ product }: { product: Product }) {
   const photos = product.photos ?? [];
   const count = Math.max(1, photos.length);
+  const labels = product.views ?? VIEWS;
+
   const [i, setI] = useState(0);
-  const [zoom, setZoom] = useState(false);
+  const [zoomOn, setZoomOn] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const [overControl, setOverControl] = useState(false);
   const [origin, setOrigin] = useState("50% 50%");
   const frame = useRef<HTMLDivElement>(null);
 
@@ -32,48 +38,64 @@ export default function ProductGallery({ product }: { product: Product }) {
       if (t === "INPUT" || t === "TEXTAREA" || t === "SELECT") return;
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "z" || e.key === "Z") setZoomOn((v) => !v);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [step]);
 
+  const src = photos[i];
+  const zoomed = zoomOn && hovering && !overControl && Boolean(src);
+
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!zoomOn) return;
     const el = frame.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     setOrigin(`${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`);
   };
 
-  const src = photos[i];
+  /** Arrows and badges suspend the lens while the pointer is on them. */
+  const control = {
+    onMouseEnter: () => setOverControl(true),
+    onMouseLeave: () => setOverControl(false),
+  };
+
+  const arrowStyle = (side: "left" | "right"): React.CSSProperties => ({
+    position: "absolute", [side]: 14, top: "50%", transform: "translateY(-50%)",
+    width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center",
+    appearance: "none", border: "2px solid var(--color-text)", background: "var(--color-bg)",
+    cursor: "pointer", color: "inherit", padding: 0, zIndex: 4,
+  });
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <div
         ref={frame}
         className="gg-plate"
-        onMouseEnter={() => setZoom(true)}
-        onMouseLeave={() => setZoom(false)}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => { setHovering(false); setOverControl(false); }}
         onMouseMove={onMove}
         style={{
           position: "relative",
           aspectRatio: "4/3",
           borderBottom: "2px solid var(--color-divider)",
-          cursor: src ? "zoom-in" : "default",
+          cursor: src && zoomOn ? (zoomed ? "zoom-out" : "zoom-in") : "default",
         }}
       >
         {src ? (
           <div
             style={{
               position: "absolute", inset: 28,
-              transform: zoom ? "scale(2.4)" : "none",
+              transform: zoomed ? "scale(2.4)" : "none",
               transformOrigin: origin,
-              transition: zoom ? "transform .18s var(--ease-out)" : "transform .35s var(--ease-out)",
+              transition: "transform .28s var(--ease-out)",
             }}
           >
             <Image
               className="gg-photo"
               src={src}
-              alt={`${product.name} — ${VIEWS[i] ?? "view"}`}
+              alt={`${product.name} — ${labels[i] ?? "view"}`}
               fill
               sizes="(max-width: 980px) 100vw, 60vw"
               priority={i === 0}
@@ -86,20 +108,10 @@ export default function ProductGallery({ product }: { product: Product }) {
 
         {count > 1 && (
           <>
-            <button
-              onClick={() => step(-1)}
-              aria-label="Previous image"
-              className="gg-hover-invert"
-              style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", appearance: "none", border: "2px solid var(--color-text)", background: "var(--color-bg)", cursor: "pointer", color: "inherit", padding: 0, zIndex: 4 }}
-            >
+            <button onClick={() => step(-1)} aria-label="Previous image" className="gg-hover-invert" style={arrowStyle("left")} {...control}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m11 6-6 6 6 6" /><path d="M19 12H5" /></svg>
             </button>
-            <button
-              onClick={() => step(1)}
-              aria-label="Next image"
-              className="gg-hover-invert"
-              style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", appearance: "none", border: "2px solid var(--color-text)", background: "var(--color-bg)", cursor: "pointer", color: "inherit", padding: 0, zIndex: 4 }}
-            >
+            <button onClick={() => step(1)} aria-label="Next image" className="gg-hover-invert" style={arrowStyle("right")} {...control}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg>
             </button>
           </>
@@ -109,14 +121,33 @@ export default function ProductGallery({ product }: { product: Product }) {
           {product.sku}
         </div>
 
-        <div style={{ position: "absolute", right: 14, bottom: 14, display: "flex", alignItems: "center", gap: 8, pointerEvents: "none", zIndex: 4 }}>
+        <div style={{ position: "absolute", right: 14, bottom: 14, display: "flex", alignItems: "center", gap: 8, zIndex: 4 }}>
           {src && (
-            <span className="gg-desktop" style={{ background: "var(--color-bg)", border: "2px solid var(--color-text)", padding: "6px 10px", fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-              Hover to zoom
-            </span>
+            <button
+              className="gg-desktop"
+              onClick={() => setZoomOn((v) => !v)}
+              aria-pressed={zoomOn}
+              title={zoomOn ? "Turn zoom off (Z)" : "Turn zoom on (Z)"}
+              style={{
+                appearance: "none", display: "inline-flex", alignItems: "center", gap: 7, cursor: "pointer",
+                border: "2px solid var(--color-text)", padding: "6px 10px", font: "inherit",
+                fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase",
+                background: zoomOn ? "var(--color-accent)" : "var(--color-bg)",
+                color: zoomOn ? "#fff" : "var(--color-text)",
+                borderColor: zoomOn ? "var(--color-accent)" : "var(--color-text)",
+                transition: "background .16s var(--ease-out), color .16s var(--ease-out), border-color .16s var(--ease-out)",
+              }}
+              {...control}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+                <path d="M11 8v6" /><path d="M8 11h6" />
+              </svg>
+              Zoom {zoomOn ? "on" : "off"}
+            </button>
           )}
           {count > 1 && (
-            <span className="gg-figure" style={{ background: "var(--color-text)", color: "var(--color-bg)", padding: "7px 11px", fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+            <span className="gg-figure" style={{ background: "var(--color-text)", color: "var(--color-bg)", padding: "7px 11px", fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", pointerEvents: "none" }}>
               {i + 1} / {count}
             </span>
           )}
@@ -131,7 +162,7 @@ export default function ProductGallery({ product }: { product: Product }) {
               <button
                 key={p}
                 onClick={() => setI(n)}
-                aria-label={`View ${VIEWS[n] ?? `image ${n + 1}`}`}
+                aria-label={`View ${labels[n] ?? `image ${n + 1}`}`}
                 aria-current={active}
                 className="gg-plate gg-plate-flat"
                 style={{
@@ -147,7 +178,7 @@ export default function ProductGallery({ product }: { product: Product }) {
                   letterSpacing: "0.12em", textTransform: "uppercase",
                   color: active ? "var(--color-accent)" : "var(--color-neutral-500)",
                 }}>
-                  {VIEWS[n] ?? n + 1}
+                  {labels[n] ?? n + 1}
                 </span>
               </button>
             );

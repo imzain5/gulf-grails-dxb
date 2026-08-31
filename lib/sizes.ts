@@ -1,7 +1,12 @@
 import type { Product } from "@/data/products";
 
-/** The six angles a product gallery walks through, in order. */
-export const VIEWS = ["Pair", "Lateral", "Medial", "Detail", "Heel", "Sole"] as const;
+/**
+ * Labels for the four shots every catalogue pair was photographed with, in the
+ * order they appear in `PHOTOS`: the shoe from its outer side, a close-up, the
+ * inner side, then the outsole. A pair shot differently — the Air Dior, which
+ * has six in-house angles — overrides this with its own `views` list.
+ */
+export const VIEWS = ["Lateral", "Detail", "Medial", "Sole"] as const;
 
 const EU_US: Record<number, string> = {
   39: "6.5",

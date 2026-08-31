@@ -20,6 +20,12 @@ export interface Product {
   premium: boolean;
   /** Real studio photos in gallery order, or null if none have been shot yet. */
   photos: string[] | null;
+  /**
+   * Labels for those photos, when the pair wasn't shot in the standard
+   * four-angle sequence. Must be the same length as `photos`; falls back to
+   * VIEWS in lib/sizes.ts.
+   */
+  views?: readonly string[];
 }
 
 type RawRow = [
@@ -99,26 +105,35 @@ const PHOTOS: Record<string, string[]> = {
 };
 
 // The Air Dior is the flagship: it gets the six dedicated in-house angles the
-// shop actually photographed (matching VIEWS — Pair, Lateral, Medial, Detail,
-// Heel, Sole) instead of the four generic listing shots every other pair
-// uses, so its gallery has no empty upload slots.
-const PHOTO_OVERRIDES: Record<string, string[]> = {
-  "air-dior": [
-    "/assets/air-dior-pair.webp",
-    "/assets/air-dior-lateral.webp",
-    "/assets/air-dior-medial.webp",
-    "/assets/air-dior-swoosh.webp",
-    "/assets/air-dior-heel.webp",
-    "/assets/air-dior-outsole.webp",
-  ],
+// shop actually photographed instead of the four generic listing shots every
+// other pair uses.
+//
+// The lateral shot leads, so its card and its gallery open on the same
+// right-facing side view as every other pair in the grid — the two-shoe "pair"
+// shot sat first originally and made the flagship the odd one out. Each
+// override carries its own labels because the sequence isn't the standard four.
+const PHOTO_OVERRIDES: Record<string, { photos: string[]; views: readonly string[] }> = {
+  "air-dior": {
+    photos: [
+      "/assets/air-dior-lateral.webp",
+      "/assets/air-dior-pair.webp",
+      "/assets/air-dior-medial.webp",
+      "/assets/air-dior-swoosh.webp",
+      "/assets/air-dior-heel.webp",
+      "/assets/air-dior-outsole.webp",
+    ],
+    views: ["Lateral", "Pair", "Medial", "Detail", "Heel", "Sole"],
+  },
 };
 
 export const PRODUCTS: Product[] = RAW.map((r) => {
   const [id, brand, fam, name, colorway, sku, year, price, market, sizes, stock, drop, blurb, desc, premium] = r;
   const files = PHOTOS[id];
+  const override = PHOTO_OVERRIDES[id];
   return {
     id, brand, fam, name, colorway, sku, year, price, market, sizes, stock, drop, blurb, desc, premium,
-    photos: PHOTO_OVERRIDES[id] ?? (files ? files.map((f) => `/assets/products/${f}.jpg`) : null),
+    photos: override?.photos ?? (files ? files.map((f) => `/assets/products/${f}.jpg`) : null),
+    views: override?.views,
   };
 });
 
