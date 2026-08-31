@@ -43,6 +43,16 @@ export default function Vault({ products }: { products: Product[] }) {
           </div>
         </Rise>
 
+        <Rise variant="mask" className="hp-frame" style={{ aspectRatio: "21 / 9", marginBottom: "clamp(30px, 4vw, 64px)" }}>
+          <Image
+            src="/assets/campaign/air-dior-flatlay.jpg"
+            alt="Air Dior pairs laid out"
+            fill
+            sizes="100vw"
+            style={{ objectFit: "cover", objectPosition: "center 46%" }}
+          />
+        </Rise>
+
         <div
           className="hp-grid"
           style={{ "--n": products.length >= 4 ? 4 : products.length, "--n-md": 2, "--n-sm": 2, "--n-xs": 1, "--hp-gap": "clamp(20px, 2.6vw, 44px)" } as React.CSSProperties}

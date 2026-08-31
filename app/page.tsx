@@ -28,13 +28,26 @@ const ARROW = (
  * are what turn a sequence of product rows into an editorial.
  */
 function Statement({
-  children, note, ground = "paper",
+  children, note, ground = "paper", photo,
 }: {
   children: React.ReactNode;
   note?: string;
   ground?: "paper" | "ink";
+  /** Optional campaign photograph set beside the claim. */
+  photo?: { src: string; alt: string; position?: string };
 }) {
   const dark = ground === "ink";
+  const body = (
+    <Rise>
+      <h2 className="hp-display hp-statement" style={{ maxWidth: "16ch" }}>{children}</h2>
+      {note && (
+        <p className={`hp-body ${dark ? "hp-body-light" : ""}`} style={{ margin: "clamp(26px,3vw,44px) 0 0", maxWidth: "44ch" }}>
+          {note}
+        </p>
+      )}
+    </Rise>
+  );
+
   return (
     <section
       className={dark ? "hp-dark" : undefined}
@@ -43,16 +56,19 @@ function Statement({
         borderBottom: `1px solid ${dark ? "var(--hp-line-dark)" : "var(--hp-line)"}`,
       }}
     >
-      <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
-        <Rise>
-          <h2 className="hp-display hp-statement" style={{ maxWidth: "16ch" }}>{children}</h2>
-          {note && (
-            <p className={`hp-body ${dark ? "hp-body-light" : ""}`} style={{ margin: "clamp(26px,3vw,44px) 0 0", maxWidth: "44ch" }}>
-              {note}
-            </p>
-          )}
-        </Rise>
-      </div>
+      {photo ? (
+        <div
+          className="hp-shell hp-asym"
+          style={{ paddingBlock: "var(--hp-section)", alignItems: "center", "--hp-cols": "1.15fr 1fr", "--hp-gap": "clamp(34px, 5vw, 88px)" } as React.CSSProperties}
+        >
+          {body}
+          <Rise variant="mask" className="hp-frame hp-zoom" style={{ aspectRatio: "4 / 5" }}>
+            <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 900px) 100vw, 42vw" style={{ objectFit: "cover", objectPosition: photo.position ?? "center" }} />
+          </Rise>
+        </div>
+      ) : (
+        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>{body}</div>
+      )}
     </section>
   );
 }
@@ -153,7 +169,11 @@ export default function HomePage() {
         />
       )}
 
-      <Statement ground="ink" note="Al Quoz 1, Dubai. Viewing by appointment. Same-day delivery across the city, next day to every other emirate, and you pay the courier once the box is open and the pair is on your feet.">
+      <Statement
+        ground="ink"
+        note="Al Quoz 1, Dubai. Viewing by appointment. Same-day delivery across the city, next day to every other emirate, and you pay the courier once the box is open and the pair is on your feet."
+        photo={{ src: "/assets/campaign/air-dior-onfoot.jpg", alt: "Air Dior on foot", position: "center 55%" }}
+      >
         Physically stocked in Dubai.
       </Statement>
 
@@ -182,19 +202,14 @@ export default function HomePage() {
                 </Link>
               </Rise>
 
-              <Rise delay={120} variant="mask" className="hp-frame" style={{ marginTop: "clamp(30px, 4vw, 52px)", aspectRatio: "1 / 1" }}>
-                {/* The ground sits inside the reveal's clip layer so the opaque
-                    photo has something to multiply against. */}
-                <span style={{ position: "absolute", inset: 0, display: "block", background: "var(--color-bg)" }}>
-                  <Image
-                    className="gg-photo"
-                    src="/assets/air-dior-swoosh.webp"
-                    alt="The Dior Oblique swoosh, photographed on our table"
-                    fill
-                    sizes="(max-width: 900px) 100vw, 42vw"
-                    style={{ objectFit: "contain", padding: "4%" }}
-                  />
-                </span>
+              <Rise delay={120} variant="mask" className="hp-frame" style={{ marginTop: "clamp(30px, 4vw, 52px)", aspectRatio: "4 / 5" }}>
+                <Image
+                  src="/assets/campaign/air-dior-outsoles.jpg"
+                  alt="Translucent Dior outsoles held up to the light"
+                  fill
+                  sizes="(max-width: 900px) 100vw, 42vw"
+                  style={{ objectFit: "cover", objectPosition: "center 45%" }}
+                />
               </Rise>
             </div>
 
@@ -277,6 +292,7 @@ export default function HomePage() {
                 title: "Keeping white leather white in 45°C",
                 body: "Heat yellows midsoles faster than wear does. Never leave a pair in the car, never store them in direct sun, and keep the silica packs that come in the box.",
                 href: "/trust",
+                photo: "/assets/campaign/air-dior-white.jpg",
               },
             ].map((s, i) => {
               const p = findProduct(s.shot.pid);
@@ -284,7 +300,11 @@ export default function HomePage() {
                 <Rise key={s.title} delay={i * 110}>
                   <Link href={s.href} style={{ color: "inherit", display: "block" }}>
                     <span className="hp-frame hp-zoom" style={{ display: "block", aspectRatio: "16 / 10", background: "transparent" }}>
-                      {p.photos && (
+                      {s.photo ? (
+                        /* A campaign photograph fills the frame; a studio
+                           cut-out is contained and blended. */
+                        <Image src={s.photo} alt="" aria-hidden fill sizes="(max-width: 760px) 100vw, 46vw" style={{ objectFit: "cover" }} />
+                      ) : p.photos && (
                         <Image
                           className="gg-photo"
                           src={p.photos[0]}

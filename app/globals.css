@@ -584,8 +584,367 @@ body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: 
   .gg-reveal { opacity: 1; transform: none; }
 }
 
-/* The active hero pip fills as the autoplay clock runs down. */
-@keyframes gg-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* On a phone the hero leads with the photograph, then the copy, and the media
+   is capped so the headline is never pushed off the first screen. */
+@media (max-width: 980px) {
+  .gg-hero { min-height: 0 !important; }
+  .gg-hero > *:first-child { order: 2; }
+  .gg-hero > .gg-split-media {
+    order: 1;
+    min-height: min(52vh, 400px) !important;
+    border-top: 0;
+    border-bottom: var(--rule) solid var(--color-text);
+  }
+}
+
+/* Story tiles put the photo beside the copy on desktop and above it on a
+   phone, where a 40%-wide image column would leave the text unreadable. */
+@media (max-width: 620px) {
+  .gg-story { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+/* — why every product image multiplies —
+   The catalogue photos are opaque JPEGs with a white studio background baked
+   in, not cut-outs with alpha. Dropped straight onto a tinted ground they show
+   as white rectangles. Multiplying them against the backdrop makes white read
+   as transparent, which does three things at once: the shoe sits on whatever
+   ground the frame sets, the plate's contact shadow shows through beneath it,
+   and a tinted tile no longer needs a white box cut out of it. Grounds must
+   stay light for this — a dark ground is handled by insetting a white plate
+   instead (see EditorialFrame). */
+.gg-photo { mix-blend-mode: multiply; }
+
+@supports not (mix-blend-mode: multiply) {
+  .gg-photo { mix-blend-mode: normal; }
+}
+
+/* The newsletter column carries a form, so it takes the whole row once the
+   footer drops to two columns. */
+@media (max-width: 820px) {
+  .gg-footer-wide { grid-column: 1 / -1; }
+}
+
+/* A bag line drops its price under the details rather than squeezing three
+   columns into a phone width. */
+@media (max-width: 520px) {
+  .gg-line { grid-template-columns: 76px 1fr !important; gap: 14px !important; }
+  .gg-line > *:last-child { grid-column: 2; }
+}
+
+/* The drop banner is a headline, a clock and a CTA. Below the tablet break
+   they stop competing for one row. */
+@media (max-width: 860px) {
+  .gg-drop { flex-direction: column; align-items: flex-start !important; gap: 14px !important; }
+  .gg-drop-right { width: 100%; justify-content: space-between; }
+}
+@media (max-width: 460px) {
+  .gg-drop-right { flex-direction: column; align-items: stretch; gap: 12px !important; }
+  .gg-drop-right > a { width: 100%; }
+}
+
+/* The WhatsApp button keeps its label on desktop and becomes a disc on a
+   phone, where a wide pill sits on top of the copy it is meant to support. */
+@media (max-width: 900px) {
+  .gg-fab { width: 54px; height: 54px !important; padding: 0 !important; justify-content: center; }
+}
+
+/* Print, and any context that never scrolls: the reveal animation must not be
+   able to leave content invisible on paper. */
+@media print {
+  .gg-reveal { opacity: 1 !important; transform: none !important; }
+  .gg-scrim, .gg-drawer, .gg-fab { display: none !important; }
+}
+
+/* Five houses don't divide by two, so the last tile takes the whole row
+   rather than leaving a half-bordered hole at the end of the grid. */
+@media (max-width: 820px) {
+  .gg-houses > :last-child { grid-column: 1 / -1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOMEPAGE LAYER — `.hp-*`
+   Scoped entirely to the homepage and components/home/*. Nothing outside
+   app/page.tsx uses these classes, so the shop, product and editorial pages
+   are unaffected by anything below.
+
+   The art direction differs deliberately from the rest of the site. The
+   storefront's 2px rules put everything in a box, which reads as a catalogue;
+   here the boxes come off and the work is done by whitespace, hairlines and
+   scale instead. Restraint carries it — the accent appears at label size and
+   almost nowhere else.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Vertical rhythm. Sections breathe on desktop and stay generous on a phone. */
+  --hp-section: clamp(72px, 9vw, 168px);
+  --hp-section-tight: clamp(52px, 6vw, 104px);
+  --hp-gutter: clamp(18px, 4.2vw, 76px);
+
+  /* A hairline, not a rule. */
+  --hp-line: color-mix(in srgb, #201e1d 14%, transparent);
+  --hp-line-strong: color-mix(in srgb, #201e1d 26%, transparent);
+  --hp-line-dark: color-mix(in srgb, #f3f2f2 16%, transparent);
+
+  /* Warmer paper than the site ground, for the hero and campaign grounds. */
+  --hp-paper: #f6f4f2;
+  --hp-ink: #1c1a19;
+
+  --hp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hp-shell {
+  max-width: 1680px;
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: var(--hp-gutter);
+  box-sizing: border-box;
+}
+
+/* — type —
+   One display family at three weights of presence: the statement, the section
+   head, and the small wide-tracked label that carries every piece of metadata. */
+.hp-display {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  margin: 0;
+  text-wrap: balance;
+}
+.hp-hero-type { font-size: clamp(52px, 12.5vw, 208px); letter-spacing: -0.055em; }
+.hp-statement { font-size: clamp(34px, 7.4vw, 124px); line-height: 0.88; }
+.hp-section-head { font-size: clamp(28px, 4.4vw, 68px); line-height: 0.92; letter-spacing: -0.04em; }
+.hp-card-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+.hp-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, #201e1d 52%, transparent);
+}
+.hp-label-accent { color: var(--color-accent); }
+.hp-label-light { color: color-mix(in srgb, #f3f2f2 62%, transparent); }
+
+.hp-body {
+  font-size: clamp(14px, 1.05vw, 16px);
+  line-height: 1.62;
+  color: color-mix(in srgb, #201e1d 68%, transparent);
+  text-wrap: pretty;
+}
+.hp-body-light { color: color-mix(in srgb, #f3f2f2 66%, transparent); }
+
+/* — the quiet link, with an underline that wipes rather than appears — */
+.hp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: inherit;
+  padding-bottom: 6px;
+  position: relative;
+}
+.hp-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform .42s var(--hp-ease);
+}
+.hp-link:hover { color: inherit; }
+.hp-link:hover::after { transform: scaleX(0); transform-origin: right; }
+.hp-link svg { transition: transform .38s var(--hp-ease); }
+.hp-link:hover svg { transform: translateX(6px); }
+
+/* — the one solid button on the page — */
+.hp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  height: 58px;
+  padding-inline: 30px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: var(--hp-ink);
+  color: var(--hp-paper);
+  border: 1px solid var(--hp-ink);
+  cursor: pointer;
+  transition: background .34s var(--hp-ease), color .34s var(--hp-ease);
+}
+.hp-btn:hover { background: transparent; color: var(--hp-ink); }
+.hp-btn svg { transition: transform .38s var(--hp-ease); }
+.hp-btn:hover svg { transform: translateX(6px); }
+.hp-btn-ghost { background: transparent; color: var(--hp-ink); }
+.hp-btn-ghost:hover { background: var(--hp-ink); color: var(--hp-paper); }
+.hp-btn-light { background: var(--hp-paper); color: var(--hp-ink); border-color: var(--hp-paper); }
+.hp-btn-light:hover { background: transparent; color: var(--hp-paper); }
+@media (max-width: 560px) { .hp-btn { height: 52px; padding-inline: 22px; font-size: 10px; gap: 12px; } }
+
+/* — motion —
+   Two reveals: copy fades up ~20px, imagery uncovers from the bottom edge.
+   Both land in 500–900ms with the same easing so the page feels of a piece. */
+.hp-rise {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .8s var(--hp-ease), transform .8s var(--hp-ease);
+  transition-delay: var(--d, 0ms);
+}
+.hp-rise.hp-in { opacity: 1; transform: none; }
+
+.hp-mask {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path .95s var(--hp-ease);
+  transition-delay: var(--d, 0ms);
+}
+.hp-mask.hp-in { clip-path: inset(0 0 0 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-rise, .hp-mask { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+}
+@media print {
+  .hp-rise, .hp-mask { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+}
+
+/* — imagery —
+   A frame that crops, with the photo easing up in scale on hover. The product
+   shots are opaque JPEGs, so they still need .gg-photo's multiply to sit on a
+   tinted ground; .hp-frame only handles the crop and the motion. */
+.hp-frame {
+  position: relative;
+  overflow: hidden;
+  display: block;
+}
+.hp-frame img { transition: transform .85s var(--hp-ease); will-change: transform; }
+@media (hover: hover) {
+  .hp-zoom:hover img { transform: scale(1.045); }
+}
+
+/* The soft floor a cut-out sits on. Lighter than the catalogue plate — on a
+   large image a hard shadow reads as clip art. */
+.hp-floor::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 11%;
+  width: 46%;
+  height: 5%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, #201e1d 22%, transparent) 0%, transparent 72%);
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* — homepage product card —
+   Deliberately not the shop card: no border, no badge stack, no quick-size
+   rail. Image, brand, name, price. Everything else appears on hover. */
+.hp-card { position: relative; display: flex; flex-direction: column; color: inherit; min-width: 0; }
+.hp-card-media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--hp-paper);
+  overflow: hidden;
+  isolation: isolate;
+}
+.hp-card-media img { transition: transform .85s var(--hp-ease), opacity .5s var(--hp-ease); }
+@media (hover: hover) {
+  .hp-card:hover .hp-card-media img { transform: scale(1.04); }
+  .hp-card:hover .hp-alt { opacity: 1; }
+  .hp-card:hover .hp-base { opacity: 0; }
+  .hp-card:hover .hp-card-tools { opacity: 1; transform: none; }
+}
+.hp-base, .hp-alt { position: absolute; inset: 0; transition: opacity .55s var(--hp-ease); }
+.hp-alt { opacity: 0; }
+.hp-card-tools {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .34s var(--hp-ease), transform .34s var(--hp-ease);
+}
+@media (hover: none) { .hp-card-tools { opacity: 1; transform: none; } }
+
+/* — dark ground, used by The Vault and the closing statement — */
+.hp-dark { background: var(--hp-ink); color: var(--hp-paper); }
+.hp-dark .hp-label { color: color-mix(in srgb, #f3f2f2 54%, transparent); }
+.hp-dark .hp-label-accent { color: var(--color-accent-400); }
+
+/* — layout primitives —
+   Asymmetry is the point: these are intentionally uneven and collapse to a
+   single column rather than degrading into a squeezed grid. */
+.hp-asym { display: grid; grid-template-columns: var(--hp-cols, 1.35fr 1fr); gap: var(--hp-gap, clamp(24px, 3.4vw, 72px)); }
+@media (max-width: 900px) { .hp-asym { grid-template-columns: minmax(0, 1fr); } }
+
+.hp-grid { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: var(--hp-gap, clamp(20px, 2.4vw, 48px)); }
+@media (max-width: 1100px) { .hp-grid { grid-template-columns: repeat(var(--n-md, var(--n, 3)), minmax(0, 1fr)); } }
+@media (max-width: 760px)  { .hp-grid { grid-template-columns: repeat(var(--n-sm, 2), minmax(0, 1fr)); } }
+@media (max-width: 460px)  { .hp-grid { grid-template-columns: repeat(var(--n-xs, var(--n-sm, 2)), minmax(0, 1fr)); } }
+
+.hp-hair { border: 0; height: 1px; background: var(--hp-line); margin: 0; }
+.hp-dark .hp-hair { background: var(--hp-line-dark); }
+
+/* — the hero —
+   A full-height photographic column bleeding off the right edge, with the type
+   held in the page shell on the left. The image column is not inside .hp-shell
+   on purpose: a campaign photograph that stops at the content margin reads as
+   a banner, one that runs off the edge reads as a spread. */
+.hp-hero-v2 {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr clamp(360px, 46vw, 860px);
+  min-height: min(76vh, 880px);
+  background: var(--hp-paper);
+  color: var(--hp-ink);
+  border-bottom: 1px solid var(--hp-line);
+  overflow: hidden;
+}
+.hp-hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(40px, 4.4vw, 68px);
+  padding-right: clamp(24px, 4vw, 72px);
+  /* Line the copy up with .hp-shell without being inside it. */
+  padding-left: max(var(--hp-gutter), calc((100vw - 1680px) / 2 + var(--hp-gutter)));
+  min-width: 0;
+}
+.hp-hero-photo { position: relative; overflow: hidden; }
+.hp-hero-type { font-size: clamp(58px, 8.6vw, 152px); letter-spacing: -0.055em; line-height: 0.82; }
+
+@media (max-width: 900px) {
+  .hp-hero-v2 { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .hp-hero-photo { order: -1; aspect-ratio: 4 / 5; max-height: 62vh; }
+  .hp-hero-copy {
+    padding-inline: var(--hp-gutter);
+    padding-block: clamp(30px, 7vw, 52px);
+  }
+  .hp-hero-type { font-size: clamp(54px, 17vw, 96px); }
+}
 
 /* On a phone the hero leads with the photograph, then the copy, and the media
    is capped so the headline is never pushed off the first screen. */
