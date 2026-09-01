@@ -52,9 +52,8 @@ export default function CampaignBand({
       }}
     >
       <div
-        className="hp-shell hp-asym"
+        className="hp-shell hp-asym hp-space-editorial"
         style={{
-          paddingBlock: "var(--hp-section)",
           alignItems: "center",
           "--hp-cols": flip ? "1fr 1.25fr" : "1.25fr 1fr",
           "--hp-gap": "clamp(32px, 5vw, 96px)",

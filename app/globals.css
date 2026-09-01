@@ -693,9 +693,12 @@ body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: 
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Vertical rhythm. Sections breathe on desktop and stay generous on a phone. */
-  --hp-section: clamp(72px, 9vw, 168px);
-  --hp-section-tight: clamp(52px, 6vw, 104px);
+  /* Three deliberate beats keep the long editorial page from reading as a
+     stack of equally padded panels. Cinematic moments pause, stories breathe,
+     and utility-led sections move at a tighter pace. */
+  --hp-space-cinematic: clamp(76px, 9vw, 156px);
+  --hp-space-editorial: clamp(60px, 7vw, 112px);
+  --hp-space-compact: clamp(44px, 5vw, 76px);
   --hp-gutter: clamp(18px, 4.2vw, 76px);
 
   /* A hairline, not a rule. */
@@ -710,6 +713,10 @@ body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: 
 
   --hp-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+.hp-space-cinematic { padding-block: var(--hp-space-cinematic); }
+.hp-space-editorial { padding-block: var(--hp-space-editorial); }
+.hp-space-compact { padding-block: var(--hp-space-compact); }
 
 .hp-shell {
   max-width: 1680px;

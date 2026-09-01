@@ -61,8 +61,8 @@ function Statement({
     >
       {photo ? (
         <div
-          className="hp-shell hp-asym"
-          style={{ paddingBlock: "var(--hp-section)", alignItems: "center", "--hp-cols": "1.15fr 1fr", "--hp-gap": "clamp(34px, 5vw, 88px)" } as React.CSSProperties}
+          className="hp-shell hp-asym hp-space-cinematic"
+          style={{ alignItems: "center", "--hp-cols": "1.15fr 1fr", "--hp-gap": "clamp(34px, 5vw, 88px)" } as React.CSSProperties}
         >
           {body}
           <Rise variant="mask" className="hp-frame hp-zoom" style={{ aspectRatio: "4 / 5" }}>
@@ -70,7 +70,7 @@ function Statement({
           </Rise>
         </div>
       ) : (
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>{body}</div>
+        <div className="hp-shell hp-space-cinematic">{body}</div>
       )}
     </section>
   );
@@ -158,7 +158,7 @@ export default async function HomePage() {
       {vault.length > 0 && <Vault products={vault} />}
 
       <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <div className="hp-shell hp-space-compact">
           <SectionHead
             kicker="In the stockroom"
             title="Ready to wear this week"
@@ -191,7 +191,7 @@ export default async function HomePage() {
 
       {/* ── authenticity, told visually ─────────────────────────────────── */}
       <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <div className="hp-shell hp-space-editorial">
           <div
             className="hp-asym"
             style={{ "--hp-cols": "1fr 1.1fr", "--hp-gap": "clamp(34px, 5vw, 96px)", alignItems: "start" } as React.CSSProperties}
@@ -246,7 +246,7 @@ export default async function HomePage() {
 
       {/* ── houses ──────────────────────────────────────────────────────── */}
       <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <div className="hp-shell hp-space-compact">
           <SectionHead kicker="By house" title="Where to start" />
           <div
             className="hp-grid"
@@ -287,7 +287,7 @@ export default async function HomePage() {
 
       {/* ── journal ─────────────────────────────────────────────────────── */}
       <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <div className="hp-shell hp-space-editorial">
           <SectionHead kicker="Journal" title="From the stockroom" />
           <div className="hp-grid" style={{ "--n": 2, "--n-sm": 1, "--n-xs": 1, "--hp-gap": "clamp(28px, 4vw, 72px)" } as React.CSSProperties}>
             {[
@@ -345,7 +345,7 @@ export default async function HomePage() {
 
       {/* ── the index and the voices ────────────────────────────────────── */}
       <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
-        <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+        <div className="hp-shell hp-space-compact">
           <div className="hp-asym" style={{ "--hp-cols": "1fr 1.15fr", "--hp-gap": "clamp(40px, 5vw, 104px)" } as React.CSSProperties}>
             <div>
               <Rise>
@@ -403,7 +403,7 @@ export default async function HomePage() {
       <section className="hp-dark">
         <div
           className="hp-shell"
-          style={{ paddingTop: "var(--hp-section)", paddingBottom: "var(--hp-section-tight)" }}
+          style={{ paddingTop: "var(--hp-space-cinematic)", paddingBottom: "var(--hp-space-editorial)" }}
         >
           <Rise>
             <div className="hp-label hp-label-accent" style={{ marginBottom: 26 }}>The Gulf Grails guarantee</div>
