@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PRODUCTS, findProduct } from "@/data/products";
+import { findIn } from "@/data/products";
+import { getCatalogue } from "@/lib/catalogue";
 import { CHECKS, HOUSES, MARKET, REVIEWS } from "@/data/content";
 import { STORY_SHOTS } from "@/lib/editorial";
 import { money } from "@/lib/money";
@@ -108,21 +109,26 @@ function SectionHead({
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Everything below is derived from the live catalogue, so a pair added or
+  // sold out at /admin moves through the homepage on its own — there is no
+  // hand-kept list of what appears here.
+  const catalogue = await getCatalogue();
+
   // The vault is defined by price rather than a hand-kept list, so a new grail
   // lands in it on its own.
-  const vault = [...PRODUCTS].filter((p) => p.price >= 10000).sort((a, b) => b.price - a.price).slice(0, 4);
+  const vault = [...catalogue].filter((p) => p.price >= 10000).sort((a, b) => b.price - a.price).slice(0, 4);
   const vaultIds = new Set(vault.map((p) => p.id));
-  const travis = PRODUCTS.filter((p) => p.fam === "Travis Scott");
-  const offWhite = PRODUCTS.filter((p) => p.fam === "Off-White");
+  const travis = catalogue.filter((p) => p.fam === "Travis Scott");
+  const offWhite = catalogue.filter((p) => p.fam === "Off-White");
 
   // The curated row leads with the pairs carrying a badge, then fills.
   const curated = [
-    ...PRODUCTS.filter((p) => p.drop && !vaultIds.has(p.id)),
-    ...PRODUCTS.filter((p) => !p.drop && !vaultIds.has(p.id)),
+    ...catalogue.filter((p) => p.drop && !vaultIds.has(p.id)),
+    ...catalogue.filter((p) => !p.drop && !vaultIds.has(p.id)),
   ].slice(0, 8);
 
-  const cheapest = Math.min(...PRODUCTS.map((p) => p.price));
+  const cheapest = Math.min(...catalogue.map((p) => p.price));
 
   return (
     <div data-screen-label="Home">
@@ -144,7 +150,7 @@ export default function HomePage() {
           body="The reversed swoosh that changed the hobby, and the low that outsells everything else we carry. Four Travis pairs in the stockroom right now, from the AED 2,900 Air Force 1 to the 2019 Mocha high."
           href="/shop?fam=Travis+Scott"
           cta="Explore the collection"
-          lead={findProduct("ts-aj1-high")}
+          lead={findIn(catalogue, "ts-aj1-high")}
           support={travis.filter((p) => p.id !== "ts-aj1-high").slice(0, 3)}
         />
       )}
@@ -156,7 +162,7 @@ export default function HomePage() {
           <SectionHead
             kicker="In the stockroom"
             title="Ready to wear this week"
-            action={{ label: `All ${PRODUCTS.length} pairs`, href: "/shop" }}
+            action={{ label: `All ${catalogue.length} pairs`, href: "/shop" }}
           />
           <CollectionGrid products={curated} columns={4} />
         </div>
@@ -169,7 +175,7 @@ export default function HomePage() {
           body="The Ten Chicago that started deconstruction, Lot 01 of the fifty-pair Dunk series, and the Volt Air Force 1 from the 2018 run. Held with their zip ties, tags and both lace sets."
           href="/shop?fam=Off-White"
           cta="See the archive"
-          lead={findProduct("ow-aj1")}
+          lead={findIn(catalogue, "ow-aj1")}
           support={offWhite.filter((p) => p.id !== "ow-aj1").slice(0, 3)}
           flip
         />
@@ -247,8 +253,8 @@ export default function HomePage() {
             style={{ "--n": 5, "--n-md": 3, "--n-sm": 2, "--n-xs": 2, "--hp-gap": "clamp(16px, 2vw, 34px)" } as React.CSSProperties}
           >
             {HOUSES.map((h, i) => {
-              const face = findProduct(h.pid);
-              const count = PRODUCTS.filter((p) =>
+              const face = findIn(catalogue, h.pid);
+              const count = catalogue.filter((p) =>
                 h.fam === "Dunk" ? p.brand === "Nike" : h.fam === "Jordan 1" ? p.brand === "Air Jordan" : p.fam === h.fam,
               ).length;
               return (
@@ -301,7 +307,7 @@ export default function HomePage() {
                 photo: "/assets/campaign/air-dior-white.jpg",
               },
             ].map((s, i) => {
-              const p = findProduct(s.shot.pid);
+              const p = findIn(catalogue, s.shot.pid);
               return (
                 <Rise key={s.title} delay={i * 110}>
                   <Link href={s.href} style={{ color: "inherit", display: "block" }}>
@@ -335,7 +341,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <EditorialGallery />
+      <EditorialGallery catalogue={catalogue} />
 
       {/* ── the index and the voices ────────────────────────────────────── */}
       <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
@@ -433,7 +439,7 @@ export default function HomePage() {
                 ["Same day in Dubai", "Next day UAE-wide"],
                 ["10am – 11pm", "On WhatsApp, every day"],
                 [SITE_CONFIG.email, "Email us anytime"],
-                [`From ${money(cheapest)}`, `${PRODUCTS.length} pairs in stock`],
+                [`From ${money(cheapest)}`, `${catalogue.length} pairs in stock`],
               ].map(([a, b]) => (
                 <div key={a}>
                   <div className="hp-card-name" style={{ fontSize: 14, marginBottom: 6 }}>{a}</div>

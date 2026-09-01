@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { CHECKS } from "@/data/content";
 import EditorialFrame from "@/components/EditorialFrame";
+import { getCatalogue } from "@/lib/catalogue";
 import { PAGE_SHOTS } from "@/lib/editorial";
 import FaqAccordion from "@/components/FaqAccordion";
 
 export const metadata: Metadata = { title: "Authenticity & delivery" };
 
-export default function TrustPage() {
+export default async function TrustPage() {
+  const catalogue = await getCatalogue();
   return (
     <div data-screen-label="Authenticity">
       <div className="gg-split" style={{ borderBottom: "2px solid var(--color-text)", "--split": "1fr .8fr" } as React.CSSProperties}>
@@ -20,6 +22,7 @@ export default function TrustPage() {
           </p>
         </div>
         <EditorialFrame
+          catalogue={catalogue}
           shot={PAGE_SHOTS.trust}
           className="gg-split-media"
           sizes="(max-width: 980px) 100vw, 45vw"

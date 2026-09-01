@@ -10,9 +10,59 @@ storefront's own layer built on top of them.
 ```bash
 npm install
 npm run dev      # http://localhost:3000
+
+# to try /admin locally
+ADMIN_PASSWORD=whatever npm run dev
 npm run build && npm run start   # production build
 npm run lint
 ```
+
+## Running the shop (`/admin`)
+
+Inventory is not in this repository. It lives in the project's Vercel Blob
+store as a single JSON document, and the owner edits it at **`/admin`** — add a
+pair, upload its photos, change the price, set how many are left, mark it sold
+out, delete it. Saving is live: the storefront, the search, the sitemap and the
+structured data all update on the next request.
+
+### One-time setup
+
+Two environment variables, both set in the Vercel dashboard (Project →
+Settings → Environment Variables), never in the repository:
+
+| Variable | Where it comes from |
+| --- | --- |
+| `BLOB_READ_WRITE_TOKEN` | Created for you. Project → **Storage** → create a Blob store → connect it to this project. |
+| `ADMIN_PASSWORD` | You choose it. Long and random — it is the only thing between the internet and your inventory. |
+
+Redeploy after setting them. Until `BLOB_READ_WRITE_TOKEN` exists, `/admin`
+tells you so and refuses to save; until `ADMIN_PASSWORD` exists, nobody can
+sign in at all.
+
+Changing `ADMIN_PASSWORD` later signs every open session out, because the
+session cookie is signed with it.
+
+### Day to day
+
+- **Stock** — the number box on each row of the inventory list saves on its
+  own. **Zero is the out-of-stock switch**: the pair stays on the site, marked
+  sold out, keeping its page, its links and its search ranking, and nothing
+  about it can be bought. Delete only removes a pair for good.
+- **Adding a pair** — *Add a pair*, fill the form, upload photos. Photos go
+  from the browser straight to Blob storage, so a full-size phone photo is
+  fine. The first photo leads everywhere: the card, the search result, the link
+  preview. Reorder with the arrows.
+- **Model group** decides which shop filter chip the pair sits under. Pick one
+  that already exists unless you mean to start a new one — a typo makes a new,
+  nearly-empty filter.
+
+### If nothing has been saved yet
+
+Before the first save, and in local development without a Blob token, the site
+serves `data/seed.ts` — the thirty pairs it shipped with, and the studio
+photography in `public/assets/products`. That is a fallback, not the
+catalogue: once the owner saves once, the Blob document takes over completely
+and editing `seed.ts` changes nothing on the live site.
 
 ## How the CSS is organised
 
@@ -55,48 +105,40 @@ handled follows from that:
 - Grounds must stay light for that to work. `EditorialFrame` handles a dark
   ground by insetting a white plate instead of blending.
 
-### Adding or replacing a photo
+### Shooting a pair
 
-Photos are files in `public/assets/products/` plus one line in `data/products.ts`.
-There is no upload screen and no CMS — this is the whole pipeline.
+The upload box will take anything, but the grid only looks like one shop if
+every pair is shot the same way. Four angles, in this order:
 
-1. **Shoot four angles**, in this order. Every pair in the catalogue follows it,
-   which is what makes the grid look like one shop rather than a marketplace:
+| # | Angle | What it shows |
+| --- | --- | --- |
+| 1 | **Lateral** | The whole shoe from its outer side, **toe pointing right**. This is the card image — get this one right and the grid stays consistent. |
+| 2 | **Detail** | Close-up of the logo, swoosh or toe box |
+| 3 | **Medial** | The whole shoe from its inner side, toe pointing left |
+| 4 | **Sole** | The outsole, flat on |
 
-   | # | Angle | What it shows |
-   | --- | --- | --- |
-   | 1 | **Lateral** | The whole shoe from its outer side, **toe pointing right**. This is the card image — get this one right and the grid stays consistent. |
-   | 2 | **Detail** | Close-up of the logo, swoosh or toe box |
-   | 3 | **Medial** | The whole shoe from its inner side, toe pointing left |
-   | 4 | **Sole** | The outsole, flat on |
+Shoot on plain white, one shoe, roughly square, and leave a little margin — the
+site crops in. 1200px on the long edge is plenty. Upload them in that order, or
+reorder them afterwards with the arrows; the first one is the card.
 
-   Shoot on plain white, one shoe, roughly square, and leave a little margin —
-   the site crops in. 1200px on the long edge is plenty.
+Fewer than four is fine — the gallery just shows fewer thumbnails. A pair with
+no photos at all falls back to a designed studio plate rather than a broken
+image.
 
-2. **Save them as `.jpg`** into `public/assets/products/`, named style code plus
-   angle number: `DD1391-100-1.jpg` through `-4.jpg`.
+### The shipped photography
 
-   The extension has to match the actual file format, or the photo gets served
-   with the wrong Content-Type to anything that fetches it directly — social
-   share cards especially. Don't rename a PNG to `.jpg`; re-export it.
+The thirty pairs in `data/seed.ts` are wired to files in
+`public/assets/products/`, named style code plus angle number
+(`DD1391-100-1.jpg` … `-4.jpg`), and mapped to pairs by the `PHOTOS` table in
+that file. To swap one of those, overwrite the file and keep the name.
 
-3. **Name the files** in that pair's row of the `PHOTOS` map in
-   `data/products.ts`, without the extension:
+The extension has to match the actual file format, or the photo is served with
+the wrong Content-Type to anything that fetches it directly — social share
+cards especially. Don't rename a PNG to `.jpg`; re-export it.
 
-   ```ts
-   "dunk-panda": ["DD1391-100-1", "DD1391-100-2", "DD1391-100-3", "DD1391-100-4"],
-   ```
-
-   Array order is gallery order, and the **first entry is the card image**. The
-   filename is only a label — this map is what binds a file to a pair, so a
-   filename that doesn't match the SKU still works (a few existing ones don't).
-
-**To replace one photo**, overwrite the file and keep the name — nothing else to
-change. **To reorder a gallery**, reorder the array. **Fewer than four** is fine;
-the gallery just shows fewer thumbnails.
-
-A pair shot differently can carry its own labels. The Air Dior has six in-house
-angles, so it overrides both the files and the labels in `PHOTO_OVERRIDES`:
+A pair shot differently can carry its own gallery labels. The Air Dior has six
+in-house angles, so it overrides both the files and the labels in
+`PHOTO_OVERRIDES`:
 
 ```ts
 "air-dior": {
@@ -105,40 +147,24 @@ angles, so it overrides both the files and the labels in `PHOTO_OVERRIDES`:
 },
 ```
 
-`views` must be the same length as `photos`. Without it, the labels come from
-`VIEWS` in `lib/sizes.ts`.
+`views` must be the same length as `photos`. Without it the labels come from
+`VIEWS` in `lib/sizes.ts`. Pairs uploaded at `/admin` always use `VIEWS`.
 
-### Adding a new pair to the inventory
+### Where the catalogue is read
 
-Add one row to the `RAW` array in `data/products.ts`. The columns are, in order:
+`lib/catalogue.ts` is the only thing that knows where inventory comes from. It
+reads the Blob document, falls back to the seed, caches the result under the
+`gg-catalogue` tag, and drops that cache on every admin write.
 
-```ts
-["dunk-panda",            // id — the URL slug, /product/dunk-panda
- "Nike",                  // brand, shown on the card
- "Dunk",                  // fam — must match a FAMILY_FILTERS entry to be filterable
- "Nike Dunk Low Retro Panda",   // name
- "White / Black",         // colourway
- "DD1391-100",            // style code
- 2023,                    // release year — drives the "Newest" sort
- 620,                     // your price, AED
- 720,                     // market price, AED — the struck-through figure
- [39,40,41,42,43,44,45,46],     // EU sizes in stock
- 9,                       // total pairs in stock; 3 or fewer shows the red badge
- "",                      // badge text, e.g. "Bestseller" — "" for none
- "Short line for the card.",    // blurb
- "Full paragraph for the product page.",   // desc
- false],                  // premium — true adds the 8% bump on EU 42–44
-```
+Server components `await getCatalogue()`. Client components read it from
+`context/CatalogueContext.tsx`, which the storefront layout fills once — the
+header search, the wishlist and the cart all price from the same list the
+server rendered. Nothing in `components/` imports a product array directly any
+more; `data/products.ts` holds only the type and pure helpers.
 
-Then add its photos per the steps above. That's it — the pair appears in the
-shop, the search, the sitemap and the structured data automatically.
-
-One optional touch: **a fit note in the size guide**. Add the id to `FIT_NOTES`
-in `components/product/SizeGuide.tsx`, e.g. `"bal-triple-s": "Runs large..."`.
-Without one it shows the generic note.
-
-If you add a whole new family, add it to `FAMILY_FILTERS` in
-`data/products.ts` too, or the shop's filter chip won't exist.
+One optional touch when adding a pair: **a fit note in the size guide**. Add
+its id to `FIT_NOTES` in `components/product/SizeGuide.tsx`, e.g.
+`"bal-triple-s": "Runs large..."`. Without one it shows the generic note.
 
 ### What puts a pair on the homepage
 
@@ -153,8 +179,11 @@ pair lands in the right place on its own:
 | **The archive** | `fam` is `"Off-White"`. The lead is `ow-aj1`. |
 | **By house** | The `HOUSES` list in `data/content.ts` — each entry names the family and a `pid` for the tile photo. |
 
-So to get a new pair into the Vault, price it above 10,000. To get it into the
-"ready to wear" row ahead of the others, give it a `drop` badge.
+So to get a new pair into the Vault, price it above 10,000 at `/admin`. To get
+it into the "ready to wear" row ahead of the others, give it a badge.
+
+The shop's filter chips are derived the same way: a model group only appears
+once a pair uses it, and the size chips are the union of every pair's sizes.
 
 ### Editorial slots
 
@@ -167,8 +196,9 @@ hunting through components.
 
 ## What's real vs. what's a placeholder
 
-- **Catalogue** (`data/products.ts`): 30 real pairs with real style codes, EU
-  sizes and AED prices. 94 real product photos live in `public/assets/`.
+- **Catalogue**: 30 real pairs with real style codes, EU sizes and AED prices,
+  and 94 real product photos in `public/assets/`. These ship as the seed; the
+  live catalogue is whatever the owner has saved at `/admin`.
 - **Ordering** has no backend and no payment processor, by design — it matches
   the brief (cash on delivery / bank transfer, confirmed on WhatsApp). The
   cart, wishlist, recently-viewed list and last order live in the browser's
@@ -192,4 +222,16 @@ tags, `sitemap.xml`, `robots.txt` and the `Store` / `Product` structured data.
 ## Deploying
 
 Built for Vercel: `vercel --prod` from this directory, or connect the repo in
-the Vercel dashboard. No environment variables are required.
+the Vercel dashboard.
+
+Two environment variables, both set in the dashboard and neither in the
+repository — see [Running the shop](#running-the-shop-admin) for what they are
+and where they come from:
+
+```
+BLOB_READ_WRITE_TOKEN=…   # created by connecting a Blob store
+ADMIN_PASSWORD=…          # your own, long and random
+```
+
+The site builds and runs without them: it serves the seed catalogue and
+`/admin` explains what is missing.

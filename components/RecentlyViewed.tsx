@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
-import { PRODUCTS } from "@/data/products";
+import type { Product } from "@/data/products";
+import { useCatalogue } from "@/context/CatalogueContext";
 import { money } from "@/lib/money";
 import { getRecentServerSnapshot, getRecentSnapshot, subscribeRecent } from "@/lib/recentStore";
 import { ProductCardPhoto } from "./ProductPhoto";
@@ -18,11 +19,14 @@ import { ProductCardPhoto } from "./ProductPhoto";
  */
 export default function RecentlyViewed({ excludeId }: { excludeId?: string }) {
   const ids = useSyncExternalStore(subscribeRecent, getRecentSnapshot, getRecentServerSnapshot);
+  const catalogue = useCatalogue();
 
+  // An id can outlive the pair it points at, if the owner has since removed it
+  // from the catalogue — those simply drop out of the rail.
   const items = ids
     .filter((id) => id !== excludeId)
-    .map((id) => PRODUCTS.find((p) => p.id === id))
-    .filter((p): p is (typeof PRODUCTS)[number] => Boolean(p))
+    .map((id) => catalogue.find((p) => p.id === id))
+    .filter((p): p is Product => Boolean(p))
     .slice(0, 6);
 
   if (items.length < 2) return null;

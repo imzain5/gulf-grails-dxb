@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { INSTAGRAM_SHOTS, shotProduct, shotSrc } from "@/lib/editorial";
+import type { Product } from "@/data/products";
 import Rise from "./Rise";
 
 const ARROW = (
@@ -19,7 +20,7 @@ const ARROW = (
  */
 const SPANS: [number, number][] = [[2, 2], [2, 1], [1, 1], [1, 1], [2, 1], [2, 1]];
 
-export default function EditorialGallery() {
+export default function EditorialGallery({ catalogue }: { catalogue: Product[] }) {
   return (
     <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
       <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
@@ -48,8 +49,8 @@ export default function EditorialGallery() {
 
         <div className="hp-gallery">
           {INSTAGRAM_SHOTS.map((shot, i) => {
-            const src = shotSrc(shot);
-            const product = shotProduct(shot);
+            const src = shotSrc(catalogue, shot);
+            const product = shotProduct(catalogue, shot);
             const [c, r] = SPANS[i] ?? [1, 1];
             return (
               <Rise

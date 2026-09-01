@@ -1,4 +1,4 @@
-import { PRODUCTS, type Product, type SortKey } from "@/data/products";
+import type { Product, SortKey } from "@/data/products";
 
 export interface ShopFilters {
   fam: string;
@@ -9,9 +9,10 @@ export interface ShopFilters {
 
 export const DEFAULT_FILTERS: ShopFilters = { fam: "All", sizeF: "All", sort: "Featured", q: "" };
 
-export function filterProducts(f: ShopFilters): Product[] {
+/** Narrow and order a catalogue for the shop grid. */
+export function filterProducts(catalogue: Product[], f: ShopFilters): Product[] {
   const needle = f.q.trim().toLowerCase();
-  let list = PRODUCTS.filter((p) => {
+  let list = catalogue.filter((p) => {
     if (f.fam !== "All" && p.fam !== f.fam) return false;
     if (f.sizeF !== "All" && !p.sizes.includes(Number(f.sizeF))) return false;
     if (needle) {

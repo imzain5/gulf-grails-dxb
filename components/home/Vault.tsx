@@ -83,7 +83,7 @@ export default function Vault({ products }: { products: Product[] }) {
                       color: "var(--color-accent)", letterSpacing: "0.2em",
                     }}
                   >
-                    {p.stock === 1 ? "One pair" : `${p.stock} pairs`}
+                    {p.stock === 0 ? "Sold out" : p.stock === 1 ? "One pair" : `${p.stock} pairs`}
                   </span>
                 </Link>
 

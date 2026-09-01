@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EditorialFrame from "@/components/EditorialFrame";
+import { getCatalogue } from "@/lib/catalogue";
 import { PAGE_SHOTS } from "@/lib/editorial";
 
 export const metadata: Metadata = { title: "About Gulf Grails" };
@@ -10,7 +11,8 @@ const STATS: [string, string][] = [
   ["100%", "Verified or refunded"],
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const catalogue = await getCatalogue();
   return (
     <div data-screen-label="About">
       <div className="gg-split" style={{ borderBottom: "2px solid var(--color-text)", "--split": "1fr .8fr" } as React.CSSProperties}>
@@ -27,6 +29,7 @@ export default function AboutPage() {
           </p>
         </div>
         <EditorialFrame
+          catalogue={catalogue}
           shot={PAGE_SHOTS.about}
           className="gg-split-media"
           sizes="(max-width: 980px) 100vw, 45vw"

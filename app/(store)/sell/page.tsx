@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { waLink } from "@/lib/whatsapp";
 import { SITE_CONFIG } from "@/lib/config";
 import EditorialFrame from "@/components/EditorialFrame";
+import { getCatalogue } from "@/lib/catalogue";
 import { PAGE_SHOTS } from "@/lib/editorial";
 
 export const metadata: Metadata = { title: "Sell or trade your pair" };
 
-export default function SellPage() {
+export default async function SellPage() {
+  const catalogue = await getCatalogue();
   return (
     <div data-screen-label="Sell to us">
       <div className="gg-split" style={{ borderBottom: "2px solid var(--color-text)", "--split": "1fr .8fr" } as React.CSSProperties}>
@@ -44,6 +46,7 @@ export default function SellPage() {
           </div>
         </div>
         <EditorialFrame
+          catalogue={catalogue}
           shot={PAGE_SHOTS.sell}
           className="gg-split-media"
           sizes="(max-width: 980px) 100vw, 45vw"

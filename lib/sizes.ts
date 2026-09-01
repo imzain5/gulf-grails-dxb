@@ -30,7 +30,12 @@ export function sizePrice(p: Product, eu: number): number {
   return hot ? Math.round((p.price * 1.08) / 10) * 10 : p.price;
 }
 
-/** Deterministic per-size stock split so the size chart doesn't reshuffle on every render. */
+/**
+ * Deterministic per-size stock split so the size chart doesn't reshuffle on
+ * every render. A pair the owner has set to zero is zero in every size — the
+ * shop marks it sold out rather than quietly offering a last pair.
+ */
 export function sizeStock(p: Product, i: number): number {
+  if (p.stock <= 0) return 0;
   return Math.max(1, Math.round(p.stock / p.sizes.length) + (i % 2));
 }

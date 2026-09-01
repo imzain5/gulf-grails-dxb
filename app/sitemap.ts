@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
-import { PRODUCTS } from "@/data/products";
+import { getCatalogue } from "@/lib/catalogue";
 import { SITE_CONFIG } from "@/lib/config";
 
 /** Every page a crawler should know about: the fixed routes plus one per pair. */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getCatalogue();
   const base = SITE_CONFIG.siteUrl;
   const now = new Date();
 
@@ -22,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency,
       priority,
     })),
-    ...PRODUCTS.map((p) => ({
+    ...products.map((p) => ({
       url: `${base}/product/${p.id}`,
       lastModified: now,
       changeFrequency: "weekly" as const,

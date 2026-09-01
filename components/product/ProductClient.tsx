@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Product } from "@/data/products";
-import { PRODUCTS } from "@/data/products";
+import { useCatalogue } from "@/context/CatalogueContext";
 import { euToUs, sizePrice, sizeStock } from "@/lib/sizes";
 import { money } from "@/lib/money";
 import { waLink } from "@/lib/whatsapp";
@@ -45,6 +45,7 @@ const ASSURANCES: [React.ReactNode, string, string][] = [
 
 export default function ProductClient({ product: prod }: { product: Product }) {
   const { addToBag, isWished, toggleWish, setStickyBar } = useStore();
+  const catalogue = useCatalogue();
   const [sel, setSel] = useState<number | null>(null);
   const [needSize, setNeedSize] = useState(false);
   const [showMatrix, setShowMatrix] = useState(false);
@@ -72,15 +73,23 @@ export default function ProductClient({ product: prod }: { product: Product }) {
 
   const selPrice = sel ? sizePrice(prod, sel) : prod.price;
   const selPriceLabel = money(selPrice);
-  const stockLabel = prod.stock <= 2 ? `Only ${prod.stock} in the stockroom` : `${prod.stock} pairs in the stockroom`;
+  // Zero stock is a state the owner sets from /admin when a pair is between
+  // restocks: the listing stays up so the page keeps its search ranking and
+  // its inbound links, but nothing about it can be bought.
+  const soldOut = prod.stock <= 0;
+  const stockLabel = soldOut
+    ? "Sold out — message us for the next pair"
+    : prod.stock <= 2
+      ? `Only ${prod.stock} in the stockroom`
+      : `${prod.stock} pairs in the stockroom`;
   const saving = prod.market - prod.price;
   const savingPct = Math.round((saving / prod.market) * 100);
   const selLabel = sel ? `EU ${sel} · US ${euToUs(sel)}` : "Select a size";
   const wished = isWished(prod.id);
 
-  const bundle = PRODUCTS.filter((p) => p.price < 800 && p.id !== prod.id).slice(0, 3);
-  const related = PRODUCTS.filter((p) => p.fam === prod.fam && p.id !== prod.id)
-    .concat(PRODUCTS.filter((p) => p.fam !== prod.fam && p.id !== prod.id))
+  const bundle = catalogue.filter((p) => p.price < 800 && p.id !== prod.id).slice(0, 3);
+  const related = catalogue.filter((p) => p.fam === prod.fam && p.id !== prod.id)
+    .concat(catalogue.filter((p) => p.fam !== prod.fam && p.id !== prod.id))
     .slice(0, 4);
 
   const handleAddToBag = () => {
@@ -141,11 +150,13 @@ export default function ProductClient({ product: prod }: { product: Product }) {
                     key={z}
                     onClick={() => { setSel(z); setNeedSize(false); }}
                     aria-pressed={on}
+                    disabled={soldOut}
                     style={{
-                      appearance: "none", cursor: "pointer", font: "inherit", fontSize: 14, fontWeight: 800, height: 52,
+                      appearance: "none", cursor: soldOut ? "default" : "pointer", font: "inherit", fontSize: 14, fontWeight: 800, height: 52,
                       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
                       border: "2px solid var(--color-text)", background: on ? "var(--color-text)" : "transparent",
                       color: on ? "var(--color-bg)" : "var(--color-text)",
+                      opacity: soldOut ? 0.35 : 1,
                       transition: "background .14s var(--ease-out), color .14s var(--ease-out)",
                     }}
                   >
@@ -168,14 +179,20 @@ export default function ProductClient({ product: prod }: { product: Product }) {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 24 }}>
-            <button onClick={handleAddToBag} className="gg-btn" style={{ justifyContent: "space-between" }}>
-              Add to bag — {selPriceLabel}
-              {ARROW}
-            </button>
+            {soldOut ? (
+              <div className="gg-btn" style={{ justifyContent: "space-between", cursor: "default", opacity: 0.55 }} aria-disabled>
+                Sold out — {selPriceLabel}
+              </div>
+            ) : (
+              <button onClick={handleAddToBag} className="gg-btn" style={{ justifyContent: "space-between" }}>
+                Add to bag — {selPriceLabel}
+                {ARROW}
+              </button>
+            )}
             <div style={{ display: "flex", gap: 10 }}>
               <a href={waLink(waProductText)} target="_blank" rel="noopener" className="gg-btn gg-btn-outline" style={{ flex: 1, justifyContent: "flex-start", gap: 10 }}>
                 <WhatsAppIcon />
-                Order on WhatsApp
+                {soldOut ? "Ask when it's back" : "Order on WhatsApp"}
               </a>
               <button
                 onClick={() => toggleWish(prod.id)}
@@ -228,10 +245,10 @@ export default function ProductClient({ product: prod }: { product: Product }) {
                       <tr key={z}>
                         <td style={{ paddingLeft: 0, fontWeight: 800, fontSize: 15 }}>{z}</td>
                         <td>{euToUs(z)}</td>
-                        <td><span className={`tag ${st <= 1 ? "tag-accent" : "tag-neutral"}`} style={{ fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{st <= 1 ? "Last pair" : `${st} pairs`}</span></td>
+                        <td><span className={`tag ${st <= 1 ? "tag-accent" : "tag-neutral"}`} style={{ fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{st === 0 ? "Sold out" : st === 1 ? "Last pair" : `${st} pairs`}</span></td>
                         <td style={{ fontWeight: 800, whiteSpace: "nowrap" }}>{money(sizePrice(prod, z))}</td>
                         <td style={{ textAlign: "right" }}>
-                          <button onClick={() => { setSel(z); setNeedSize(false); }} className="btn btn-ghost" style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" }}>Select</button>
+                          <button onClick={() => { setSel(z); setNeedSize(false); }} disabled={soldOut} className="btn btn-ghost" style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", opacity: soldOut ? 0.4 : 1, cursor: soldOut ? "default" : "pointer" }}>Select</button>
                         </td>
                       </tr>
                     );
@@ -308,10 +325,14 @@ export default function ProductClient({ product: prod }: { product: Product }) {
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: sel ? "var(--color-neutral-600)" : "var(--color-accent)", marginTop: 3 }}>{selLabel}</div>
             </div>
             <span className="gg-figure gg-desktop" style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 22, letterSpacing: "-0.02em", flex: "none" }}>{selPriceLabel}</span>
-            <button onClick={handleAddToBag} className="gg-btn gg-btn-sm" style={{ flex: "none" }}>
-              Add to bag
-              {ARROW}
-            </button>
+            {soldOut ? (
+              <span className="gg-btn gg-btn-sm" style={{ flex: "none", opacity: 0.55, cursor: "default" }}>Sold out</span>
+            ) : (
+              <button onClick={handleAddToBag} className="gg-btn gg-btn-sm" style={{ flex: "none" }}>
+                Add to bag
+                {ARROW}
+              </button>
+            )}
           </div>
         </div>
       )}

@@ -5,7 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MENUS, TRUST_BAR, type MenuTarget } from "@/data/content";
-import { PRODUCTS, findProduct, type Product } from "@/data/products";
+import { type Product } from "@/data/products";
+import { useCatalogue, useProduct } from "@/context/CatalogueContext";
 import { money } from "@/lib/money";
 import { useStore } from "@/context/StoreContext";
 
@@ -20,10 +21,10 @@ function targetToShopHref(target: MenuTarget): string {
 }
 
 /** Best six matches on name, brand, family, colourway or style code. */
-function search(term: string): Product[] {
+function search(catalogue: Product[], term: string): Product[] {
   const needle = term.trim().toLowerCase();
   if (needle.length < 2) return [];
-  return PRODUCTS
+  return catalogue
     .map((p) => {
       const name = p.name.toLowerCase();
       const hay = `${p.name} ${p.brand} ${p.fam} ${p.colorway} ${p.sku}`.toLowerCase();
@@ -89,11 +90,12 @@ export default function SiteHeader() {
   const [q, setQ] = useState("");
   const [focused, setFocused] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const flag = findProduct("air-dior");
+  const catalogue = useCatalogue();
+  const flag = useProduct("air-dior");
   const activeMenu = MENUS.find((m) => m.key === menu) ?? null;
   const bag = cartCount();
 
-  const suggestions = useMemo(() => search(q), [q]);
+  const suggestions = useMemo(() => search(catalogue, q), [catalogue, q]);
   const showSuggestions = focused && suggestions.length > 0;
 
   useEffect(() => {

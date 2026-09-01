@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GROUNDS, shotProduct, shotSrc, type EditorialShot } from "@/lib/editorial";
+import type { Product } from "@/data/products";
 import StudioPlate from "./StudioPlate";
 
 /**
@@ -19,6 +20,7 @@ import StudioPlate from "./StudioPlate";
  */
 export default function EditorialFrame({
   shot,
+  catalogue,
   priority = false,
   drift = false,
   sizes = "50vw",
@@ -28,6 +30,8 @@ export default function EditorialFrame({
   style,
 }: {
   shot: EditorialShot;
+  /** The live catalogue the slot resolves against — see lib/editorial.ts. */
+  catalogue: Product[];
   priority?: boolean;
   /** Slow ken-burns. Reserve it for heroes — a wall of drifting tiles is noise. */
   drift?: boolean;
@@ -39,8 +43,8 @@ export default function EditorialFrame({
   className?: string;
   style?: React.CSSProperties;
 }) {
-  const src = shotSrc(shot);
-  const product = shotProduct(shot);
+  const src = shotSrc(catalogue, shot);
+  const product = shotProduct(catalogue, shot);
   const ground = GROUNDS[shot.ground];
   const dark = shot.ground === "ink" || shot.ground === "accent";
   const caption = label ?? shot.caption;
