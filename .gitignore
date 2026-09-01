@@ -26,3 +26,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# Local development store — stands in for Vercel Blob when there is no token.
+.gg-local/

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { getCatalogue, pruneOrphanPhotos, saveCatalogue } from "@/lib/catalogue";
+import { getOrders, saveOrders, type OrderStatus } from "@/lib/orders";
 import { isAdmin, requireAdmin, signIn, signOut } from "@/lib/admin-auth";
 import type { Product } from "@/data/products";
 
@@ -213,4 +214,96 @@ export async function setStockAction(formData: FormData): Promise<void> {
 /** Used by the admin pages themselves; keeps the auth check on the server. */
 export async function adminSignedIn(): Promise<boolean> {
   return isAdmin();
+}
+
+/* ── orders ──────────────────────────────────────────────────────────────── */
+
+/**
+ * Move an order along, or cancel it.
+ *
+ * Cancelling is the only thing here that touches inventory: it puts the pairs
+ * back on the shelf. `holdsStock` is cleared in the same write, so pressing
+ * cancel twice — or cancelling an order that was already cancelled — can never
+ * return the same pairs again.
+ */
+export async function setOrderStatusAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const ref = String(formData.get("ref") ?? "");
+  const next = String(formData.get("status") ?? "") as OrderStatus;
+  if (!["new", "confirmed", "delivered", "cancelled"].includes(next)) redirect("/admin/orders");
+
+  const orders = await getOrders();
+  const order = orders.find((o) => o.ref === ref);
+  if (!order) redirect("/admin/orders");
+
+  const returning = next === "cancelled" && order.holdsStock;
+
+  try {
+    if (returning) {
+      const catalogue = await getCatalogue();
+      const back = new Map<string, number>();
+      for (const line of order.lines) {
+        back.set(line.pid, (back.get(line.pid) ?? 0) + line.qty);
+      }
+      await saveCatalogue(
+        catalogue.map((p) => {
+          const n = back.get(p.id);
+          return n ? { ...p, stock: p.stock + n } : p;
+        }),
+      );
+    }
+
+    await saveOrders(
+      orders.map((o) =>
+        o.ref === ref
+          ? { ...o, status: next, holdsStock: next === "cancelled" ? false : o.holdsStock }
+          : o,
+      ),
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Could not save.";
+    redirect("/admin/orders?error=" + encodeURIComponent(message));
+  }
+
+  redirect(
+    "/admin/orders?done=" + encodeURIComponent(ref + (returning ? " cancelled, stock returned" : " marked " + next)),
+  );
+}
+
+/* ── copying a pair ──────────────────────────────────────────────────────── */
+
+/**
+ * Start a new listing from an existing one.
+ *
+ * The shop stocks the same silhouette in several colourways, so the fastest
+ * way to list the next one is usually the last one. This copies everything
+ * except the photos — which are the one thing that must not be shared between
+ * two pairs — and opens it for editing.
+ */
+export async function duplicateProductAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const catalogue = await getCatalogue();
+  const source = catalogue.find((p) => p.id === id);
+  if (!source) redirect("/admin");
+
+  const copy = {
+    ...source,
+    id: uniqueId(source.name, new Set(catalogue.map((p) => p.id))),
+    name: source.name,
+    photos: null,
+    views: undefined,
+    stock: 1,
+    drop: "",
+  };
+
+  try {
+    await saveCatalogue([...catalogue, copy]);
+  } catch (err) {
+    failed(err);
+  }
+
+  redirect("/admin/" + copy.id + "?copied=1");
 }

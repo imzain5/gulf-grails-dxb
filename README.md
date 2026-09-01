@@ -44,17 +44,77 @@ session cookie is signed with it.
 
 ### Day to day
 
-- **Stock** — the number box on each row of the inventory list saves on its
-  own. **Zero is the out-of-stock switch**: the pair stays on the site, marked
-  sold out, keeping its page, its links and its search ranking, and nothing
-  about it can be bought. Delete only removes a pair for good.
-- **Adding a pair** — *Add a pair*, fill the form, upload photos. Photos go
-  from the browser straight to Blob storage, so a full-size phone photo is
-  fine. The first photo leads everywhere: the card, the search result, the link
-  preview. Reorder with the arrows.
-- **Model group** decides which shop filter chip the pair sits under. Pick one
-  that already exists unless you mean to start a new one — a typo makes a new,
-  nearly-empty filter.
+`/admin` has three screens, reachable from the top bar on a desktop and from a
+fixed bar at the bottom of the screen on a phone.
+
+**Inventory.** Everything the shop sells, sold out and running low first.
+Search matches the name, colourway, style code or badge; the four views answer
+the questions actually asked at the shelf — what is out, what is nearly out,
+what still has no photograph. The `−` / `+` stepper on each row is the control
+staff touch most; Save appears only once the number has changed.
+
+**Zero is the out-of-stock switch.** The pair stays on the site, marked sold
+out, keeping its page, its inbound links and its search ranking, and nothing
+about it can be bought. Delete is separate, confirmed, and permanent.
+
+**Copy** starts a new listing from an existing one — everything except the
+photographs, which must never be shared between two pairs. It is the fastest
+way to list the next colourway of a shape already in stock.
+
+**Orders.** Every order placed on the site, newest first, with the phone number
+as a WhatsApp link and a dial link. Confirm it, mark it delivered, or cancel it
+— see below for what cancelling does to stock.
+
+**Add a pair.** Start by searching the model: type "dunk" or "samba" or "350"
+and the silhouette fills in the brand, model group, size run, collab flag and a
+description of the shape, leaving only the colourway, the style code, the price
+and the count. Photographs go from the camera straight to Blob storage, so a
+full-size phone photo is fine; the first one leads everywhere, and the arrows
+reorder them.
+
+### Stock moves on its own
+
+Placing an order takes the pairs off the shelf as the order is written — the
+number in the stockroom and the number on the site are the same number, and
+nobody maintains it.
+
+Under cash on delivery an order is a commitment rather than a payment, so stock
+is held from the moment the order is placed. The alternative is selling the same
+last pair twice while waiting for a WhatsApp reply. **Cancelling an order puts
+its pairs straight back**, once — pressing cancel twice cannot return them
+again.
+
+Everything about the money is recomputed on the server from the catalogue when
+the order arrives. A browser that can send `{ amount: 1 }` will, so nothing the
+customer's browser says about price or availability is trusted; it is only
+allowed to name the pairs and the delivery address. An order is refused
+outright if a pair has sold out in the meantime, and one phone number may only
+have three orders waiting to be confirmed at a time.
+
+### Working on it locally
+
+```bash
+ADMIN_PASSWORD=whatever npm run dev
+```
+
+With no `BLOB_READ_WRITE_TOKEN` set, the catalogue and the orders are read from
+and written to JSON files under `.gg-local/` (gitignored) instead of Blob
+storage, so the whole admin — including placing an order and watching stock
+come down — works offline. Photo uploads are the exception: they go from the
+browser to Blob directly and have no local equivalent, so they stay off until a
+real store is connected. Delete `.gg-local/` to go back to the seed.
+
+### The model library
+
+`data/models.ts` holds the silhouettes the shop sells — around forty shapes,
+each with its brand, model group, usual size run, collab flag and a description
+of the shoe. It is deliberately **silhouettes, not colourways**: "Air Jordan 1
+Retro High OG" covers Chicago, Bred Toe and every colourway that will ever
+exist on that shape, whereas a list of specific colourways would be stale
+within a season.
+
+To add a shape, add an entry. Nothing it fills in is binding — every field is
+editable afterwards.
 
 ### If nothing has been saved yet
 
@@ -156,6 +216,10 @@ in-house angles, so it overrides both the files and the labels in
 reads the Blob document, falls back to the seed, caches the result under the
 `gg-catalogue` tag, and drops that cache on every admin write.
 
+Orders live beside it in `lib/orders.ts`, same shape: one JSON document, whole
+rewrites, its own cache tag. `app/(store)/checkout/actions.ts` is the only
+thing that writes both at once.
+
 Server components `await getCatalogue()`. Client components read it from
 `context/CatalogueContext.tsx`, which the storefront layout fills once — the
 header search, the wishlist and the cart all price from the same list the
@@ -199,13 +263,13 @@ hunting through components.
 - **Catalogue**: 30 real pairs with real style codes, EU sizes and AED prices,
   and 94 real product photos in `public/assets/`. These ship as the seed; the
   live catalogue is whatever the owner has saved at `/admin`.
-- **Ordering** has no backend and no payment processor, by design — it matches
-  the brief (cash on delivery / bank transfer, confirmed on WhatsApp). The
-  cart, wishlist, recently-viewed list and last order live in the browser's
-  `localStorage` only (`context/StoreContext.tsx`, `lib/recentStore.ts`);
-  "placing an order" builds a pre-filled WhatsApp message via
-  `lib/whatsapp.ts`. Nothing is recorded server-side — if that's needed later,
-  those are the files to start from.
+- **Ordering** has no payment processor, by design — it matches the brief
+  (cash on delivery / bank transfer, confirmed on WhatsApp), and placing an
+  order still builds a pre-filled WhatsApp message via `lib/whatsapp.ts`. What
+  *is* recorded server-side is the order itself: `lib/orders.ts` writes it next
+  to the catalogue and draws the stock down. The cart, wishlist and
+  recently-viewed list are still per-browser `localStorage`
+  (`context/StoreContext.tsx`, `lib/recentStore.ts`).
 - **The grail index, the review quotes and the "viewing now" counter** are
   content in `data/content.ts` and a timer, not live data. Replace them
   wholesale when there is a real feed behind them.

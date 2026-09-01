@@ -110,7 +110,7 @@ interface StoreContextValue {
   setPay: (p: "cod" | "bank") => void;
   setReceipt: (name: string) => void;
   setConfirmSize: (v: boolean) => void;
-  placeOrder: () => PlacedOrder | null;
+  commitOrder: (order: PlacedOrder) => void;
   orderMessageText: (o: PlacedOrder) => string;
 }
 
@@ -207,29 +207,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const setReceipt = useCallback((name: string) => store.set((s) => ({ ...s, receipt: name })), []);
   const setConfirmSize = useCallback((v: boolean) => store.set((s) => ({ ...s, confirmSize: v })), []);
 
-  const placeOrder = useCallback((): PlacedOrder | null => {
-    let placed: PlacedOrder | null = null;
-    store.set((s) => {
-      const resolved = s.cart.map((c) => {
-        const p = findIn(catalogue, c.pid);
-        const unit = sizePrice(p, c.size);
-        return { name: p.name, size: c.size, qty: c.qty, amount: unit * c.qty };
-      });
-      if (resolved.length === 0) return s;
-      const disc = s.refOk ? SITE_CONFIG.referralDiscount : 0;
-      const sub = resolved.reduce((sum, l) => sum + l.amount, 0);
-      const fee = s.form.emirate === "Dubai" ? 0 : SITE_CONFIG.deliveryFeeOutside;
-      const orderTotal = Math.max(0, sub + fee - disc);
-      const ref = "GG-" + String(Math.floor(1000 + Math.random() * 9000));
-      const order: PlacedOrder = {
-        ref, lines: resolved, total: orderTotal, discount: disc, pay: s.pay, form: { ...s.form },
-        date: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      };
-      placed = order;
-      return { ...s, cart: [], lastOrder: order, receipt: "", confirmSize: false, ref: "", refOk: false };
-    });
-    return placed;
-  }, [catalogue]);
+  /**
+   * Record an order the server has already accepted.
+   *
+   * The totals, the reference and the stock draw-down are all decided in
+   * app/(store)/checkout/actions.ts — a browser cannot be trusted with what a
+   * pair costs or whether it is still on the shelf. All that happens here is
+   * that the bag empties and the receipt page gets something to render.
+   */
+  const commitOrder = useCallback((order: PlacedOrder) => {
+    store.set((s) => ({
+      ...s, cart: [], lastOrder: order, receipt: "", confirmSize: false, ref: "", refOk: false,
+    }));
+  }, []);
 
   const orderMessageText = useCallback((o: PlacedOrder) => {
     const items = o.lines
@@ -279,11 +269,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setPay,
     setReceipt,
     setConfirmSize,
-    placeOrder,
+    commitOrder,
     orderMessageText,
   }), [state, toast, showToast, stickyBar, lines, subtotal, deliveryFee, discount, total, cartCount,
     addToBag, setQty, removeLine, toggleWish, isWished, setForm, setRef, applyRef, setPay, setReceipt,
-    setConfirmSize, placeOrder, orderMessageText]);
+    setConfirmSize, commitOrder, orderMessageText]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
