@@ -23,7 +23,7 @@ const SPANS: [number, number][] = [[2, 2], [2, 1], [1, 1], [1, 1], [2, 1], [2, 1
 export default function EditorialGallery({ catalogue }: { catalogue: Product[] }) {
   return (
     <section style={{ borderBottom: "1px solid var(--hp-line)" }}>
-      <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+      <div className="hp-shell hp-space-editorial">
         <Rise>
           <div
             style={{

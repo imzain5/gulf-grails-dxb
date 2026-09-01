@@ -86,7 +86,7 @@ export default function CampaignFilm({
 
   return (
     <section style={{ background: "var(--color-bg)", borderBottom: "1px solid var(--hp-line)" }}>
-      <div className="hp-shell" style={{ paddingTop: "var(--hp-section)", paddingBottom: "clamp(34px, 4vw, 64px)" }}>
+      <div className="hp-shell" style={{ paddingTop: "var(--hp-space-cinematic)", paddingBottom: "clamp(34px, 4vw, 64px)" }}>
         <Rise>
           <h2 className="hp-display hp-statement" style={{ maxWidth: "16ch" }}>{title}</h2>
           {note && (

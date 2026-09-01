@@ -23,7 +23,7 @@ const ARROW = (
 export default function Vault({ products }: { products: Product[] }) {
   return (
     <section className="hp-dark" style={{ borderBottom: "1px solid var(--hp-line-dark)" }}>
-      <div className="hp-shell" style={{ paddingBlock: "var(--hp-section)" }}>
+      <div className="hp-shell hp-space-cinematic">
         <Rise>
           <div
             style={{
