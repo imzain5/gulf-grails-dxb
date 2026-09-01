@@ -11,6 +11,7 @@ import DropStrip from "@/components/home/DropStrip";
 import CollectionGrid from "@/components/home/CollectionGrid";
 import CampaignBand from "@/components/home/CampaignBand";
 import Vault from "@/components/home/Vault";
+import CampaignFilm from "@/components/home/CampaignFilm";
 import EditorialGallery from "@/components/home/EditorialGallery";
 import Rise from "@/components/home/Rise";
 
@@ -127,9 +128,13 @@ export default function HomePage() {
       <HomeHero />
       <DropStrip />
 
-      <Statement note="Thirty pairs, physically in the Al Quoz stockroom. Not a marketplace and not a dropship line — if a size shows on this site, it is in our hands and photographed on our own table.">
-        The pairs you thought you missed.
-      </Statement>
+      <CampaignFilm
+        title={<>The pairs you thought you missed.</>}
+        note="Thirty pairs, physically in the Al Quoz stockroom. Not a marketplace and not a dropship line — if a size shows on this site, it is in our hands and photographed on our own table."
+        src="/assets/video/air-dior-film.mp4"
+        poster="/assets/video/air-dior-film-poster.jpg"
+        caption="Air Dior — the campaign film"
+      />
 
       {travis.length > 0 && (
         <CampaignBand

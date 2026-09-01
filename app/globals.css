@@ -1040,3 +1040,51 @@ body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: 
 @media (max-width: 820px) {
   .gg-houses > :last-child { grid-column: 1 / -1; }
 }
+
+/* — the campaign film —
+   Full-bleed and capped by viewport height so it stays a band rather than a
+   900px wall on a wide screen. */
+.hp-film {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: min(78vh, 820px);
+  overflow: hidden;
+  background: var(--hp-ink);
+  isolation: isolate;
+}
+.hp-film-bar {
+  position: absolute;
+  left: var(--hp-gutter);
+  right: var(--hp-gutter);
+  bottom: clamp(14px, 2vw, 26px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+.hp-film-bar > * { pointer-events: auto; }
+.hp-film-sound {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  color: var(--hp-paper);
+  background: color-mix(in srgb, #201e1d 55%, transparent);
+  border: 1px solid color-mix(in srgb, #f3f2f2 34%, transparent);
+  backdrop-filter: blur(6px);
+  transition: background .28s var(--hp-ease), border-color .28s var(--hp-ease);
+}
+.hp-film-sound:hover {
+  background: color-mix(in srgb, #201e1d 78%, transparent);
+  border-color: var(--hp-paper);
+}
