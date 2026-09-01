@@ -60,7 +60,7 @@ export const STORY_SHOTS: EditorialShot[] = [
 
 /** The @gulfgrails wall — six pairs, each a different silhouette. */
 export const INSTAGRAM_SHOTS: EditorialShot[] = [
-  { pid: "ts-aj1-high", view: 2, ground: "white", caption: "Mocha high, Al Quoz table" },
+  { pid: "ts-aj1-high", view: 2, ground: "white", caption: "Mocha high, Jumeirah table" },
   { pid: "bal-triple-s", view: 0, ground: "paper", caption: "Triple S, clear sole" },
   { pid: "yz-zebra", view: 0, ground: "white", caption: "Zebra restock" },
   { pid: "aj1-lost", view: 0, ground: "paper", caption: "Lost & Found, boxed" },

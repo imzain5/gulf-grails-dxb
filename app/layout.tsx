@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 /**
  * Storefront identity for search engines.
  *
- * A shop that trades on being a real place in Al Quoz with a real WhatsApp
+ * A shop that trades on being a real place in Jumeirah with a real WhatsApp
  * number should say so in a form Google can read — it is what puts the
  * opening hours, the contact number and the rating into the result.
  */
@@ -59,10 +59,11 @@ const ORGANISATION_LD = {
   description: DESCRIPTION,
   url: SITE_CONFIG.siteUrl,
   telephone: "+" + waDigits(),
+  email: SITE_CONFIG.email,
   priceRange: "AED 380 – AED 33,000",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Al Quoz 1",
+    streetAddress: "Jumeirah 1",
     addressLocality: "Dubai",
     addressCountry: "AE",
   },

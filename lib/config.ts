@@ -6,6 +6,8 @@ export const SITE_CONFIG = {
       images, the sitemap and the structured data. Change this before launch. */
   siteUrl: "https://gulfgrails.ae",
   whatsappNumber: "+971 55 689 2085",
+  /** Shown in the footer and the contact points; also feeds the structured data. */
+  email: "gulfgrails@gmail.com",
   /** AED delivery fee for any emirate other than Dubai. Dubai is free. */
   deliveryFeeOutside: 30,
   /** Orders above this AED amount are asked to pay by bank transfer instead of COD. */

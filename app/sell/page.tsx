@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { waLink } from "@/lib/whatsapp";
+import { SITE_CONFIG } from "@/lib/config";
 import EditorialFrame from "@/components/EditorialFrame";
 import { PAGE_SHOTS } from "@/lib/editorial";
 
@@ -20,6 +21,13 @@ export default function SellPage() {
           <a href={waLink("Hello Gulf Grails, I would like to sell a pair. Here are the photos:")} target="_blank" rel="noopener" className="gg-btn">
             Send photos on WhatsApp
           </a>
+          <div style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-neutral-700)", marginTop: 16 }}>
+            Prefer email? Send the same four photos to{" "}
+            <a href={`mailto:${SITE_CONFIG.email}?subject=Selling a pair`} style={{ fontWeight: 600 }}>
+              {SITE_CONFIG.email}
+            </a>{" "}
+            and we&apos;ll come back to you the same day.
+          </div>
           <div className="gg-grid" style={{ borderTop: "2px solid var(--color-text)", marginTop: 44, "--cols": 3, "--cols-xs": 1 } as React.CSSProperties}>
             <div style={{ padding: "20px 20px 20px 0", borderRight: "2px solid var(--color-divider)" }}>
               <div style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 26, letterSpacing: "-0.02em" }}>Same day</div>

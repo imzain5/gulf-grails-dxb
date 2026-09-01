@@ -54,7 +54,7 @@ export default function HomeHero() {
           </div>
           <p className="hp-body" style={{ margin: 0 }}>
             8,500 pairs made worldwide. Five million people entered the draw. Two of them are
-            sitting in our Al Quoz stockroom with the numbered box and both dust bags.
+            sitting in our Jumeirah stockroom with the numbered box and both dust bags.
           </p>
         </div>
 

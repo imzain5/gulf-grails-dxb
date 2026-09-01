@@ -119,7 +119,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
 
   const list = useMemo(() => filterProducts(filters), [filters]);
   const active = activeCount(filters);
-  const shopKicker = filters.fam === "All" ? "Inventory · Al Quoz stockroom" : filters.fam;
+  const shopKicker = filters.fam === "All" ? "Inventory · Jumeirah stockroom" : filters.fam;
   const resultLabel = list.length === 0
     ? "No match"
     : list.length === PRODUCTS.length

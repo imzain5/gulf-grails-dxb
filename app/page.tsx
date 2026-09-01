@@ -4,6 +4,7 @@ import { PRODUCTS, findProduct } from "@/data/products";
 import { CHECKS, HOUSES, MARKET, REVIEWS } from "@/data/content";
 import { STORY_SHOTS } from "@/lib/editorial";
 import { money } from "@/lib/money";
+import { SITE_CONFIG } from "@/lib/config";
 import { waLink } from "@/lib/whatsapp";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import HomeHero from "@/components/home/HomeHero";
@@ -130,7 +131,7 @@ export default function HomePage() {
 
       <CampaignFilm
         title={<>The pairs you thought you missed.</>}
-        note="Thirty pairs, physically in the Al Quoz stockroom. Not a marketplace and not a dropship line — if a size shows on this site, it is in our hands and photographed on our own table."
+        note="Thirty pairs, physically in the Jumeirah stockroom. Not a marketplace and not a dropship line — if a size shows on this site, it is in our hands and photographed on our own table."
         src="/assets/video/air-dior-film.mp4"
         poster="/assets/video/air-dior-film-poster.jpg"
         caption="Air Dior — the campaign film"
@@ -176,7 +177,7 @@ export default function HomePage() {
 
       <Statement
         ground="ink"
-        note="Al Quoz 1, Dubai. Viewing by appointment. Same-day delivery across the city, next day to every other emirate, and you pay the courier once the box is open and the pair is on your feet."
+        note="Jumeirah 1, Dubai. Viewing by appointment. Same-day delivery across the city, next day to every other emirate, and you pay the courier once the box is open and the pair is on your feet."
         photo={{ src: "/assets/campaign/air-dior-onfoot.jpg", alt: "Air Dior on foot", position: "center 55%" }}
       >
         Physically stocked in Dubai.
@@ -428,9 +429,10 @@ export default function HomePage() {
             <hr className="hp-hair" style={{ margin: "clamp(46px, 5vw, 78px) 0 30px" }} />
             <div style={{ display: "flex", gap: "clamp(20px, 4vw, 64px)", flexWrap: "wrap" }}>
               {[
-                ["Al Quoz 1, Dubai", "Viewing by appointment"],
+                ["Jumeirah 1, Dubai", "Viewing by appointment"],
                 ["Same day in Dubai", "Next day UAE-wide"],
                 ["10am – 11pm", "On WhatsApp, every day"],
+                [SITE_CONFIG.email, "Email us anytime"],
                 [`From ${money(cheapest)}`, `${PRODUCTS.length} pairs in stock`],
               ].map(([a, b]) => (
                 <div key={a}>

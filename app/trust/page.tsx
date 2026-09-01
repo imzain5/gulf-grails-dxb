@@ -16,7 +16,7 @@ export default function TrustPage() {
             We stake the<br />business on<br />every pair.
           </h1>
           <p style={{ margin: "26px 0 0", fontSize: 16, lineHeight: 1.6, maxWidth: "50ch", color: "var(--color-neutral-800)", textWrap: "pretty" }}>
-            Nothing is drop-shipped. Every pair passes through our hands in Al Quoz, gets photographed, checked and logged before it is listed. If a pair you buy from us is ever proven fake, you get a full refund plus the delivery fee — no argument, no timeline.
+            Nothing is drop-shipped. Every pair passes through our hands in Jumeirah, gets photographed, checked and logged before it is listed. If a pair you buy from us is ever proven fake, you get a full refund plus the delivery fee — no argument, no timeline.
           </p>
         </div>
         <EditorialFrame

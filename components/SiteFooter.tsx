@@ -45,16 +45,25 @@ export default function SiteFooter() {
             The house
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-neutral-400)", maxWidth: "34ch", textWrap: "pretty" }}>
-            Luxury sneakers, verified in-house and delivered across the UAE. Al Quoz 1, Dubai. Viewing by appointment.
+            Luxury sneakers, verified in-house and delivered across the UAE. Jumeirah 1, Dubai. Viewing by appointment.
           </div>
-          <a
-            href={waLink("Hello Gulf Grails, I have a question about a pair.")}
-            target="_blank" rel="noopener"
-            className="gg-hover-accent-2"
-            style={{ color: "var(--color-bg)", fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 18, letterSpacing: "-0.01em", display: "inline-block", marginTop: 16 }}
-          >
-            {SITE_CONFIG.whatsappNumber}
-          </a>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start", marginTop: 16 }}>
+            <a
+              href={waLink("Hello Gulf Grails, I have a question about a pair.")}
+              target="_blank" rel="noopener"
+              className="gg-hover-accent-2"
+              style={{ color: "var(--color-bg)", fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 18, letterSpacing: "-0.01em" }}
+            >
+              {SITE_CONFIG.whatsappNumber}
+            </a>
+            <a
+              href={`mailto:${SITE_CONFIG.email}`}
+              className="gg-hover-accent-2"
+              style={{ color: "var(--color-neutral-400)", fontSize: 13, letterSpacing: "0.01em" }}
+            >
+              {SITE_CONFIG.email}
+            </a>
+          </div>
         </div>
         <div>
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-neutral-500)", marginBottom: 14 }}>Shop</div>
