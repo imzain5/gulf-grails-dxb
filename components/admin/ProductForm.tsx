@@ -26,6 +26,11 @@ const EMPTY: ActionState = {};
  * phone photo is several times that; uploading directly also means the file is
  * already stored by the time the form is submitted, so a save is instant.
  *
+ * The file is sent exactly as it came off the camera. Nothing here resizes it,
+ * re-encodes it or strips it — the shop sells the photograph as much as the
+ * shoe, so the stored copy is the master and the site renders derivatives from
+ * it at full quality.
+ *
  * The first photo leads everywhere — card, search result, link preview — which
  * is why it is labelled rather than left to be discovered.
  */
@@ -78,10 +83,29 @@ export default function ProductForm({
   }
 
   async function addFiles(files: FileList | File[]) {
-    const chosen = [...files].filter((f) => f.type.startsWith("image/"));
+    const picked = [...files].filter((f) => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name));
+    if (picked.length === 0) return;
+
+    /*
+     * HEIC is what an iPhone shoots unless told otherwise. Safari can display
+     * it and Chrome cannot, so one stored here would look broken to most
+     * customers. iOS usually converts to JPEG when a photo is picked from the
+     * camera roll — this catches the times it doesn't (the Files app, mostly)
+     * and says what to change rather than failing at the server with a content
+     * type nobody recognises.
+     */
+    const unusable = picked.filter(
+      (f) => /heic|heif/i.test(f.type) || (!f.type && /\.(heic|heif)$/i.test(f.name)),
+    );
+    const chosen = picked.filter((f) => !unusable.includes(f));
+
+    setUploadError(
+      unusable.length
+        ? "Those are HEIC files, which most browsers can't display. On iPhone: Settings → Camera → Formats → Most Compatible, then reshoot — or share the photo to yourself first, which converts it."
+        : null,
+    );
     if (chosen.length === 0) return;
 
-    setUploadError(null);
     setBusy((n) => n + chosen.length);
 
     for (const file of chosen) {
@@ -177,7 +201,7 @@ export default function ProductForm({
           <div className="ad-photos">
             {photos.map((url, i) => (
               <div key={url} className="ad-photo">
-                <Image src={url} alt="" width={220} height={220} sizes="220px" unoptimized />
+                <Image src={url} alt="" width={220} height={220} sizes="220px" />
                 <button
                   type="button"
                   className="ad-photo-x"
@@ -230,7 +254,12 @@ export default function ProductForm({
               <div style={{ marginTop: 10, lineHeight: 1.5 }}>
                 Lateral shot first — it becomes the card. Then detail, medial, sole.
                 <br />
-                Plain white background, JPEG or PNG up to 12MB.
+                Plain white background. JPEG, PNG or WebP, up to 50MB.
+                <br />
+                <strong style={{ color: "var(--ad-ink)" }}>Send the full-size file.</strong>{" "}
+                It is stored exactly as shot and never compressed — don&apos;t shrink it or
+                screenshot it. Shoot at least 2000px on the long edge: customers zoom into the
+                stitching, and that is the only thing that limits how sharp it gets.
               </div>
             </>
           ) : (

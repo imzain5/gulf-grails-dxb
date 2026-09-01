@@ -178,8 +178,12 @@ every pair is shot the same way. Four angles, in this order:
 | 4 | **Sole** | The outsole, flat on |
 
 Shoot on plain white, one shoe, roughly square, and leave a little margin — the
-site crops in. 1200px on the long edge is plenty. Upload them in that order, or
-reorder them afterwards with the arrows; the first one is the card.
+site crops in. Upload them in that order, or reorder them afterwards with the
+arrows; the first one is the card.
+
+**Shoot at least 2000px on the long edge, and upload the file untouched.** The
+product page magnifies 2.4× on zoom, so the source resolution is the only thing
+that limits how sharp a customer can get — see below.
 
 Fewer than four is fine — the gallery just shows fewer thumbnails. A pair with
 no photos at all falls back to a designed studio plate rather than a broken
@@ -209,6 +213,35 @@ in-house angles, so it overrides both the files and the labels in
 
 `views` must be the same length as `photos`. Without it the labels come from
 `VIEWS` in `lib/sizes.ts`. Pairs uploaded at `/admin` always use `VIEWS`.
+
+### Photo quality
+
+Nothing in the pipeline compresses a photograph.
+
+- **Uploads are stored byte-for-byte.** The browser sends the file straight to
+  Blob storage; nothing resizes, re-encodes or strips it. The stored file is
+  the master, and up to 50MB is accepted so nobody has to shrink anything.
+- **What a customer sees is a derivative generated at quality 100.**
+  `images.qualities` in `next.config.ts` has a single entry, which is what
+  forces it: Next 16 requires this allowlist and defaults it to `[75]`, so
+  every product shot on the site was previously re-compressed to quality 75
+  before it reached anyone. With one entry, any `quality` prop coerces to it,
+  so the setting holds site-wide without a prop on each image.
+- **The zoom asks for a bigger source.** The gallery magnifies 2.4×, so its
+  `sizes` widens while zoom is on and the browser fetches a source matched to
+  the magnified box rather than the frame.
+
+Quality 100 costs roughly 3.5–4× the bytes of quality 75 (measured: a 1080px-wide
+WebP goes from 56KB to 214KB). That is the deliberate trade — the photograph is
+the product. To take the middle path instead, set `qualities: [90]`, which lands
+around 117KB for the same image and is visually indistinguishable from the
+original on a screen.
+
+**The binding constraint is now the source files.** The thirty shipped pairs
+were shot at 1250px wide, and the Air Dior's six in-house angles at 640px, so
+they cannot get sharper than that under zoom no matter what the config says.
+Re-uploading those at full resolution through `/admin` is the only fix, and
+nothing else needs to change when you do.
 
 ### Where the catalogue is read
 

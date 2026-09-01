@@ -32,7 +32,7 @@ export default function InventoryRow({ product }: { product: Product }) {
   return (
     <div className={`ad-row${out ? " is-out" : low ? " is-low" : ""}`}>
       <div className={`ad-thumb${cover ? "" : " is-empty"}`}>
-        {cover && <Image src={cover} alt="" width={64} height={64} sizes="64px" unoptimized />}
+        {cover && <Image src={cover} alt="" width={64} height={64} sizes="64px" />}
       </div>
 
       <div style={{ minWidth: 0 }}>
