@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { PRODUCTS } from "@/data/products";
+import { useCatalogue } from "@/context/CatalogueContext";
 import { useStore } from "@/context/StoreContext";
 import ProductCard from "@/components/ProductCard";
 
 export default function WishlistClient() {
   const { wish } = useStore();
-  const list = PRODUCTS.filter((p) => wish.includes(p.id));
+  const catalogue = useCatalogue();
+  const list = catalogue.filter((p) => wish.includes(p.id));
 
   return (
     <div data-screen-label="Saved">

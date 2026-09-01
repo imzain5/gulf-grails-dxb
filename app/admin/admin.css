@@ -1,0 +1,344 @@
+/*
+ * The stockroom terminal.
+ *
+ * Deliberately not the storefront. The shop is an editorial object with big
+ * type and a lot of air; this is a tool one person uses on a phone in a
+ * stockroom, so it is dense, high-contrast and boring on purpose. It carries
+ * its own tokens rather than the `--gg-*` / `--hp-*` sets so that nothing
+ * here can drift the customer-facing design, and nothing there can reflow
+ * this.
+ */
+
+.ad {
+  --ad-ink: #16150f;
+  --ad-mute: #6d6a5f;
+  --ad-line: #dedbd0;
+  --ad-paper: #f6f4ee;
+  --ad-card: #ffffff;
+  --ad-accent: #8f2d21;
+  --ad-ok: #2f6b3f;
+
+  min-height: 100vh;
+  background: var(--ad-paper);
+  color: var(--ad-ink);
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ad-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(14px, 3vw, 28px);
+}
+
+.ad-bar {
+  border-bottom: 1px solid var(--ad-line);
+  background: var(--ad-card);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.ad-bar-in {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 13px 0;
+}
+.ad-mark {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 15px;
+  margin-right: auto;
+}
+.ad-mark span { color: var(--ad-mute); font-weight: 600; }
+
+.ad-nav { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.ad-nav a, .ad-linkbtn {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ad-mute);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ad-nav a:hover, .ad-linkbtn:hover { color: var(--ad-ink); }
+
+.ad-main { padding: clamp(20px, 3vw, 34px) 0 80px; }
+
+.ad-h1 {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+.ad-sub { color: var(--ad-mute); margin: 0 0 22px; max-width: 62ch; }
+
+.ad-note {
+  border: 1px solid var(--ad-line);
+  border-left: 3px solid var(--ad-accent);
+  background: var(--ad-card);
+  padding: 13px 15px;
+  margin: 0 0 20px;
+  max-width: 74ch;
+}
+.ad-note.is-ok { border-left-color: var(--ad-ok); }
+.ad-note h3 { margin: 0 0 5px; font-size: 13px; font-weight: 800; }
+.ad-note p { margin: 0 0 6px; color: var(--ad-mute); }
+.ad-note p:last-child { margin-bottom: 0; }
+.ad-note code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: var(--ad-paper);
+  padding: 1px 5px;
+  border: 1px solid var(--ad-line);
+}
+
+/* ── buttons ─────────────────────────────────────────────────────────────── */
+
+.ad-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--ad-ink);
+  background: var(--ad-ink);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity .18s ease;
+}
+.ad-btn:hover { opacity: .84; }
+.ad-btn[disabled] { opacity: .45; cursor: default; }
+.ad-btn.is-ghost { background: transparent; color: var(--ad-ink); }
+.ad-btn.is-ghost:hover { background: var(--ad-card); opacity: 1; }
+.ad-btn.is-danger { background: transparent; border-color: var(--ad-accent); color: var(--ad-accent); }
+.ad-btn.is-danger:hover { background: var(--ad-accent); color: #fff; opacity: 1; }
+.ad-btn.is-small { padding: 6px 11px; font-size: 12px; }
+
+/* ── fields ──────────────────────────────────────────────────────────────── */
+
+.ad-field { display: block; margin-bottom: 15px; }
+.ad-field > span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ad-mute);
+  margin-bottom: 5px;
+}
+.ad-field em {
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+  color: var(--ad-mute);
+  margin-top: 5px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+}
+.ad-input, .ad-area, .ad-select {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--ad-card);
+  border: 1px solid var(--ad-line);
+  padding: 9px 11px;
+  border-radius: 0;
+}
+.ad-input:focus, .ad-area:focus, .ad-select:focus {
+  outline: 2px solid var(--ad-ink);
+  outline-offset: -2px;
+}
+.ad-area { min-height: 92px; resize: vertical; line-height: 1.55; }
+.ad-check { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 15px; }
+.ad-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--ad-ink); }
+.ad-check span { font-size: 13px; }
+.ad-check em { display: block; font-style: normal; color: var(--ad-mute); font-size: 12px; }
+
+.ad-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0 16px;
+}
+
+.ad-card {
+  background: var(--ad-card);
+  border: 1px solid var(--ad-line);
+  padding: clamp(16px, 2.4vw, 24px);
+}
+
+/* ── inventory table ─────────────────────────────────────────────────────── */
+
+.ad-list { display: flex; flex-direction: column; gap: 10px; }
+
+.ad-row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  background: var(--ad-card);
+  border: 1px solid var(--ad-line);
+  padding: 10px 12px;
+}
+.ad-row.is-out { background: #fbf7f6; border-color: #e6cfcb; }
+
+.ad-thumb {
+  width: 62px;
+  height: 62px;
+  border: 1px solid var(--ad-line);
+  background: var(--ad-paper);
+  position: relative;
+  overflow: hidden;
+  flex: none;
+}
+.ad-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.ad-thumb.is-empty::after {
+  content: "No photo";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ad-mute);
+  text-align: center;
+}
+
+.ad-name { font-weight: 700; line-height: 1.3; }
+.ad-name a { color: inherit; text-decoration: none; }
+.ad-name a:hover { text-decoration: underline; }
+.ad-meta {
+  font-size: 12px;
+  color: var(--ad-mute);
+  margin-top: 3px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ad-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  padding: 1px 5px;
+}
+.ad-tag.is-out { color: var(--ad-accent); }
+
+.ad-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.ad-stock {
+  width: 62px;
+  text-align: center;
+  font: inherit;
+  font-weight: 700;
+  padding: 6px 4px;
+  border: 1px solid var(--ad-line);
+  background: var(--ad-paper);
+}
+
+@media (max-width: 640px) {
+  .ad-row { grid-template-columns: 48px minmax(0, 1fr); }
+  .ad-thumb { width: 48px; height: 48px; }
+  .ad-actions { grid-column: 1 / -1; justify-content: flex-start; }
+}
+
+/* ── photo strip ─────────────────────────────────────────────────────────── */
+
+.ad-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ad-photo {
+  position: relative;
+  border: 1px solid var(--ad-line);
+  background: var(--ad-paper);
+  aspect-ratio: 1 / 1;
+}
+.ad-photo img { width: 100%; height: 100%; object-fit: contain; }
+.ad-photo-x {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--ad-line);
+  background: #fff;
+  color: var(--ad-accent);
+  font: inherit;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+.ad-photo-i {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #fff;
+  border: 1px solid var(--ad-line);
+  padding: 1px 5px;
+  color: var(--ad-mute);
+}
+.ad-move {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  display: flex;
+  gap: 3px;
+}
+.ad-move button {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--ad-line);
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ad-move button[disabled] { opacity: .35; cursor: default; }
+
+.ad-drop {
+  border: 1px dashed var(--ad-line);
+  background: var(--ad-card);
+  padding: 16px;
+  text-align: center;
+  color: var(--ad-mute);
+  font-size: 13px;
+}
+.ad-drop.is-on { border-color: var(--ad-ink); color: var(--ad-ink); }
+
+/* ── login ───────────────────────────────────────────────────────────────── */
+
+.ad-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.ad-login-box { width: 100%; max-width: 360px; }

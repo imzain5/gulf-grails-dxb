@@ -79,7 +79,9 @@ function QuickSizes({ product }: { product: Product }) {
 }
 
 export default function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
-  const stockLabel = product.stock <= 2 ? `Only ${product.stock} left` : `${product.stock} in stock`;
+  const stockLabel = product.stock === 0
+    ? "Sold out"
+    : product.stock <= 2 ? `Only ${product.stock} left` : `${product.stock} in stock`;
   const sizeRange = product.sizes[0] + "–" + product.sizes[product.sizes.length - 1];
   const saving = product.market - product.price;
   const savingPct = Math.round((saving / product.market) * 100);
@@ -105,7 +107,8 @@ export default function ProductCard({ product, priority = false }: { product: Pr
 
         {product.stock <= 3 && (
           <div style={{
-            position: "absolute", left: 0, bottom: 0, background: "var(--color-accent)", color: "#fff",
+            position: "absolute", left: 0, bottom: 0,
+            background: product.stock === 0 ? "var(--color-text)" : "var(--color-accent)", color: "#fff",
             padding: "6px 10px", fontSize: 10, fontWeight: 800, letterSpacing: "0.14em",
             textTransform: "uppercase", pointerEvents: "none", zIndex: 2,
           }}>

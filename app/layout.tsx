@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
 import "./globals.css";
-import { StoreProvider } from "@/context/StoreContext";
-import SiteChrome from "@/components/SiteChrome";
 import { SITE_CONFIG } from "@/lib/config";
-import { waDigits } from "@/lib/whatsapp";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -46,45 +43,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Storefront identity for search engines.
+ * Document shell only.
  *
- * A shop that trades on being a real place in Jumeirah with a real WhatsApp
- * number should say so in a form Google can read — it is what puts the
- * opening hours, the contact number and the rating into the result.
+ * The storefront chrome (header, footer, cart, catalogue) lives in the
+ * `(store)` route group so that /admin, which shares none of it, can sit
+ * beside it with its own layout.
  */
-const ORGANISATION_LD = {
-  "@context": "https://schema.org",
-  "@type": "Store",
-  name: "Gulf Grails",
-  description: DESCRIPTION,
-  url: SITE_CONFIG.siteUrl,
-  telephone: "+" + waDigits(),
-  email: SITE_CONFIG.email,
-  priceRange: "AED 380 – AED 33,000",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Jumeirah 1",
-    addressLocality: "Dubai",
-    addressCountry: "AE",
-  },
-  areaServed: "United Arab Emirates",
-  currenciesAccepted: "AED",
-  paymentAccepted: "Cash on delivery, Bank transfer",
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      opens: "10:00",
-      closes: "23:00",
-    },
-  ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "312",
-  },
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={archivo.variable}>
@@ -96,16 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{".gg-reveal{opacity:1!important;transform:none!important}"}</style>
         </noscript>
       </head>
-      <body>
-        <script
-          type="application/ld+json"
-          // Serialised from a literal defined above — no user input reaches it.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANISATION_LD) }}
-        />
-        <StoreProvider>
-          <SiteChrome>{children}</SiteChrome>
-        </StoreProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

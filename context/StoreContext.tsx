@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { findProduct, type Product } from "@/data/products";
+import { findIn, type Product } from "@/data/products";
+import { useCatalogue } from "./CatalogueContext";
 import { sizePrice } from "@/lib/sizes";
 import { money } from "@/lib/money";
 import { SITE_CONFIG } from "@/lib/config";
@@ -117,6 +118,9 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
+  // Cart lines are stored as ids, so pricing and naming them needs the live
+  // catalogue rather than a compiled-in copy.
+  const catalogue = useCatalogue();
   const [toast, setToast] = useState("");
   const [stickyBar, setStickyBar] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -129,11 +133,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const lines = useCallback((): ResolvedLine[] => {
     return state.cart.map((c, i) => {
-      const p = findProduct(c.pid);
+      const p = findIn(catalogue, c.pid);
       const unit = sizePrice(p, c.size);
       return { key: c.pid + "-" + c.size, i, p, size: c.size, qty: c.qty, amount: unit * c.qty };
     });
-  }, [state.cart]);
+  }, [state.cart, catalogue]);
 
   const subtotal = useCallback(() => lines().reduce((s, l) => s + l.amount, 0), [lines]);
   const deliveryFee = useCallback(
@@ -207,7 +211,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     let placed: PlacedOrder | null = null;
     store.set((s) => {
       const resolved = s.cart.map((c) => {
-        const p = findProduct(c.pid);
+        const p = findIn(catalogue, c.pid);
         const unit = sizePrice(p, c.size);
         return { name: p.name, size: c.size, qty: c.qty, amount: unit * c.qty };
       });
@@ -225,7 +229,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       return { ...s, cart: [], lastOrder: order, receipt: "", confirmSize: false, ref: "", refOk: false };
     });
     return placed;
-  }, []);
+  }, [catalogue]);
 
   const orderMessageText = useCallback((o: PlacedOrder) => {
     const items = o.lines

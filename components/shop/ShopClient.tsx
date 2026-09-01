@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { FAMILY_FILTERS, SIZE_FILTERS, SORTS, PRODUCTS, type SortKey } from "@/data/products";
+import { SORTS, familyFilters, sizeFilters, type SortKey } from "@/data/products";
+import { useCatalogue } from "@/context/CatalogueContext";
 import { filterProducts, DEFAULT_FILTERS, type ShopFilters } from "@/lib/filter";
 import ProductCard from "@/components/ProductCard";
 import { waLink } from "@/lib/whatsapp";
@@ -41,11 +42,13 @@ function chipStyle(on: boolean, square = false): React.CSSProperties {
 
 /** The three filter groups, shared by the desktop bar and the mobile drawer. */
 function FilterGroups({
-  filters, update, layout,
+  filters, update, layout, families, sizes,
 }: {
   filters: ShopFilters;
   update: (patch: Partial<ShopFilters>) => void;
   layout: "bar" | "stack";
+  families: string[];
+  sizes: (number | "All")[];
 }) {
   const stack = layout === "stack";
   const row: React.CSSProperties = stack
@@ -60,7 +63,7 @@ function FilterGroups({
       <div style={row}>
         <span style={label}>Model</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", flex: 1 }}>
-          {FAMILY_FILTERS.map((b) => (
+          {families.map((b) => (
             <button key={b} onClick={() => update({ fam: b })} aria-pressed={filters.fam === b} style={chipStyle(filters.fam === b)}>{b}</button>
           ))}
         </div>
@@ -68,7 +71,7 @@ function FilterGroups({
       <div style={row}>
         <span style={label}>Size EU</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", flex: 1 }}>
-          {SIZE_FILTERS.map((z) => (
+          {sizes.map((z) => (
             <button key={String(z)} onClick={() => update({ sizeF: z })} aria-pressed={String(filters.sizeF) === String(z)} style={chipStyle(String(filters.sizeF) === String(z), true)}>{z}</button>
           ))}
         </div>
@@ -94,6 +97,11 @@ function FilterGroups({
 
 export default function ShopClient({ initialFilters }: { initialFilters: ShopFilters }) {
   const router = useRouter();
+  const catalogue = useCatalogue();
+  // Both chip rows come from what is actually in stock, so a model or a size
+  // the owner adds at /admin is filterable without touching this file.
+  const families = useMemo(() => familyFilters(catalogue), [catalogue]);
+  const sizes = useMemo(() => sizeFilters(catalogue), [catalogue]);
   const [filters, setFilters] = useState<ShopFilters>(initialFilters);
   const [sheet, setSheet] = useState(false);
 
@@ -117,12 +125,12 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
     };
   }, [sheet]);
 
-  const list = useMemo(() => filterProducts(filters), [filters]);
+  const list = useMemo(() => filterProducts(catalogue, filters), [catalogue, filters]);
   const active = activeCount(filters);
   const shopKicker = filters.fam === "All" ? "Inventory · Jumeirah stockroom" : filters.fam;
   const resultLabel = list.length === 0
     ? "No match"
-    : list.length === PRODUCTS.length
+    : list.length === catalogue.length
       ? "Everything in stock"
       : list.length === 1 ? "1 pair matches" : `${list.length} pairs match`;
 
@@ -148,7 +156,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
       {/* — desktop filter bar — */}
       <div className="gg-desktop" style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
         <div className="gg-wrap" style={{ padding: "20px var(--gutter)", display: "flex", flexDirection: "column", gap: 14 }}>
-          <FilterGroups filters={filters} update={update} layout="bar" />
+          <FilterGroups filters={filters} update={update} layout="bar" families={families} sizes={sizes} />
           <div style={{ display: "flex", justifyContent: "flex-end", marginTop: -8 }}>
             <button onClick={clear} className="btn btn-ghost" style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" }}>
               Clear all
@@ -191,7 +199,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
               </button>
             </div>
             <div style={{ padding: "22px var(--gutter)", display: "flex", flexDirection: "column", gap: 26, flex: 1 }}>
-              <FilterGroups filters={filters} update={update} layout="stack" />
+              <FilterGroups filters={filters} update={update} layout="stack" families={families} sizes={sizes} />
             </div>
             <div style={{ padding: "14px var(--gutter) 22px", borderTop: "2px solid var(--color-text)", display: "flex", gap: 10, flex: "none", position: "sticky", bottom: 0, background: "var(--color-bg)" }}>
               <button onClick={clear} className="gg-btn gg-btn-outline" style={{ flex: "0 0 auto" }}>Clear</button>

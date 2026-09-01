@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { findProduct } from "@/data/products";
+import { useProduct } from "@/context/CatalogueContext";
 import { money } from "@/lib/money";
 
 const ARROW = (
@@ -27,7 +27,7 @@ const ARROW = (
  * dirty the image.
  */
 export default function HomeHero() {
-  const flag = findProduct("air-dior");
+  const flag = useProduct("air-dior");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
