@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/admin-auth";
-import { blobConfigured, getCatalogue } from "@/lib/catalogue";
+import { storageWritable, getCatalogue } from "@/lib/catalogue";
 import AdminBar from "@/components/admin/AdminBar";
-import InventoryRow from "@/components/admin/InventoryRow";
+import InventoryList from "@/components/admin/InventoryList";
+import { getOrders } from "@/lib/orders";
 import { money } from "@/lib/money";
 
 /**
@@ -21,14 +22,12 @@ export default async function AdminPage({
 }) {
   if (!(await isAdmin())) redirect("/admin/login");
 
-  const [catalogue, flags] = await Promise.all([getCatalogue(), searchParams]);
-  const storageReady = blobConfigured();
+  const [catalogue, orders, flags] = await Promise.all([
+    getCatalogue(), getOrders(), searchParams,
+  ]);
+  const storageReady = storageWritable();
 
-  const sorted = [...catalogue].sort((a, b) => {
-    const rank = (p: typeof a) => (p.stock === 0 ? 0 : p.stock <= 2 ? 1 : 2);
-    return rank(a) - rank(b) || a.name.localeCompare(b.name);
-  });
-
+  const newOrders = orders.filter((o) => o.status === "new").length;
   const out = catalogue.filter((p) => p.stock === 0).length;
   const low = catalogue.filter((p) => p.stock > 0 && p.stock <= 2).length;
   const pairs = catalogue.reduce((n, p) => n + p.stock, 0);
@@ -42,7 +41,7 @@ export default async function AdminPage({
 
   return (
     <>
-      <AdminBar />
+      <AdminBar active="inventory" newOrders={newOrders} />
 
       <div className="ad-shell ad-main">
         <h1 className="ad-h1">Inventory</h1>
@@ -78,15 +77,11 @@ export default async function AdminPage({
           </div>
         )}
 
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
+        <div className="ad-hide-phone" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
           <Link className="ad-btn" href="/admin/new">Add a pair</Link>
         </div>
 
-        <div className="ad-list">
-          {sorted.map((p) => (
-            <InventoryRow key={p.id} product={p} />
-          ))}
-        </div>
+        <InventoryList products={catalogue} />
       </div>
     </>
   );

@@ -2,11 +2,18 @@
  * The stockroom terminal.
  *
  * Deliberately not the storefront. The shop is an editorial object with big
- * type and a lot of air; this is a tool one person uses on a phone in a
- * stockroom, so it is dense, high-contrast and boring on purpose. It carries
- * its own tokens rather than the `--gg-*` / `--hp-*` sets so that nothing
+ * type and a lot of air; this is a tool staff use one-handed on a phone while
+ * holding a shoe, so it is dense, high-contrast and boring on purpose. It
+ * carries its own tokens rather than the `--gg-*` / `--hp-*` sets so nothing
  * here can drift the customer-facing design, and nothing there can reflow
  * this.
+ *
+ * Phone rules that are not negotiable:
+ *   - every input is 16px, because anything smaller makes iOS zoom the page
+ *     on focus and the person listing loses their place;
+ *   - every tap target clears 44px;
+ *   - the primary action is reachable with a thumb, which is why forms get a
+ *     sticky bar and navigation sits at the bottom rather than the top.
  */
 
 .ad {
@@ -17,14 +24,17 @@
   --ad-card: #ffffff;
   --ad-accent: #8f2d21;
   --ad-ok: #2f6b3f;
+  --ad-warn: #96650f;
+  --ad-tap: 44px;
 
   min-height: 100vh;
   background: var(--ad-paper);
   color: var(--ad-ink);
   font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
 }
 
 .ad-shell {
@@ -32,6 +42,8 @@
   margin: 0 auto;
   padding: 0 clamp(14px, 3vw, 28px);
 }
+
+/* ── top bar ─────────────────────────────────────────────────────────────── */
 
 .ad-bar {
   border-bottom: 1px solid var(--ad-line);
@@ -44,19 +56,23 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: wrap;
-  padding: 13px 0;
+  min-height: 54px;
 }
 .ad-mark {
   font-weight: 800;
   letter-spacing: -0.02em;
   font-size: 15px;
   margin-right: auto;
+  white-space: nowrap;
 }
 .ad-mark span { color: var(--ad-mute); font-weight: 600; }
 
-.ad-nav { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.ad-nav { display: flex; gap: 4px; align-items: center; }
 .ad-nav a, .ad-linkbtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ad-tap);
+  padding: 0 10px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -65,32 +81,57 @@
   text-decoration: none;
   background: none;
   border: 0;
-  padding: 0;
   cursor: pointer;
   font-family: inherit;
 }
 .ad-nav a:hover, .ad-linkbtn:hover { color: var(--ad-ink); }
+.ad-nav a[aria-current="page"] { color: var(--ad-ink); box-shadow: inset 0 -2px 0 var(--ad-ink); }
 
-.ad-main { padding: clamp(20px, 3vw, 34px) 0 80px; }
+.ad-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 9px;
+  background: var(--ad-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+/* The bottom bar is the phone's navigation; the top nav hides there. */
+.ad-tabs { display: none; }
+
+/* Block padding only. `.ad-main` shares an element with `.ad-shell`, so a
+   `padding` shorthand here would silently reset the shell's own gutter — which
+   is invisible on a wide screen and jams the content into the bezel on a
+   phone. */
+.ad-main { padding-block: clamp(18px, 3vw, 32px) 90px; }
+
+/* ── headings and notes ──────────────────────────────────────────────────── */
 
 .ad-h1 {
-  font-size: clamp(22px, 3vw, 30px);
+  font-size: clamp(21px, 3vw, 30px);
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0 0 4px;
 }
-.ad-sub { color: var(--ad-mute); margin: 0 0 22px; max-width: 62ch; }
+.ad-sub { color: var(--ad-mute); margin: 0 0 20px; max-width: 62ch; font-size: 14px; }
 
 .ad-note {
   border: 1px solid var(--ad-line);
   border-left: 3px solid var(--ad-accent);
   background: var(--ad-card);
   padding: 13px 15px;
-  margin: 0 0 20px;
+  margin: 0 0 18px;
   max-width: 74ch;
+  font-size: 14px;
 }
 .ad-note.is-ok { border-left-color: var(--ad-ok); }
-.ad-note h3 { margin: 0 0 5px; font-size: 13px; font-weight: 800; }
+.ad-note h3 { margin: 0 0 5px; font-size: 14px; font-weight: 800; }
 .ad-note p { margin: 0 0 6px; color: var(--ad-mute); }
 .ad-note p:last-child { margin-bottom: 0; }
 .ad-note code {
@@ -99,6 +140,7 @@
   background: var(--ad-paper);
   padding: 1px 5px;
   border: 1px solid var(--ad-line);
+  overflow-wrap: anywhere;
 }
 
 /* ── buttons ─────────────────────────────────────────────────────────────── */
@@ -108,28 +150,31 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
+  min-height: var(--ad-tap);
   border: 1px solid var(--ad-ink);
   background: var(--ad-ink);
   color: #fff;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  padding: 9px 16px;
+  padding: 0 16px;
   cursor: pointer;
   text-decoration: none;
   transition: opacity .18s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 .ad-btn:hover { opacity: .84; }
-.ad-btn[disabled] { opacity: .45; cursor: default; }
+.ad-btn[disabled] { opacity: .4; cursor: default; }
 .ad-btn.is-ghost { background: transparent; color: var(--ad-ink); }
-.ad-btn.is-ghost:hover { background: var(--ad-card); opacity: 1; }
+.ad-btn.is-ghost:hover { background: var(--ad-paper); opacity: 1; }
 .ad-btn.is-danger { background: transparent; border-color: var(--ad-accent); color: var(--ad-accent); }
 .ad-btn.is-danger:hover { background: var(--ad-accent); color: #fff; opacity: 1; }
-.ad-btn.is-small { padding: 6px 11px; font-size: 12px; }
+.ad-btn.is-small { min-height: 38px; padding: 0 12px; font-size: 13px; }
+.ad-btn.is-wide { width: 100%; }
 
 /* ── fields ──────────────────────────────────────────────────────────────── */
 
-.ad-field { display: block; margin-bottom: 15px; }
+.ad-field { display: block; margin-bottom: 16px; }
 .ad-field > span {
   display: block;
   font-size: 11px;
@@ -137,14 +182,14 @@
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ad-mute);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .ad-field em {
   display: block;
   font-style: normal;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ad-mute);
-  margin-top: 5px;
+  margin-top: 6px;
   letter-spacing: 0;
   text-transform: none;
   font-weight: 400;
@@ -152,41 +197,125 @@
 .ad-input, .ad-area, .ad-select {
   width: 100%;
   font: inherit;
+  /* 16px exactly: iOS zooms the whole page on focus below this. */
+  font-size: 16px;
   color: inherit;
   background: var(--ad-card);
   border: 1px solid var(--ad-line);
-  padding: 9px 11px;
+  min-height: var(--ad-tap);
+  padding: 10px 12px;
   border-radius: 0;
+  appearance: none;
 }
 .ad-input:focus, .ad-area:focus, .ad-select:focus {
   outline: 2px solid var(--ad-ink);
   outline-offset: -2px;
 }
-.ad-area { min-height: 92px; resize: vertical; line-height: 1.55; }
-.ad-check { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 15px; }
-.ad-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--ad-ink); }
-.ad-check span { font-size: 13px; }
-.ad-check em { display: block; font-style: normal; color: var(--ad-mute); font-size: 12px; }
+.ad-area { min-height: 104px; resize: vertical; line-height: 1.55; }
+
+.ad-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 16px;
+  padding: 10px 0;
+  cursor: pointer;
+}
+.ad-check input { margin-top: 2px; width: 22px; height: 22px; flex: none; accent-color: var(--ad-ink); }
+.ad-check span { font-size: 15px; }
+.ad-check em { display: block; font-style: normal; color: var(--ad-mute); font-size: 13px; margin-top: 2px; }
 
 .ad-cols {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0 16px;
 }
 
 .ad-card {
   background: var(--ad-card);
   border: 1px solid var(--ad-line);
-  padding: clamp(16px, 2.4vw, 24px);
+  padding: clamp(14px, 2.4vw, 24px);
 }
 
-/* ── inventory table ─────────────────────────────────────────────────────── */
+/* ── chips: size presets, list filters ───────────────────────────────────── */
+
+.ad-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.ad-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--ad-line);
+  background: var(--ad-card);
+  color: var(--ad-mute);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.ad-chip[aria-pressed="true"], .ad-chip.is-on {
+  background: var(--ad-ink);
+  border-color: var(--ad-ink);
+  color: #fff;
+}
+
+/* ── the model picker ────────────────────────────────────────────────────── */
+
+.ad-picker { position: relative; margin-bottom: 20px; }
+.ad-results {
+  border: 1px solid var(--ad-line);
+  border-top: 0;
+  background: var(--ad-card);
+  max-height: 320px;
+  overflow-y: auto;
+}
+.ad-result {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid var(--ad-line);
+  background: none;
+  font: inherit;
+  padding: 11px 13px;
+  cursor: pointer;
+  min-height: var(--ad-tap);
+}
+.ad-result:last-child { border-bottom: 0; }
+.ad-result:hover, .ad-result:focus-visible { background: var(--ad-paper); }
+.ad-result b { display: block; font-weight: 700; font-size: 15px; }
+.ad-result span { font-size: 13px; color: var(--ad-mute); }
+
+.ad-applied {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 1px solid var(--ad-ok);
+  border-left-width: 3px;
+  background: var(--ad-card);
+  padding: 11px 13px;
+  font-size: 14px;
+}
+
+/* ── inventory list ──────────────────────────────────────────────────────── */
+
+.ad-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.ad-search { flex: 1 1 220px; min-width: 0; }
 
 .ad-list { display: flex; flex-direction: column; gap: 10px; }
 
 .ad-row {
   display: grid;
-  grid-template-columns: 62px minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
   background: var(--ad-card);
@@ -194,10 +323,11 @@
   padding: 10px 12px;
 }
 .ad-row.is-out { background: #fbf7f6; border-color: #e6cfcb; }
+.ad-row.is-low { border-color: #e8dcc0; }
 
 .ad-thumb {
-  width: 62px;
-  height: 62px;
+  width: 64px;
+  height: 64px;
   border: 1px solid var(--ad-line);
   background: var(--ad-paper);
   position: relative;
@@ -218,16 +348,17 @@
   text-align: center;
 }
 
-.ad-name { font-weight: 700; line-height: 1.3; }
+.ad-name { font-weight: 700; line-height: 1.3; font-size: 15px; }
 .ad-name a { color: inherit; text-decoration: none; }
 .ad-name a:hover { text-decoration: underline; }
 .ad-meta {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ad-mute);
   margin-top: 3px;
   display: flex;
-  gap: 10px;
+  gap: 9px;
   flex-wrap: wrap;
+  align-items: center;
 }
 .ad-tag {
   font-size: 10px;
@@ -236,92 +367,148 @@
   text-transform: uppercase;
   border: 1px solid currentColor;
   padding: 1px 5px;
+  white-space: nowrap;
 }
 .ad-tag.is-out { color: var(--ad-accent); }
+.ad-tag.is-low { color: var(--ad-warn); }
 
-.ad-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+.ad-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* The stepper is the control staff touch most, so it is the biggest. */
+.ad-stepper { display: flex; align-items: stretch; border: 1px solid var(--ad-line); background: var(--ad-paper); }
+.ad-stepper button {
+  width: var(--ad-tap);
+  min-height: var(--ad-tap);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ad-ink);
+  -webkit-tap-highlight-color: transparent;
 }
-.ad-stock {
-  width: 62px;
+.ad-stepper button[disabled] { opacity: .3; cursor: default; }
+.ad-stepper input {
+  width: 52px;
+  border: 0;
+  border-inline: 1px solid var(--ad-line);
+  background: var(--ad-card);
   text-align: center;
   font: inherit;
-  font-weight: 700;
-  padding: 6px 4px;
-  border: 1px solid var(--ad-line);
-  background: var(--ad-paper);
+  font-size: 16px;
+  font-weight: 800;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.ad-stepper input::-webkit-outer-spin-button,
+.ad-stepper input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+
+.ad-empty {
+  border: 1px dashed var(--ad-line);
+  background: var(--ad-card);
+  padding: 34px 20px;
+  text-align: center;
+  color: var(--ad-mute);
 }
 
-@media (max-width: 640px) {
-  .ad-row { grid-template-columns: 48px minmax(0, 1fr); }
-  .ad-thumb { width: 48px; height: 48px; }
-  .ad-actions { grid-column: 1 / -1; justify-content: flex-start; }
+/* ── orders ──────────────────────────────────────────────────────────────── */
+
+.ad-order { background: var(--ad-card); border: 1px solid var(--ad-line); padding: 14px; }
+.ad-order.is-new { border-left: 3px solid var(--ad-accent); }
+.ad-order.is-confirmed { border-left: 3px solid var(--ad-warn); }
+.ad-order.is-delivered { border-left: 3px solid var(--ad-ok); }
+.ad-order.is-cancelled { opacity: .62; }
+
+.ad-order-top {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
+.ad-ref { font-weight: 800; font-size: 16px; letter-spacing: -0.01em; }
+.ad-when { font-size: 13px; color: var(--ad-mute); margin-right: auto; }
+.ad-total { font-weight: 800; font-size: 16px; white-space: nowrap; }
+
+.ad-order-lines {
+  border-top: 1px solid var(--ad-line);
+  border-bottom: 1px solid var(--ad-line);
+  padding: 9px 0;
+  margin-bottom: 10px;
+}
+.ad-order-line { display: flex; gap: 10px; font-size: 14px; padding: 2px 0; }
+.ad-order-line span:first-child { flex: 1; min-width: 0; }
+.ad-order-line span:last-child { color: var(--ad-mute); white-space: nowrap; }
+
+.ad-who { font-size: 14px; line-height: 1.55; margin-bottom: 12px; }
+.ad-who a { color: var(--ad-ink); font-weight: 700; }
+.ad-who div { color: var(--ad-mute); }
+
+.ad-status {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+}
+.ad-status.is-new { color: var(--ad-accent); }
+.ad-status.is-confirmed { color: var(--ad-warn); }
+.ad-status.is-delivered { color: var(--ad-ok); }
+.ad-status.is-cancelled { color: var(--ad-mute); }
 
 /* ── photo strip ─────────────────────────────────────────────────────────── */
 
 .ad-photos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
   gap: 10px;
   margin-bottom: 12px;
 }
-.ad-photo {
-  position: relative;
-  border: 1px solid var(--ad-line);
-  background: var(--ad-paper);
-  aspect-ratio: 1 / 1;
-}
+.ad-photo { position: relative; border: 1px solid var(--ad-line); background: var(--ad-paper); aspect-ratio: 1 / 1; }
 .ad-photo img { width: 100%; height: 100%; object-fit: contain; }
 .ad-photo-x {
   position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 22px;
-  height: 22px;
+  top: 2px;
+  right: 2px;
+  width: 30px;
+  height: 30px;
   border: 1px solid var(--ad-line);
   background: #fff;
   color: var(--ad-accent);
   font: inherit;
+  font-size: 17px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
 }
 .ad-photo-i {
   position: absolute;
-  bottom: 3px;
-  left: 3px;
+  bottom: 2px;
+  left: 2px;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   background: #fff;
   border: 1px solid var(--ad-line);
-  padding: 1px 5px;
+  padding: 2px 5px;
   color: var(--ad-mute);
 }
-.ad-move {
-  position: absolute;
-  bottom: 3px;
-  right: 3px;
-  display: flex;
-  gap: 3px;
-}
+.ad-move { position: absolute; bottom: 2px; right: 2px; display: flex; gap: 2px; }
 .ad-move button {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   border: 1px solid var(--ad-line);
   background: #fff;
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
 }
-.ad-move button[disabled] { opacity: .35; cursor: default; }
+.ad-move button[disabled] { opacity: .3; cursor: default; }
 
 .ad-drop {
   border: 1px dashed var(--ad-line);
@@ -329,16 +516,85 @@
   padding: 16px;
   text-align: center;
   color: var(--ad-mute);
-  font-size: 13px;
+  font-size: 14px;
 }
 .ad-drop.is-on { border-color: var(--ad-ink); color: var(--ad-ink); }
 
 /* ── login ───────────────────────────────────────────────────────────────── */
 
-.ad-login {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-}
+.ad-login { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
 .ad-login-box { width: 100%; max-width: 360px; }
+
+/* ── phone ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  /* Navigation moves to the thumb. */
+  .ad-nav { display: none; }
+  .ad-main { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+
+  /* The bottom bar already carries Add pair; a second button is noise. */
+  .ad-hide-phone { display: none; }
+
+  .ad-tabs {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: var(--ad-card);
+    border-top: 1px solid var(--ad-line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .ad-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 58px;
+    text-decoration: none;
+    color: var(--ad-mute);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ad-tab[aria-current="page"] { color: var(--ad-ink); box-shadow: inset 0 2px 0 var(--ad-ink); }
+  .ad-tab svg { width: 20px; height: 20px; }
+  .ad-tab .ad-count { position: absolute; top: 7px; left: 50%; margin-left: 4px; }
+
+  /* One column: photo and name on top, controls below at full width. */
+  .ad-row { grid-template-columns: 56px minmax(0, 1fr); gap: 12px; }
+  .ad-thumb { width: 56px; height: 56px; }
+  .ad-actions { grid-column: 1 / -1; justify-content: space-between; }
+  .ad-actions .ad-stepper { flex: 1; }
+  .ad-actions .ad-stepper input { flex: 1; width: auto; }
+
+  .ad-cols { grid-template-columns: minmax(0, 1fr); }
+
+  /* Save stays under the thumb however long the form is. */
+  .ad-sticky {
+    position: sticky;
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+    background: var(--ad-card);
+    border-top: 1px solid var(--ad-line);
+    margin: 18px -14px -14px;
+    padding: 12px 14px;
+    z-index: 10;
+    /* The form scrolls under this, so it needs to read as a layer above it. */
+    box-shadow: 0 -6px 14px rgba(22, 21, 15, .07);
+  }
+  .ad-sticky .ad-btn { flex: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad * { transition: none !important; }
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import type { Product } from "@/data/products";
+import { MODEL_PRESETS, SIZE_PRESETS, searchModels, type ModelPreset } from "@/data/models";
 import { saveProductAction, type ActionState } from "@/app/admin/actions";
 import { photoPathname } from "@/lib/photos";
 
@@ -13,26 +14,37 @@ const EMPTY: ActionState = {};
 /**
  * Add or edit one pair.
  *
- * Photographs go straight from the browser to Blob storage rather than through
- * the form: a Server Action body is capped at 1MB and a photo off a phone is
- * several times that. What the form actually submits is the resulting list of
- * URLs, in gallery order, as one hidden field — so ordering and removal are
- * free, and nothing is written to the catalogue until the owner saves.
+ * Two things make this fast enough to do on a phone while holding the shoe.
  *
- * The first photo is the one the shop leads with everywhere: the card, the
- * search result, the link preview. That is why it is labelled rather than left
- * to be discovered.
+ * The first is the model picker: type "dunk" and the silhouette fills in the
+ * brand, the model group, the size run, the collab flag and a description of
+ * the shape, leaving the colourway, the style code, the price and the count —
+ * the only four things that are actually specific to the box in your hand.
+ *
+ * The second is that photographs go straight from the camera to Blob storage
+ * rather than through the form. A Server Action body is capped at 1MB and a
+ * phone photo is several times that; uploading directly also means the file is
+ * already stored by the time the form is submitted, so a save is instant.
+ *
+ * The first photo leads everywhere — card, search result, link preview — which
+ * is why it is labelled rather than left to be discovered.
  */
 export default function ProductForm({
   product,
   families,
   brands,
+  colorways,
   storageReady,
+  uploadsReady,
 }: {
   product?: Product;
   families: string[];
   brands: string[];
+  colorways: string[];
+  /** Whether a save will land anywhere. */
   storageReady: boolean;
+  /** Whether photographs can be uploaded — needs a real Blob store. */
+  uploadsReady: boolean;
 }) {
   const [state, action, pending] = useActionState(saveProductAction, EMPTY);
   const [photos, setPhotos] = useState<string[]>(product?.photos ?? []);
@@ -40,6 +52,30 @@ export default function ProductForm({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+
+  // Fields the picker writes into. They stay controlled from that point on so
+  // choosing a second model actually replaces the first one's values.
+  const [q, setQ] = useState("");
+  const [applied, setApplied] = useState<ModelPreset | null>(null);
+  const [name, setName] = useState(product?.name ?? "");
+  const [brand, setBrand] = useState(product?.brand ?? "");
+  const [fam, setFam] = useState(product?.fam ?? "");
+  const [sizes, setSizes] = useState(product?.sizes.join(", ") ?? "");
+  const [desc, setDesc] = useState(product?.desc ?? "");
+  const [premium, setPremium] = useState(product?.premium ?? false);
+
+  const matches = searchModels(q);
+
+  function applyPreset(m: ModelPreset) {
+    setApplied(m);
+    setQ("");
+    setName(m.name);
+    setBrand(m.brand);
+    setFam(m.fam);
+    setSizes(m.sizes.join(", "));
+    setDesc(m.desc);
+    setPremium(m.premium);
+  }
 
   async function addFiles(files: FileList | File[]) {
     const chosen = [...files].filter((f) => f.type.startsWith("image/"));
@@ -83,8 +119,59 @@ export default function ProductForm({
       <input type="hidden" name="id" value={product?.id ?? ""} />
       <input type="hidden" name="photos" value={JSON.stringify(photos)} />
 
-      <fieldset style={{ border: 0, padding: 0, margin: "0 0 26px" }}>
-        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 12 }}>Photos</legend>
+      {/* ── start from a known shape ───────────────────────────────────── */}
+      {!product && (
+        <fieldset style={{ border: 0, padding: 0, margin: "0 0 24px" }}>
+          <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 10 }}>Which shoe is it?</legend>
+
+          {applied ? (
+            <div className="ad-applied">
+              <span>
+                Started from <strong>{applied.name}</strong>
+                {applied.fit && <em style={{ display: "block", fontStyle: "normal", color: "var(--ad-mute)", fontSize: 13 }}>{applied.fit}</em>}
+              </span>
+              <button
+                className="ad-btn is-small is-ghost"
+                type="button"
+                style={{ marginLeft: "auto" }}
+                onClick={() => setApplied(null)}
+              >
+                Pick another
+              </button>
+            </div>
+          ) : (
+            <div className="ad-picker">
+              <input
+                className="ad-input"
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Type a model — dunk, jordan 1, samba, 350…"
+                aria-label="Find the model"
+                autoComplete="off"
+              />
+              {matches.length > 0 && (
+                <div className="ad-results">
+                  {matches.map((m) => (
+                    <button key={m.key} type="button" className="ad-result" onClick={() => applyPreset(m)}>
+                      <b>{m.name}</b>
+                      <span>{m.brand} · {m.fam} · EU {m.sizes[0]}–{m.sizes[m.sizes.length - 1]}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              <p style={{ fontSize: 13, color: "var(--ad-mute)", margin: "8px 0 0" }}>
+                Fills in the brand, model group, sizes and description for you. {MODEL_PRESETS.length} shapes
+                on file — if it isn&apos;t there, just fill the form in by hand.
+              </p>
+            </div>
+          )}
+        </fieldset>
+      )}
+
+      {/* ── photos ─────────────────────────────────────────────────────── */}
+      <fieldset style={{ border: 0, padding: 0, margin: "0 0 24px" }}>
+        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 10 }}>Photos</legend>
 
         {photos.length > 0 && (
           <div className="ad-photos">
@@ -116,7 +203,7 @@ export default function ProductForm({
           onDrop={(e) => {
             e.preventDefault();
             setDragging(false);
-            if (storageReady) void addFiles(e.dataTransfer.files);
+            if (uploadsReady) void addFiles(e.dataTransfer.files);
           }}
         >
           <input
@@ -130,18 +217,20 @@ export default function ProductForm({
               e.target.value = "";
             }}
           />
-          {storageReady ? (
+          {uploadsReady ? (
             <>
               <button
-                className="ad-btn is-ghost is-small"
+                className="ad-btn is-ghost"
                 type="button"
                 onClick={() => fileInput.current?.click()}
                 disabled={busy > 0}
               >
-                {busy > 0 ? `Uploading ${busy}…` : "Choose photos"}
+                {busy > 0 ? `Uploading ${busy}…` : "Take or choose photos"}
               </button>
-              <div style={{ marginTop: 8 }}>
-                or drop them here · the first one leads the listing · JPEG, PNG or WebP up to 12MB
+              <div style={{ marginTop: 10, lineHeight: 1.5 }}>
+                Lateral shot first — it becomes the card. Then detail, medial, sole.
+                <br />
+                Plain white background, JPEG or PNG up to 12MB.
               </div>
             </>
           ) : (
@@ -150,74 +239,99 @@ export default function ProductForm({
         </div>
 
         {uploadError && (
-          <p style={{ color: "var(--ad-accent)", fontSize: 13, margin: "10px 0 0" }}>{uploadError}</p>
+          <p style={{ color: "var(--ad-accent)", fontSize: 14, margin: "10px 0 0" }}>{uploadError}</p>
         )}
       </fieldset>
 
+      {/* ── identity ───────────────────────────────────────────────────── */}
       <fieldset style={{ border: 0, padding: 0, margin: "0 0 10px" }}>
-        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 12 }}>The pair</legend>
+        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 10 }}>The pair</legend>
 
         <label className="ad-field">
           <span>Name</span>
-          <input className="ad-input" name="name" defaultValue={product?.name ?? ""} required placeholder="Air Jordan 1 Retro High OG Chicago" />
+          <input
+            className="ad-input"
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            placeholder="Air Jordan 1 Retro High OG Chicago"
+          />
+          {applied && <em>Add the colourway to the end — e.g. “{applied.name} Chicago”.</em>}
         </label>
 
         <div className="ad-cols">
           <label className="ad-field">
             <span>Brand</span>
-            <input className="ad-input" name="brand" list="ad-brands" defaultValue={product?.brand ?? ""} placeholder="Nike" />
+            <input className="ad-input" name="brand" list="ad-brands" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Nike" />
           </label>
           <label className="ad-field">
             <span>Model group</span>
-            <input className="ad-input" name="fam" list="ad-families" defaultValue={product?.fam ?? ""} placeholder="Jordan 1" />
-            <em>What it filters under in the shop.</em>
+            <input className="ad-input" name="fam" list="ad-families" value={fam} onChange={(e) => setFam(e.target.value)} placeholder="Jordan 1" />
+            <em>Which filter chip it sits under in the shop.</em>
           </label>
         </div>
 
         <div className="ad-cols">
           <label className="ad-field">
             <span>Colourway</span>
-            <input className="ad-input" name="colorway" defaultValue={product?.colorway ?? ""} placeholder="White / Black / Red" />
+            <input className="ad-input" name="colorway" list="ad-colorways" defaultValue={product?.colorway ?? ""} placeholder="White / Black / Red" />
           </label>
           <label className="ad-field">
             <span>Style code</span>
-            <input className="ad-input" name="sku" defaultValue={product?.sku ?? ""} placeholder="DZ5485-612" />
+            <input className="ad-input" name="sku" defaultValue={product?.sku ?? ""} placeholder="DZ5485-612" autoCapitalize="characters" />
+            <em>Printed on the box label.</em>
           </label>
           <label className="ad-field">
             <span>Year</span>
-            <input className="ad-input" name="year" type="number" min={1980} max={2100} defaultValue={product?.year ?? new Date().getFullYear()} />
+            <input className="ad-input" name="year" type="number" inputMode="numeric" min={1980} max={2100} defaultValue={product?.year ?? new Date().getFullYear()} />
           </label>
         </div>
       </fieldset>
 
+      {/* ── money and count ────────────────────────────────────────────── */}
       <fieldset style={{ border: 0, padding: 0, margin: "16px 0 10px" }}>
-        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 12 }}>Price and stock</legend>
+        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 10 }}>Price and stock</legend>
 
         <div className="ad-cols">
           <label className="ad-field">
             <span>Your price, AED</span>
-            <input className="ad-input" name="price" type="number" min={0} step={10} defaultValue={product?.price ?? ""} required />
+            <input className="ad-input" name="price" type="number" inputMode="numeric" min={0} step={10} defaultValue={product?.price ?? ""} required />
           </label>
           <label className="ad-field">
             <span>Market price, AED</span>
-            <input className="ad-input" name="market" type="number" min={0} step={10} defaultValue={product?.market ?? ""} />
-            <em>Shown struck through. Leave blank for no saving.</em>
+            <input className="ad-input" name="market" type="number" inputMode="numeric" min={0} step={10} defaultValue={product?.market ?? ""} />
+            <em>Shown struck through. Blank means no saving is advertised.</em>
           </label>
           <label className="ad-field">
             <span>Pairs in stock</span>
-            <input className="ad-input" name="stock" type="number" min={0} step={1} defaultValue={product?.stock ?? 1} />
+            <input className="ad-input" name="stock" type="number" inputMode="numeric" min={0} step={1} defaultValue={product?.stock ?? 1} />
             <em>Zero lists it as sold out.</em>
           </label>
         </div>
 
         <label className="ad-field">
           <span>Sizes, EU</span>
-          <input className="ad-input" name="sizes" defaultValue={product?.sizes.join(", ") ?? ""} placeholder="40, 41, 42, 43, 44" required />
+          <input className="ad-input" name="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="40, 41, 42, 43, 44" required inputMode="numeric" />
           <em>Separate with commas. These are the sizes a customer can pick.</em>
         </label>
 
+        <div className="ad-chips" style={{ marginBottom: 18 }}>
+          {SIZE_PRESETS.map((s) => (
+            <button
+              key={s.label}
+              type="button"
+              className="ad-chip"
+              aria-pressed={sizes === s.sizes.join(", ")}
+              onClick={() => setSizes(s.sizes.join(", "))}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+
         <label className="ad-check">
-          <input type="checkbox" name="premium" defaultChecked={product?.premium ?? false} />
+          <input type="checkbox" name="premium" checked={premium} onChange={(e) => setPremium(e.target.checked)} />
           <span>
             Collab or luxury pair
             <em>Adds the 8% mid-size premium on EU 42–44, as the collabs already carry.</em>
@@ -225,13 +339,14 @@ export default function ProductForm({
         </label>
       </fieldset>
 
+      {/* ── words ──────────────────────────────────────────────────────── */}
       <fieldset style={{ border: 0, padding: 0, margin: "16px 0 10px" }}>
-        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 12 }}>Words</legend>
+        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 10 }}>Words</legend>
 
         <label className="ad-field">
           <span>Badge</span>
           <input className="ad-input" name="drop" defaultValue={product?.drop ?? ""} placeholder="Bestseller" />
-          <em>Two or three words on the card. Leave blank for none.</em>
+          <em>Two or three words on the card. Blank for none.</em>
         </label>
 
         <label className="ad-field">
@@ -241,28 +356,24 @@ export default function ProductForm({
 
         <label className="ad-field">
           <span>Full description</span>
-          <textarea className="ad-area" name="desc" defaultValue={product?.desc ?? ""} placeholder="What it is made of, how it fits, what comes in the box." />
+          <textarea className="ad-area" name="desc" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="What it is made of, how it fits, what comes in the box." />
+          {applied && <em>Written for the shape. Add what is specific to this colourway.</em>}
         </label>
       </fieldset>
 
       {state.error && (
-        <p style={{ color: "var(--ad-accent)", fontSize: 13, margin: "0 0 14px" }}>{state.error}</p>
+        <p style={{ color: "var(--ad-accent)", fontSize: 14, margin: "0 0 14px" }}>{state.error}</p>
       )}
 
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+      <div className="ad-sticky" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <button className="ad-btn" type="submit" disabled={pending || busy > 0 || !storageReady}>
           {pending ? "Saving…" : product ? "Save changes" : "Add to the shop"}
         </button>
         <Link className="ad-btn is-ghost" href="/admin">Cancel</Link>
         {!storageReady && (
-          <span style={{ fontSize: 12, color: "var(--ad-accent)" }}>
+          <span style={{ fontSize: 13, color: "var(--ad-accent)" }}>
             Saving is off until a Blob store is connected in Vercel.
           </span>
-        )}
-        {product && (
-          <Link className="ad-nav" href={`/product/${product.id}`} target="_blank" rel="noreferrer" style={{ marginLeft: "auto" }}>
-            <span className="ad-linkbtn">See it on the site ↗</span>
-          </Link>
         )}
       </div>
 
@@ -271,6 +382,9 @@ export default function ProductForm({
       </datalist>
       <datalist id="ad-families">
         {families.map((f) => <option key={f} value={f} />)}
+      </datalist>
+      <datalist id="ad-colorways">
+        {colorways.map((c) => <option key={c} value={c} />)}
       </datalist>
     </form>
   );

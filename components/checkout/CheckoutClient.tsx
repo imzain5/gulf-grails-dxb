@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { useStore } from "@/context/StoreContext";
+import { placeOrderAction } from "@/app/(store)/checkout/actions";
 import { money } from "@/lib/money";
 import { SITE_CONFIG } from "@/lib/config";
 
@@ -10,17 +12,38 @@ export default function CheckoutClient() {
   const {
     lines, subtotal, deliveryFee, discount, total, cartCount,
     form, setForm, pay, setPay, receipt, setReceipt, confirmSize, setConfirmSize,
-    ref, setRef, refOk, applyRef, placeOrder,
+    ref, setRef, refOk, applyRef, cart, commitOrder,
   } = useStore();
+  const [pending, startTransition] = useTransition();
+  const [failure, setFailure] = useState<string | null>(null);
 
   const resolved = lines();
   const canPlace = !!(form.name.trim() && form.phone.trim() && form.address.trim()) && resolved.length > 0;
   const sizeSummary = resolved.map((l) => "EU " + l.size + " — " + l.p.name).join(" · ");
 
+  /**
+   * The order is placed on the server, which prices it, checks the pairs are
+   * still on the shelf and takes them off it. Only once that comes back does
+   * the bag empty — so a sold-out pair or a dropped connection leaves the
+   * customer on this page with their order intact.
+   */
   const submit = () => {
-    if (!canPlace) return;
-    const order = placeOrder();
-    if (order) router.push("/order");
+    if (!canPlace || pending) return;
+    setFailure(null);
+    startTransition(async () => {
+      const result = await placeOrderAction(
+        cart.map((c) => ({ pid: c.pid, size: c.size, qty: c.qty })),
+        form,
+        pay,
+        refOk,
+      );
+      if (!result.ok) {
+        setFailure(result.error);
+        return;
+      }
+      commitOrder(result.order);
+      router.push("/order");
+    });
   };
 
   return (
@@ -133,9 +156,14 @@ export default function CheckoutClient() {
               <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>{pay === "cod" ? "Due on delivery" : "Due by transfer"}</span>
               <span style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 26, letterSpacing: "-0.03em" }}>{money(total())}</span>
             </div>
-            <button onClick={submit} disabled={!canPlace} className="btn btn-primary btn-block" style={{ height: 52, paddingInline: 20, fontSize: 12, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 0 }}>
-              Place order →
+            <button onClick={submit} disabled={!canPlace || pending} className="btn btn-primary btn-block" style={{ height: 52, paddingInline: 20, fontSize: 12, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 0 }}>
+              {pending ? "Placing…" : "Place order →"}
             </button>
+            {failure && (
+              <div style={{ border: "2px solid var(--color-accent)", color: "var(--color-accent)", padding: "12px 14px", marginTop: 14, fontSize: 13, lineHeight: 1.5, fontWeight: 600, textWrap: "pretty" }}>
+                {failure}
+              </div>
+            )}
             <div style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-neutral-700)", marginTop: 14, textWrap: "pretty" }}>
               {canPlace ? "We confirm on WhatsApp within 15 minutes, with a photo of your exact pair." : "Name, WhatsApp number and address are needed before we can dispatch."}
             </div>

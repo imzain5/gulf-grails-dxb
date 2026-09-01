@@ -3,6 +3,7 @@ import { unstable_cache, revalidatePath, revalidateTag } from "next/cache";
 import { SEED_PRODUCTS } from "@/data/seed";
 import type { Product } from "@/data/products";
 import { isUploadedPhoto } from "./photos";
+import { localStoreEnabled, readLocal, writeLocal } from "./local-store";
 
 /**
  * The live catalogue.
@@ -27,9 +28,19 @@ import { isUploadedPhoto } from "./photos";
 export const CATALOGUE_TAG = "gg-catalogue";
 export const CATALOGUE_PATH = "catalogue/products.json";
 
-/** True when a Blob store is wired up, i.e. when /admin can actually save. */
+/**
+ * True when a real Blob store is wired up.
+ *
+ * This is the one that gates photo uploads, which go from the browser straight
+ * to Blob and have no local equivalent.
+ */
 export function blobConfigured(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+/** True when a save will land somewhere — Blob in production, a file in dev. */
+export function storageWritable(): boolean {
+  return blobConfigured() || localStoreEnabled();
 }
 
 /** Coerce whatever came back from storage into a Product, dropping nothing silently. */
@@ -73,7 +84,13 @@ function normalise(raw: unknown): Product | null {
   };
 }
 
-async function readFromBlob(): Promise<Product[] | null> {
+async function readStored(): Promise<Product[] | null> {
+  if (localStoreEnabled()) {
+    const raw = await readLocal<unknown>("catalogue.json");
+    if (!Array.isArray(raw)) return null;
+    const products = raw.map(normalise).filter((p): p is Product => p !== null);
+    return products.length ? products : null;
+  }
   if (!blobConfigured()) return null;
   try {
     const { blobs } = await list({ prefix: CATALOGUE_PATH, limit: 1 });
@@ -98,7 +115,7 @@ async function readFromBlob(): Promise<Product[] | null> {
 }
 
 const cachedCatalogue = unstable_cache(
-  async (): Promise<Product[]> => (await readFromBlob()) ?? SEED_PRODUCTS,
+  async (): Promise<Product[]> => (await readStored()) ?? SEED_PRODUCTS,
   ["gg-catalogue-v1"],
   { tags: [CATALOGUE_TAG], revalidate: 3600 },
 );
@@ -110,6 +127,11 @@ export async function getCatalogue(): Promise<Product[]> {
 
 /** Replace the whole catalogue. Callers are responsible for authorising first. */
 export async function saveCatalogue(products: Product[]): Promise<void> {
+  if (localStoreEnabled()) {
+    await writeLocal("catalogue.json", products);
+    revalidateCatalogue();
+    return;
+  }
   if (!blobConfigured()) {
     throw new Error(
       "No Blob store is connected. Create one in the Vercel dashboard and set BLOB_READ_WRITE_TOKEN.",
