@@ -36,7 +36,7 @@ export default function Vault({ products }: { products: Product[] }) {
               <h2 className="hp-display hp-section-head">One pair. One chance.</h2>
             </div>
             <p className="hp-body hp-body-light" style={{ margin: 0, maxWidth: "38ch" }}>
-              Single-pair holdings we don&apos;t restock. Held in Al Quoz, viewable by appointment,
+              Single-pair holdings we don&apos;t restock. Held in Jumeirah, viewable by appointment,
               and gone the week they land. Message us and we&apos;ll send the pair&apos;s own photographs
               before you decide.
             </p>

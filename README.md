@@ -133,16 +133,28 @@ Add one row to the `RAW` array in `data/products.ts`. The columns are, in order:
 Then add its photos per the steps above. That's it — the pair appears in the
 shop, the search, the sitemap and the structured data automatically.
 
-Two optional touches:
+One optional touch: **a fit note in the size guide**. Add the id to `FIT_NOTES`
+in `components/product/SizeGuide.tsx`, e.g. `"bal-triple-s": "Runs large..."`.
+Without one it shows the generic note.
 
-- **Feature it on the homepage**: add its id to `FEATURED_IDS` at the bottom of
-  `data/products.ts` (keep that list at three).
-- **A fit note in the size guide**: add the id to `FIT_NOTES` in
-  `components/product/SizeGuide.tsx`, e.g. `"bal-triple-s": "Runs large..."`.
-  Without one it shows the generic note.
+If you add a whole new family, add it to `FAMILY_FILTERS` in
+`data/products.ts` too, or the shop's filter chip won't exist.
 
-If you add a whole new family, add it to `FAMILY_FILTERS` too, or the filter
-chip won't exist.
+### What puts a pair on the homepage
+
+Nothing is pinned by hand — every section derives from the catalogue, so a new
+pair lands in the right place on its own:
+
+| Section | What qualifies a pair |
+| --- | --- |
+| **The Vault** | `price` of AED 10,000 or more. The four most expensive show. |
+| **Ready to wear this week** | Anything not in the Vault, badged pairs first (`drop` non-empty), capped at eight. |
+| **The Travis drop** | `fam` is `"Travis Scott"`. The lead is hard-coded as `ts-aj1-high`. |
+| **The archive** | `fam` is `"Off-White"`. The lead is `ow-aj1`. |
+| **By house** | The `HOUSES` list in `data/content.ts` — each entry names the family and a `pid` for the tile photo. |
+
+So to get a new pair into the Vault, price it above 10,000. To get it into the
+"ready to wear" row ahead of the others, give it a `drop` badge.
 
 ### Editorial slots
 

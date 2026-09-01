@@ -168,6 +168,3 @@ export const SIZE_FILTERS: (number | "All")[] = ["All", 39, 40, 41, 42, 43, 44, 
 
 export const SORTS = ["Featured", "Price low", "Price high", "Newest"] as const;
 export type SortKey = (typeof SORTS)[number];
-
-/** The three cards pinned to "This week's grails" on the homepage. */
-export const FEATURED_IDS = ["air-dior", "ts-aj1-low-rev", "ow-dunk"];

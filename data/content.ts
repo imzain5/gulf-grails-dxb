@@ -15,7 +15,7 @@ export const MARKET = [
 ];
 
 export const STEPS = [
-  { n: "01", t: "Pick your pair and size", d: "Everything on the site is physically in our Al Quoz stockroom. If a size shows, we have it in hand." },
+  { n: "01", t: "Pick your pair and size", d: "Everything on the site is physically in our Jumeirah stockroom. If a size shows, we have it in hand." },
   { n: "02", t: "Place the order", d: "Name, WhatsApp number, address. We confirm within 15 minutes with a photo of your exact pair." },
   { n: "03", t: "We deliver, you inspect", d: "Same day in Dubai, next day elsewhere. Open the box, check the pair, try it on at the door." },
   { n: "04", t: "Pay cash or transfer", d: "Cash to the courier, or bank transfer before dispatch. Nothing leaves until you're happy." },
