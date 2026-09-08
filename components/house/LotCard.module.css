@@ -1,0 +1,94 @@
+/*
+ * One card implementation, replacing `gg-card` and `hp-card`.
+ *
+ * No border. A luxury grid separates by space, and a boxed card is the single
+ * clearest tell of a template shop. No discount percentage either — the loudest
+ * thing a card can say is "−22%", and what it says is "sale".
+ */
+
+.lot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: inherit;
+}
+
+/*
+ * The whole card is clickable, but the link wraps only the name — a secondary
+ * control (wishlist) cannot legally nest inside an anchor, and a card that is
+ * one giant link announces its entire contents as the link text. So the anchor
+ * stretches over the card instead, and anything that needs to sit above it
+ * raises itself.
+ */
+.link { text-decoration: none; color: inherit; }
+.link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+
+.media { position: relative; }
+
+/*
+ * Wishlist sits over the frame, so it cannot be a child of a blended plate —
+ * it would multiply too. Absolute over the top, outside the image layer.
+ */
+.action {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: var(--hair) solid transparent;
+  background: none;
+  color: rgb(20 20 15 / 0.55);
+  cursor: pointer;
+  transition: color var(--fast) var(--ease), border-color var(--fast) var(--ease);
+}
+.action:hover { color: rgb(20 20 15 / 0.95); border-color: rgb(20 20 15 / 0.2); }
+.action[aria-pressed="true"] { color: var(--brass-600); }
+
+.status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+}
+
+.meta { display: flex; flex-direction: column; gap: 7px; }
+
+.house {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  line-height: 1.15;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  text-wrap: pretty;
+}
+
+.row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+/* The size run, as mono chips rather than prose. */
+.sizes {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--text-lo);
+}
+.sizes span { white-space: nowrap; }
+.sizeOut { text-decoration: line-through; opacity: 0.5; }
+
+.soldOut { opacity: 0.62; }

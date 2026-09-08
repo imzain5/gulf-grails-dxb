@@ -1,0 +1,38 @@
+/*
+ * The header every act on a page opens with. One shape, so the rhythm of the
+ * site is set here rather than re-invented per section.
+ */
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pad-sm);
+  flex-wrap: wrap;
+  padding-bottom: var(--pad-sm);
+  margin-bottom: var(--pad-md);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.titles { display: flex; flex-direction: column; gap: 10px; margin-right: auto; }
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.note {
+  font-family: var(--font-ui);
+  font-size: var(--t-body);
+  color: var(--text-mid);
+  margin: 0;
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+
+.action { flex: none; }

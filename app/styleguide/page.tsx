@@ -1,4 +1,12 @@
 import ThemeToggle from "@/components/house/ThemeToggle";
+import { Button, Hairline, Price, Tag } from "@/components/house/primitives";
+import Frame from "@/components/house/Frame";
+import Reveal from "@/components/house/Reveal";
+import SectionHeader from "@/components/house/SectionHeader";
+import LotCard from "@/components/house/LotCard";
+import Header from "@/components/house/Header";
+import Footer from "@/components/house/Footer";
+import { SEED_PRODUCTS } from "@/data/seed";
 import s from "./styleguide.module.css";
 
 /**
@@ -40,8 +48,16 @@ const TYPE = [
 const SPACE = ["--gutter", "--pad-sm", "--pad-md", "--pad-lg", "--pad-xl"] as const;
 
 export default function StyleguidePage() {
+  // Real catalogue rows, so the components are exercised against real data
+  // rather than a shape invented to make them look good.
+  const lots = SEED_PRODUCTS.filter((p) => p.photos?.length).slice(0, 4);
+  const studio = lots[0]?.photos?.[0] ?? null;
+
   return (
-    <div className={s.page}>
+    <>
+      <Header products={SEED_PRODUCTS} bagCount={2} />
+
+      <div className={s.page}>
       <header className={s.bar}>
         <span className={s.wordmark}>Gulf Grails — House system</span>
         <ThemeToggle className={s.toggle} />
@@ -98,12 +114,12 @@ export default function StyleguidePage() {
           a button background or a link colour.
         </p>
         <div className={s.row}>
-          <span className={`${s.tag} ${s.tagBrass}`}>✓ Authenticated</span>
-          <span className={`${s.tag} ${s.tagBrass}`}>Lot 004</span>
-          <span className={`${s.tag} ${s.tagSignal}`}>Sold</span>
-          <span className={`${s.tag} ${s.tagSignal}`}>Closes in 04:12:55</span>
-          <span className={s.tag}>Deadstock</span>
-          <span className={s.tag}>One pair only</span>
+          <Tag tone="brass">✓ Authenticated</Tag>
+          <Tag tone="brass">Lot 004</Tag>
+          <Tag tone="signal">Sold</Tag>
+          <Tag tone="signal">Closes in 04:12:55</Tag>
+          <Tag>Deadstock</Tag>
+          <Tag>One pair only</Tag>
         </div>
       </section>
 
@@ -147,10 +163,17 @@ export default function StyleguidePage() {
           <span className={s.label}>Primary is never the signal colour</span>
         </div>
         <div className={s.row}>
-          <button className={`${s.btn} ${s.btnPrimary}`}>Add to bag</button>
-          <button className={`${s.btn} ${s.btnGhost}`}>Reserve on WhatsApp</button>
-          <button className={`${s.btn} ${s.btnLink}`}>View the condition report</button>
-          <button className={`${s.btn} ${s.btnPrimary}`} disabled>Sold</button>
+          <Button>Add to bag</Button>
+          <Button variant="ghost">Reserve on WhatsApp</Button>
+          <Button variant="link">View the condition report</Button>
+          <Button disabled>Sold</Button>
+          <Button variant="ghost" href="/shop">As a link</Button>
+        </div>
+
+        <div className={s.row} style={{ marginTop: "var(--pad-sm)" }}>
+          <Price amount={31200} was={34500} size="lg" />
+          <Price amount={19100} was={21000} />
+          <Price amount={620} size="sm" />
         </div>
       </section>
 
@@ -163,11 +186,15 @@ export default function StyleguidePage() {
         <div className={s.stack}>
           <div>
             <span className={s.ratio}>--line</span>
-            <hr className={s.hairline} />
+            <Hairline />
           </div>
           <div>
             <span className={s.ratio}>--line-strong</span>
-            <hr className={s.hairlineStrong} />
+            <Hairline tone="strong" />
+          </div>
+          <div>
+            <span className={s.ratio}>--brass</span>
+            <Hairline tone="brass" />
           </div>
           {SPACE.map((token) => (
             <div key={token} className={s.row}>
@@ -178,38 +205,57 @@ export default function StyleguidePage() {
         </div>
       </section>
 
+      {/* ── frame ────────────────────────────────────────────────────── */}
+      <section className={s.section}>
+        <SectionHeader
+          kicker="Media"
+          title="Frame"
+          note="Studio cut-outs are white-background JPEGs made transparent by multiply, which only works over a light plate — on the page ground they would go black. Campaign photography carries no blend and bleeds."
+        />
+        <div className={s.grid} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+          <div className={s.swatch}>
+            <Frame src={studio} alt="" ratio="4:5" sizes="240px" zoom />
+            <span className={s.label}>plate · studio cut-out</span>
+          </div>
+          <div className={s.swatch}>
+            <Frame src="/assets/campaign/air-dior-onfoot.jpg" alt="" variant="bleed" ratio="4:5" sizes="240px" zoom />
+            <span className={s.label}>bleed · campaign</span>
+          </div>
+          <div className={s.swatch}>
+            <Frame src={null} alt="" ratio="4:5" />
+            <span className={s.label}>not yet photographed</span>
+          </div>
+        </div>
+      </section>
+
       {/* ── lot card ─────────────────────────────────────────────────── */}
       <section className={s.section}>
-        <div className={s.sectionHead}>
-          <h2 className={s.sectionTitle}>Lot card</h2>
-          <span className={s.label}>Separation by space, no borders</span>
-        </div>
-        <div className={`${s.grid} ${s.wipe}`} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
-          {[
-            { name: "Air Jordan 1 High OG Dior", price: "AED 31,200", tag: "Lot 004", brass: true },
-            { name: "Travis Scott x Air Jordan 1 High OG", price: "AED 19,100", tag: "One pair only", brass: false },
-            { name: "Off-White x Air Jordan 1 Chicago", price: "AED 29,500", tag: "Sold", brass: false, sold: true },
-            { name: "Nike Dunk Low Retro Panda", price: "AED 620", tag: "Deadstock", brass: false },
-          ].map((lot) => (
-            <article key={lot.name} className={s.lot}>
-              <div className={s.lotFrame} />
-              <div className={s.lotMeta}>
-                <span className={s.label}>Air Jordan</span>
-                <span className={s.lotName}>{lot.name}</span>
-                <div className={s.lotRow}>
-                  <span className={s.price}>{lot.price}</span>
-                  <span
-                    className={`${s.tag} ${lot.brass ? s.tagBrass : lot.sold ? s.tagSignal : ""}`}
-                  >
-                    {lot.tag}
-                  </span>
-                </div>
-                <span className={s.data} style={{ color: "var(--text-lo)" }}>EU 40 41 42 43 44 45</span>
-              </div>
-            </article>
+        <SectionHeader
+          kicker="Currently held"
+          title="Lot card"
+          note="One implementation, replacing gg-card and hp-card. No border, no discount percentage — separation by space, and the size run as mono chips."
+          action={{ label: "All inventory", href: "/shop" }}
+        />
+        <div className={s.grid} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
+          {lots.map((p, i) => (
+            <Reveal key={p.id} delay={i * 60}>
+              <LotCard product={p} lot={p.price >= 10000 ? i + 1 : undefined} />
+            </Reveal>
           ))}
         </div>
       </section>
-    </div>
+
+      {/* ── chrome ───────────────────────────────────────────────────── */}
+      <section className={s.section}>
+        <SectionHeader
+          kicker="Chrome"
+          title="Footer"
+          note="Four columns and a brand column. Payment marks list only what the shop can take today; the trade licence renders when one is supplied."
+        />
+      </section>
+      </div>
+
+      <Footer />
+    </>
   );
 }

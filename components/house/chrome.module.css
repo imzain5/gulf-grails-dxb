@@ -1,0 +1,295 @@
+/*
+ * Header, mega-menu, search overlay and drawer.
+ *
+ * The header is translucent over the page rather than opaque above it, and it
+ * grows a hairline only once the page has moved — so at rest there is no line
+ * across the top of a hero at all.
+ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border-bottom: var(--hair) solid transparent;
+  transition: border-color var(--fast) var(--ease);
+}
+.header[data-scrolled] { border-bottom-color: var(--line); }
+
+/* Backdrop-filter is unreliable behind mixed content; fall back to opaque. */
+@supports not (backdrop-filter: blur(1px)) {
+  .header { background: var(--surface); }
+}
+
+.utility {
+  display: none;
+  justify-content: flex-end;
+  gap: 18px;
+  padding-inline: var(--gutter);
+  border-bottom: var(--hair) solid var(--line);
+}
+@media (min-width: 900px) { .utility { display: flex; } }
+
+.utilityBtn {
+  min-height: 34px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--text-lo);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.utilityBtn:hover { color: var(--text-hi); }
+
+.bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--pad-sm);
+  padding-inline: var(--gutter);
+  min-height: 68px;
+}
+
+.left { display: flex; align-items: center; gap: 4px; }
+.right { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(19px, 1.7vw, 25px);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 12px;
+  background: none;
+  border: 0;
+  color: var(--text-mid);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--fast) var(--ease);
+}
+.navLink:hover,
+.navLink[data-open] { color: var(--text-hi); }
+
+.iconBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 0;
+  color: var(--text-mid);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+.iconBtn:hover { color: var(--text-hi); }
+
+.bagCount {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  margin-inline-start: 2px;
+  color: var(--text-hi);
+}
+
+.deskOnly { display: none; }
+@media (min-width: 900px) { .deskOnly { display: inline-flex; } }
+
+.mobileOnly { display: inline-grid; }
+@media (min-width: 900px) { .mobileOnly { display: none; } }
+
+/* ── mega-menu ──────────────────────────────────────────────────────────── */
+
+/*
+ * Three columns and one photograph. This is what makes a catalogue feel deep
+ * rather than long, and it is the pattern the regional houses use.
+ */
+.mega {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  background: color-mix(in srgb, var(--surface) 97%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-block: var(--hair) solid var(--line);
+}
+
+.megaIn {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: var(--pad-lg);
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--pad-md) var(--gutter);
+}
+
+.megaCol { display: flex; flex-direction: column; gap: 14px; }
+
+.megaLink {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(17px, 1.3vw, 21px);
+  letter-spacing: var(--track-display);
+  color: var(--text-mid);
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+.megaLink:hover { color: var(--text-hi); }
+
+.megaCount {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--text-lo);
+  margin-inline-start: 8px;
+}
+
+.megaFeature { display: flex; flex-direction: column; gap: 12px; text-decoration: none; }
+
+/* ── search overlay ─────────────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: column;
+  animation: fade var(--fast) var(--ease);
+}
+@keyframes fade { from { opacity: 0; } }
+
+.searchTop {
+  display: flex;
+  align-items: center;
+  gap: var(--pad-sm);
+  padding: var(--pad-sm) var(--gutter);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.searchField {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  color: var(--text-hi);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(24px, 4vw, 46px);
+  letter-spacing: var(--track-display);
+  outline: none;
+}
+.searchField::placeholder { color: var(--text-lo); }
+
+.results {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--pad-md) var(--gutter) var(--pad-xl);
+}
+
+.resultGroup { max-width: var(--shell); margin: 0 auto var(--pad-md); }
+
+.resultRow {
+  display: flex;
+  align-items: center;
+  gap: var(--pad-sm);
+  padding: 12px 0;
+  border-bottom: var(--hair) solid var(--line);
+  text-decoration: none;
+  color: inherit;
+}
+.resultRow[data-active] { background: var(--surface-raised); }
+
+.resultThumb { width: 56px; flex: none; }
+
+.resultName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin-right: auto;
+}
+
+.resultMeta { font-family: var(--font-data); font-size: 11px; color: var(--text-lo); }
+
+.empty { color: var(--text-mid); max-width: var(--shell); margin: 0 auto; }
+
+/* ── drawer ─────────────────────────────────────────────────────────────── */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgb(10 10 11 / 0.55);
+  animation: fade var(--fast) var(--ease);
+}
+
+.drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 85;
+  width: min(420px, 88vw);
+  background: var(--surface);
+  border-inline-end: var(--hair) solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slide var(--med) var(--ease);
+}
+@keyframes slide { from { transform: translateX(-100%); } }
+
+.drawerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pad-sm) var(--pad-sm) var(--pad-sm) var(--pad-md);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.drawerBody { padding: var(--pad-md); display: flex; flex-direction: column; gap: var(--pad-md); }
+
+.drawerGroup { display: flex; flex-direction: column; gap: 12px; }
+
+.drawerLink {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(21px, 5vw, 27px);
+  letter-spacing: var(--track-display);
+  color: var(--text-mid);
+  text-decoration: none;
+}
+.drawerLink:hover { color: var(--text-hi); }
+
+.drawerFoot {
+  margin-top: auto;
+  padding: var(--pad-md);
+  border-top: var(--hair) solid var(--line);
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay, .scrim, .drawer { animation: none; }
+}

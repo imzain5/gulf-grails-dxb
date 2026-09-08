@@ -55,12 +55,36 @@ function apply(theme: Theme) {
   for (const fn of listeners) fn();
 }
 
-export default function ThemeToggle({ className }: { className?: string }) {
+const ORDER: Theme[] = ["dark", "light", "system"];
+
+export default function ThemeToggle({
+  className,
+  /** One cycling button, for a header utility slot with no room for three. */
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  if (compact) {
+    const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={() => apply(next)}
+        aria-label={`Colour theme: ${theme}. Switch to ${next}.`}
+        title={`Theme: ${theme}`}
+      >
+        {theme}
+      </button>
+    );
+  }
 
   return (
     <div className={className} role="group" aria-label="Colour theme">
-      {(["dark", "light", "system"] as const).map((t) => (
+      {ORDER.map((t) => (
         <button
           key={t}
           type="button"
