@@ -390,6 +390,47 @@ export default function ProductForm({
         </label>
       </fieldset>
 
+      <fieldset style={{ border: 0, padding: 0, margin: "16px 0 10px" }}>
+        <legend className="ad-h1" style={{ fontSize: 17, marginBottom: 10 }}>Condition report</legend>
+        <p style={{ fontSize: 14, color: "var(--ad-mute)", margin: "0 0 16px", maxWidth: "60ch" }}>
+          Shown on the listing as an auction house would show it. Leave a field blank and the
+          listing says it hasn&apos;t been recorded, rather than implying a clean report.
+        </p>
+
+        <div className="ad-cols">
+          <label className="ad-field">
+            <span>Grade</span>
+            <input className="ad-input" name="condition" list="ad-grades" defaultValue={product?.condition ?? ""} placeholder="Deadstock" />
+          </label>
+          <label className="ad-field">
+            <span>Checked on</span>
+            <input className="ad-input" name="verifiedOn" type="date" defaultValue={product?.verifiedOn ?? ""} />
+          </label>
+          <label className="ad-field">
+            <span>Checked by</span>
+            <input className="ad-input" name="verifiedBy" defaultValue={product?.verifiedBy ?? ""} placeholder="ZA" maxLength={4} autoCapitalize="characters" />
+            <em>Your initials. They go on the listing.</em>
+          </label>
+        </div>
+
+        <label className="ad-field">
+          <span>Box and accessories</span>
+          <input className="ad-input" name="boxNote" defaultValue={product?.boxNote ?? ""} placeholder="Original box, both lace sets, card" />
+        </label>
+
+        <label className="ad-field">
+          <span>Flaws</span>
+          <textarea className="ad-area" name="flaws" defaultValue={(product?.flaws ?? []).join("\n")} placeholder="One per line. Leave empty if there are none." />
+          <em>One per line. Listing them is what makes the clean pairs believable.</em>
+        </label>
+      </fieldset>
+
+      <datalist id="ad-grades">
+        <option value="Deadstock" />
+        <option value="VNDS" />
+        <option value="Used" />
+      </datalist>
+
       {state.error && (
         <p style={{ color: "var(--ad-accent)", fontSize: 14, margin: "0 0 14px" }}>{state.error}</p>
       )}

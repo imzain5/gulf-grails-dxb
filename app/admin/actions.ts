@@ -138,6 +138,17 @@ export async function saveProductAction(
     blurb: text(formData, "blurb"),
     desc: text(formData, "desc"),
     premium: formData.get("premium") === "on",
+
+    // The condition report. Blank stays undefined so the product page can tell
+    // "not recorded" from "recorded as nothing".
+    condition: text(formData, "condition") || undefined,
+    boxNote: text(formData, "boxNote") || undefined,
+    flaws: text(formData, "flaws")
+      .split("\n")
+      .map((f) => f.trim())
+      .filter(Boolean) as string[],
+    verifiedOn: text(formData, "verifiedOn") || undefined,
+    verifiedBy: text(formData, "verifiedBy").toUpperCase() || undefined,
     photos: photos.length ? photos : null,
     // Gallery labels are only meaningful for the in-house six-angle sequence;
     // anything uploaded here falls back to the standard labels.

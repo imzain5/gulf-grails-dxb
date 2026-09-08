@@ -2,14 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findIn, type Product } from "@/data/products";
 import { getCatalogue } from "@/lib/catalogue";
-import { SITE_CONFIG } from "@/lib/config";
-import ProductClient from "@/components/product/ProductClient";
+import ProductClient from "@/components/house/product/ProductClient";
 
-/**
- * Prerender whatever is in the catalogue at build time. A pair the owner adds
- * afterwards is not in this list, so it renders on first request and is cached
- * from then on — which is why `dynamicParams` is left at its default of true.
- */
 export async function generateStaticParams() {
   const products = await getCatalogue();
   return products.map((p) => ({ id: p.id }));
@@ -20,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const p = (await getCatalogue()).find((x) => x.id === id);
   if (!p) return {};
 
-  const description = `${p.name} — ${p.colorway}, style ${p.sku}. AED ${p.price.toLocaleString("en-US")}, verified in-house, delivered across the UAE.`;
+  const description = `${p.name} — ${p.colorway}, style ${p.sku}. AED ${p.price.toLocaleString("en-US")}, authenticated in-house and delivered across the UAE.`;
   const url = `/product/${p.id}`;
 
   return {
@@ -32,37 +26,40 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title: `${p.name} — AED ${p.price.toLocaleString("en-US")}`,
       description,
       url,
-      // The real studio shot, so a shared link previews the actual pair.
       images: p.photos ? [{ url: p.photos[0], alt: p.name }] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${p.name} — AED ${p.price.toLocaleString("en-US")}`,
-      description,
-      images: p.photos ? [p.photos[0]] : undefined,
     },
   };
 }
 
-/** Product structured data, so a listing can carry its price and stock. */
+/**
+ * Structured data for one lot.
+ *
+ * `itemCondition` is stated only when the shop has actually recorded a grade —
+ * asserting NewCondition on every pair by default would be the same class of
+ * unverifiable claim as the review count that came out of the site markup.
+ */
 function productLd(p: Product) {
+  const condition = p.condition?.toLowerCase();
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: p.name,
     description: p.desc,
-    sku: p.sku,
-    mpn: p.sku,
+    sku: p.sku || undefined,
     brand: { "@type": "Brand", name: p.brand },
-    color: p.colorway,
-    releaseDate: String(p.year),
-    image: (p.photos ?? []).map((src) => SITE_CONFIG.siteUrl + src),
+    color: p.colorway || undefined,
+    image: p.photos ?? undefined,
+    ...(condition
+      ? {
+          itemCondition: condition.includes("used")
+            ? "https://schema.org/UsedCondition"
+            : "https://schema.org/NewCondition",
+        }
+      : {}),
     offers: {
       "@type": "Offer",
-      url: `${SITE_CONFIG.siteUrl}/product/${p.id}`,
       priceCurrency: "AED",
       price: p.price,
-      itemCondition: "https://schema.org/NewCondition",
       availability: p.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       seller: { "@type": "Organization", name: "Gulf Grails" },
     },

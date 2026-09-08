@@ -38,6 +38,24 @@ export interface Product {
    * VIEWS in lib/sizes.ts.
    */
   views?: readonly string[];
+
+  /*
+   * The condition report — auction-house convention, and the thing nobody in
+   * UAE sneaker resale publishes. All of it is optional and all of it is
+   * recorded by hand at /admin; the product page shows what exists and says
+   * plainly what has not been recorded rather than implying a clean report.
+   */
+
+  /** Grade, e.g. "Deadstock", "VNDS", "Used — see flaws". */
+  condition?: string;
+  /** Box and accessories, e.g. "Original box, both lace sets, card". */
+  boxNote?: string;
+  /** Flaws found, listed. An empty list is not the same as no report. */
+  flaws?: readonly string[];
+  /** ISO date the six checks were run on this pair. */
+  verifiedOn?: string;
+  /** Initials of whoever ran them. */
+  verifiedBy?: string;
 }
 
 /** The card/thumbnail shot, and the shot a card cross-fades to on hover. */
