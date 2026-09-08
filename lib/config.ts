@@ -13,5 +13,15 @@ export const SITE_CONFIG = {
   /** Orders above this AED amount are asked to pay by bank transfer instead of COD. */
   codLimit: 6000,
   /** AED credited to a referral code/name at checkout. */
+  /**
+   * What the house pays, as a fraction of what it sells the same model for.
+   *
+   * Used only for the indicative band on /sell. It is a commercial decision,
+   * not a design one, which is why it lives here rather than inside a
+   * component — set it to your real spread before that page goes live. The
+   * band is labelled indicative and subject to inspection either way.
+   */
+  sellBand: [0.6, 0.72] as [number, number],
+
   referralDiscount: 100,
 };

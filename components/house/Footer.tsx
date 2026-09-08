@@ -24,18 +24,18 @@ const SHOP = [
 ] as const;
 
 const SERVICES = [
-  ["Authentication", "/trust"],
+  ["Authentication", "/authentication"],
   ["Sell to us", "/sell"],
-  ["Size guide", "/size-guide"],
-  ["Delivery", "/trust"],
-  ["Returns", "/trust"],
+  ["Size & fit", "/size-guide"],
+  ["Delivery & returns", "/shipping-returns"],
+  ["Questions", "/faq"],
 ] as const;
 
 const HOUSE = [
   ["About", "/about"],
   ["The Grail Index", "/index"],
-  ["Journal", "/journal"],
-  ["Contact", "/about"],
+  ["Privacy", "/privacy"],
+  ["Terms of sale", "/terms"],
 ] as const;
 
 export default function Footer({
