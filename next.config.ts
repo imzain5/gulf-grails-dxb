@@ -6,9 +6,17 @@ const nextConfig: NextConfig = {
    * other redirects permanently, so the links already in the wild — the
    * footer, product pages, anything shared on WhatsApp — keep working and
    * search engines fold the two together rather than seeing duplicate copy.
+   *
+   * /index is the Grail Index under its old URL. It can never be a route
+   * again: a segment named `index` compiles but breaks Vercel's output
+   * adapter (see the note in app/(house)/grail-index/page.tsx), so it lives
+   * here as a redirect rather than a directory.
    */
   async redirects() {
-    return [{ source: "/trust", destination: "/authentication", permanent: true }];
+    return [
+      { source: "/trust", destination: "/authentication", permanent: true },
+      { source: "/index", destination: "/grail-index", permanent: true },
+    ];
   },
 
   images: {
