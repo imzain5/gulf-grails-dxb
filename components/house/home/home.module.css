@@ -1,0 +1,270 @@
+/*
+ * The homepage, eight acts.
+ *
+ * One stylesheet for all of them because they are one page with one rhythm — a
+ * beat between acts, a hairline where two meet, and nothing else drawn.
+ * Splitting this into seven modules would hide that rhythm across seven files.
+ */
+
+.shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.act { border-bottom: var(--hair) solid var(--line); }
+
+/*
+ * Three paces rather than one. `--beat-*` is defined in styles/tokens.css with
+ * the reasoning; here is where the page decides which act gets which.
+ */
+.actIn { padding-block: var(--beat, var(--beat-editorial)); }
+
+/* Modifiers set the variable rather than the property, so which one wins does
+   not depend on the order these rules happen to appear in. */
+.cinematic { --beat: var(--beat-cinematic); }
+.compact { --beat: var(--beat-compact); }
+
+/* ── 1 · hero ───────────────────────────────────────────────────────────── */
+
+/*
+ * Asymmetric, and the photograph bleeds off the right edge rather than sitting
+ * in a box. The campaign shot is portrait (2240×3360) — cover-cropping it to a
+ * letterbox loses either the figure or the shoes, and the shoes are the point.
+ */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 0.82fr;
+  align-items: stretch;
+  min-height: min(84vh, 900px);
+  border-bottom: var(--hair) solid var(--line);
+}
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; min-height: 0; }
+}
+
+.heroType {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--pad-sm);
+  padding: var(--pad-lg) var(--gutter);
+  padding-inline-end: var(--pad-md);
+}
+
+.heroStatement {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-hero);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.heroLine {
+  font-size: var(--t-body);
+  color: var(--text-mid);
+  max-width: 42ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.heroActions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+
+.heroMedia { position: relative; min-height: 60vh; }
+@media (max-width: 900px) { .heroMedia { min-height: 62vh; } }
+
+/* ── 2 · the vault ──────────────────────────────────────────────────────── */
+
+/*
+ * Always the ink ground, in both modes. The Vault is the one place the house
+ * asserts a fixed expression rather than following the page — it is the room
+ * with no windows.
+ */
+.vault {
+  background: var(--ink-900);
+  color: rgb(244 241 235);
+  --text-hi: rgb(244 241 235);
+  --text-mid: rgb(244 241 235 / 0.68);
+  --text-lo: rgb(244 241 235 / 0.52);
+  --line: rgb(244 241 235 / 0.1);
+  --line-strong: rgb(244 241 235 / 0.2);
+  --brass-text: var(--brass-400);
+  --surface-inverse: var(--bone-50);
+  --text-inverse: rgb(20 20 15);
+}
+
+.lots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--pad-md);
+}
+@media (max-width: 900px) { .lots { grid-template-columns: 1fr; gap: var(--pad-lg); } }
+
+.lot { display: flex; flex-direction: column; gap: 16px; }
+
+.lotHead { display: flex; align-items: baseline; gap: 12px; }
+
+.lotName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  line-height: 1.15;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  text-decoration: none;
+  text-wrap: pretty;
+}
+.lotName:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.provenance {
+  font-size: var(--t-body);
+  color: var(--text-mid);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ── 3 · currently held ─────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--pad-md) var(--pad-sm);
+}
+@media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── 4 · six checks ─────────────────────────────────────────────────────── */
+
+/*
+ * A horizontal rail rather than a stacked list: six numbered cards you move
+ * through, which reads as a procedure instead of a paragraph.
+ */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(268px, 1fr);
+  gap: var(--pad-md);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--pad-sm);
+  /* The gutter is on the shell, so the rail bleeds to the edge on a phone. */
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
+  scrollbar-width: thin;
+}
+.rail > * { scroll-snap-align: start; }
+@media (min-width: 1200px) {
+  .rail { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); overflow: visible; margin-inline: 0; padding-inline: 0; }
+}
+
+.check { display: flex; flex-direction: column; gap: 12px; }
+
+.checkNum {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(40px, 4vw, 64px);
+  line-height: 1;
+  letter-spacing: var(--track-display);
+  color: var(--brass-text);
+}
+
+.checkTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  line-height: 1.2;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+
+.checkBody { color: var(--text-mid); margin: 0; text-wrap: pretty; }
+
+/* ── 5 · the grail index ────────────────────────────────────────────────── */
+
+.index { display: flex; flex-direction: column; }
+
+.indexRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--pad-sm);
+  align-items: baseline;
+  padding-block: 18px;
+  border-bottom: var(--hair) solid var(--line);
+}
+.indexRow:first-child { border-top: var(--hair) solid var(--line); }
+
+.indexName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+
+.indexFigure {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-body);
+  color: var(--text-hi);
+}
+
+.indexDelta {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+  color: var(--text-mid);
+  min-width: 7ch;
+  text-align: end;
+}
+/* Signal earns its place here: a fall is the thing a holder needs to notice. */
+.indexDown { color: var(--signal-text); }
+
+.indexNote { color: var(--text-lo); font-size: var(--t-data); margin: var(--pad-sm) 0 0; }
+
+/* ── 6 · held in dubai ──────────────────────────────────────────────────── */
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pad-lg);
+  align-items: center;
+}
+@media (max-width: 900px) { .split { grid-template-columns: 1fr; gap: var(--pad-md); } }
+
+.promises { display: flex; flex-direction: column; gap: var(--pad-sm); margin: 0; }
+
+.promise { display: flex; flex-direction: column; gap: 4px; }
+.promiseTerm {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+.promiseDesc { color: var(--text-mid); margin: 0; }
+
+/* ── 7 · journal ────────────────────────────────────────────────────────── */
+
+.stories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pad-lg) var(--pad-md);
+}
+@media (max-width: 760px) { .stories { grid-template-columns: 1fr; } }
+
+.story { display: flex; flex-direction: column; gap: 14px; text-decoration: none; }
+
+.storyTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  line-height: 1.2;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  text-wrap: pretty;
+}
+
+.storyBody { color: var(--text-mid); margin: 0; max-width: 52ch; text-wrap: pretty; }

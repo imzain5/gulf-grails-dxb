@@ -85,10 +85,26 @@
   --gutter: clamp(20px, 4vw, 88px);
   --shell: 1680px;
 
-  --pad-xl: clamp(96px, 11vw, 200px);   /* between major acts */
+  --pad-xl: clamp(96px, 11vw, 200px);
   --pad-lg: clamp(64px, 7vw, 120px);
   --pad-md: clamp(40px, 4.5vw, 72px);
   --pad-sm: clamp(20px, 2vw, 32px);
+
+  /*
+   * Three beats, not one.
+   *
+   * Padding every act with the same value makes a long page read as a stack of
+   * equally weighted panels, whatever is inside them — the eye stops finding
+   * the emphasis. So a cinematic moment pauses, an editorial one breathes, and
+   * a utility section moves at a tighter pace, and the rhythm carries meaning
+   * the content alone cannot.
+   *
+   * Ported from the `hp-*` refinement on main, which had the diagnosis right
+   * and lives in a layer that has since been deleted.
+   */
+  --beat-cinematic: clamp(84px, 10vw, 176px);
+  --beat-editorial: clamp(62px, 7vw, 118px);
+  --beat-compact: clamp(46px, 5vw, 80px);
 
   --radius: 0px;   /* the one brutalist decision that survives */
 
