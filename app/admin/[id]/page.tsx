@@ -3,6 +3,7 @@ import Link from "next/link";
 import { isAdmin } from "@/lib/admin-auth";
 import { blobConfigured, storageWritable, getCatalogue } from "@/lib/catalogue";
 import { getOrders } from "@/lib/orders";
+import { hasRecord } from "@/lib/certificate";
 import AdminBar from "@/components/admin/AdminBar";
 import ProductForm from "@/components/admin/ProductForm";
 
@@ -34,6 +35,10 @@ export default async function EditProductPage({
           Changes are live as soon as you save.{" "}
           <Link href={`/product/${product.id}`} target="_blank" rel="noreferrer">
             Open the listing ↗
+          </Link>{" "}
+          ·{" "}
+          <Link href={`/admin/${product.id}/card`}>
+            {hasRecord(product) ? "Print the authentication card" : "Authentication card"}
           </Link>
         </p>
         {flags.copied && (

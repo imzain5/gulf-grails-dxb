@@ -598,3 +598,84 @@
 @media (prefers-reduced-motion: reduce) {
   .ad * { transition: none !important; }
 }
+
+/* ── authentication cards ───────────────────────────────────────────────── */
+
+.ad-cardbar { margin: 18px 0 10px; }
+
+/*
+ * Four cards to a sheet, sized in millimetres because they get cut out with
+ * scissors and dropped in a shoebox. 90×55mm is a business card, which is the
+ * size of thing people already have a sleeve or a wallet for.
+ */
+.ad-cardsheet {
+  display: grid;
+  grid-template-columns: repeat(2, 90mm);
+  gap: 6mm;
+  justify-content: start;
+}
+
+.ad-card-cert {
+  width: 90mm;
+  height: 55mm;
+  padding: 5mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff;
+  color: #0a0a0b;
+  border: 0.4mm solid #0a0a0b;
+}
+
+.ad-cert-top { display: flex; align-items: baseline; justify-content: space-between; gap: 3mm; }
+.ad-cert-house { font-size: 9pt; font-weight: 700; letter-spacing: 0.14em; }
+.ad-cert-kicker { font-size: 6pt; letter-spacing: 0.12em; text-transform: uppercase; color: #6b6b63; }
+
+.ad-cert-mid { display: flex; gap: 4mm; align-items: center; }
+.ad-cert-mid svg { flex: none; }
+
+.ad-cert-facts { display: flex; flex-direction: column; gap: 1mm; min-width: 0; }
+.ad-cert-ref { font-size: 11pt; font-weight: 700; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.ad-cert-name {
+  font-size: 8pt;
+  line-height: 1.25;
+  /* Two lines, then ellipsis — a long collab name must not push the card taller. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ad-cert-sku { font-size: 7pt; color: #6b6b63; letter-spacing: 0.04em; }
+.ad-cert-date { font-size: 7pt; color: #6b6b63; }
+
+.ad-cert-foot { margin: 0; font-size: 6pt; letter-spacing: 0.06em; color: #6b6b63; }
+
+/*
+ * Print: the sheet and nothing else.
+ *
+ * Backgrounds are forced on, because a card printed without its rule and its
+ * QR contrast is a card that does not scan — this is the one place on the site
+ * where "ink saving" defaults actively break the artefact.
+ */
+@media print {
+  .ad-noprint { display: none !important; }
+
+  .ad, .ad-shell, .ad-main { margin: 0; padding: 0; background: #fff; }
+
+  .ad-cardsheet {
+    gap: 0;
+    grid-template-columns: repeat(2, 90mm);
+  }
+
+  .ad-card-cert {
+    /* A dashed cut line rather than the card's own border, so two adjacent
+       cards do not print a double-weight rule between them. */
+    border: 0.2mm dashed #999;
+    break-inside: avoid;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  @page { margin: 10mm; }
+}

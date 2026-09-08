@@ -277,3 +277,9 @@
   }
   .barPrice { margin-right: auto; }
 }
+
+/* The link to the public authentication record, where one exists. */
+.recordLine { color: var(--text-mid); }
+.recordLine b { color: var(--brass-text); font-family: var(--font-data); font-weight: 400; letter-spacing: 0.05em; }
+
+.foldActions { display: flex; gap: var(--pad-sm); flex-wrap: wrap; }

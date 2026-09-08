@@ -25,6 +25,7 @@ const SHOP = [
 
 const SERVICES = [
   ["Authentication", "/authentication"],
+  ["Check a record", "/verify"],
   ["Sell to us", "/sell"],
   ["Size & fit", "/size-guide"],
   ["Delivery & returns", "/shipping-returns"],

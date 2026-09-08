@@ -6,6 +6,7 @@ import AdminBar from "@/components/admin/AdminBar";
 import InventoryList from "@/components/admin/InventoryList";
 import { getOrders } from "@/lib/orders";
 import { money } from "@/lib/money";
+import { hasRecord } from "@/lib/certificate";
 
 /**
  * The stockroom.
@@ -32,6 +33,10 @@ export default async function AdminPage({
   const low = catalogue.filter((p) => p.stock > 0 && p.stock <= 2).length;
   const pairs = catalogue.reduce((n, p) => n + p.stock, 0);
   const value = catalogue.reduce((n, p) => n + p.stock * p.price, 0);
+  // Surfaced because it is the number that quietly stays at zero otherwise:
+  // the condition and authentication fields are optional, so nothing forces
+  // them and nothing complains, and the product pages read "Not recorded".
+  const unrecorded = catalogue.filter((p) => !hasRecord(p)).length;
 
   const flash =
     flags.deleted ? `Removed “${flags.deleted}” from the site.`
@@ -68,6 +73,21 @@ export default async function AdminPage({
           <div className="ad-note">
             <h3>That did not save</h3>
             <p>{flags.error}</p>
+          </div>
+        )}
+
+        {unrecorded > 0 && (
+          <div className="ad-note">
+            <h3>
+              {unrecorded} of {catalogue.length}{" "}
+              {unrecorded === 1 ? "listing has" : "listings have"} no authentication record
+            </h3>
+            <p>
+              Their product pages say “Not recorded” under Condition and Authentication, and they
+              cannot have a card printed for the box. Open a listing and fill in the{" "}
+              <strong>date checked</strong> and your <strong>initials</strong> — that is the
+              minimum for a record, and it takes about ten seconds a pair.
+            </p>
           </div>
         )}
 

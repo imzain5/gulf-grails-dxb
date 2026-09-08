@@ -68,6 +68,8 @@ export default function ProductForm({
   const [sizes, setSizes] = useState(product?.sizes.join(", ") ?? "");
   const [desc, setDesc] = useState(product?.desc ?? "");
   const [premium, setPremium] = useState(product?.premium ?? false);
+  // Undefined means nobody has logged flaws yet, so a new pair starts unticked.
+  const [flawsChecked, setFlawsChecked] = useState(product?.flaws !== undefined);
 
   const matches = searchModels(q);
 
@@ -418,9 +420,37 @@ export default function ProductForm({
           <input className="ad-input" name="boxNote" defaultValue={product?.boxNote ?? ""} placeholder="Original box, both lace sets, card" />
         </label>
 
+        {/*
+          * Ticking the box is what says the check happened. An empty textarea
+          * on its own cannot mean "no flaws found" — that is the strongest
+          * claim the condition report makes, and it must not be what a form
+          * nobody filled in says by default. See readFlaws in admin/actions.ts.
+          */}
+        <label className="ad-check">
+          <input
+            type="checkbox"
+            name="flawsChecked"
+            checked={flawsChecked}
+            onChange={(e) => setFlawsChecked(e.target.checked)}
+          />
+          <span>
+            I went over this pair for flaws
+            <em>
+              Tick it and leave the box empty to say we looked and found nothing — that is what
+              the listing will claim. Untick it and the listing says flaws have not been logged.
+            </em>
+          </span>
+        </label>
+
         <label className="ad-field">
           <span>Flaws</span>
-          <textarea className="ad-area" name="flaws" defaultValue={(product?.flaws ?? []).join("\n")} placeholder="One per line. Leave empty if there are none." />
+          <textarea
+            className="ad-area"
+            name="flaws"
+            defaultValue={(product?.flaws ?? []).join("\n")}
+            placeholder="One per line. Crease across the left toe box, scuff on the right heel tab…"
+            onChange={(e) => { if (e.target.value.trim()) setFlawsChecked(true); }}
+          />
           <em>One per line. Listing them is what makes the clean pairs believable.</em>
         </label>
       </fieldset>

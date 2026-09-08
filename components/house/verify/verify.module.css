@@ -1,0 +1,248 @@
+/*
+ * The authentication record.
+ *
+ * Set as a document rather than a page of the shop: a bordered sheet, a
+ * reference in mono at the top, and facts in rows. Someone arrives here having
+ * scanned a card while holding the shoe, so the job is to be read and checked
+ * against the object in their hand, not to sell them anything.
+ */
+
+.page {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+  padding-block: var(--beat-compact) var(--beat-editorial);
+}
+
+.sheet {
+  border: var(--hair) solid var(--line-strong);
+  background: var(--surface-raised);
+}
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+
+.head {
+  display: flex;
+  gap: var(--pad-md);
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: var(--pad-md);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+/*
+ * Flexes down to 22rem before the QR is allowed to drop below it. Without a
+ * basis the long collab names — "Travis Scott x Air Jordan 1 Low OG Reverse
+ * Mocha" — demand the full row and push the code onto its own line, leaving a
+ * band of empty sheet beside the title.
+ */
+.headText { flex: 1 1 22rem; min-width: 0; }
+
+.ref {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(19px, 2vw, 26px);
+  letter-spacing: 0.06em;
+  color: var(--brass-text);
+  margin: 10px 0 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 6px 0 0;
+  text-wrap: balance;
+}
+
+.colorway { color: var(--text-mid); margin: 6px 0 0; }
+
+.qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+/*
+ * The code is always dark-on-white, in both themes. A scanner wants contrast
+ * in the polarity it expects, and an inverted code is a coin-flip on cheap
+ * phone cameras — this is the one element on the site that does not follow the
+ * visitor's theme, for the same reason the Vault does not.
+ */
+.qr svg {
+  --qr-bg: #fff;
+  --qr-fg: #0a0a0b;
+  display: block;
+  padding: 6px;
+  background: #fff;
+  border: var(--hair) solid var(--line-strong);
+}
+
+.qrNote {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+
+/* ── the statement ──────────────────────────────────────────────────────── */
+
+.stated {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: var(--pad-md);
+  border-bottom: var(--hair) solid var(--line);
+  border-inline-start: 2px solid var(--brass);
+}
+
+.statedLine { color: var(--text-mid); margin: 0; font-size: clamp(16px, 1.3vw, 19px); }
+.statedLine strong { color: var(--text-hi); font-weight: 500; }
+
+.scope { color: var(--text-lo); margin: 0; font-size: var(--t-data); max-width: 62ch; }
+
+/* ── body ───────────────────────────────────────────────────────────────── */
+
+.body { padding: var(--pad-md); display: flex; flex-direction: column; gap: var(--pad-md); }
+
+.shot { position: relative; max-width: 34rem; }
+.shotNote {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pad-md); }
+@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+
+.block { min-width: 0; }
+
+.h2 {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+  margin: 0 0 12px;
+}
+
+.h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0 0 8px;
+}
+
+.facts { margin: 0; }
+.fact {
+  display: grid;
+  grid-template-columns: 11ch minmax(0, 1fr);
+  gap: 12px;
+  padding-block: 9px;
+  border-bottom: var(--hair) solid var(--line);
+}
+.fact:first-child { border-top: var(--hair) solid var(--line); }
+.fact dt {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+.fact dd {
+  margin: 0;
+  color: var(--text-hi);
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+  overflow-wrap: anywhere;
+}
+
+.none { color: var(--text-lo); font-style: italic; }
+.clean { color: var(--text-mid); margin: 12px 0 0; }
+.flaws { margin: 12px 0 0; padding-inline-start: 1.1em; color: var(--text-mid); }
+.flaws li { margin-bottom: 6px; }
+
+/* ── the six checks ─────────────────────────────────────────────────────── */
+
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+.check {
+  display: grid;
+  grid-template-columns: 5ch minmax(0, 1fr);
+  gap: var(--pad-sm);
+  padding-block: 13px;
+  border-bottom: var(--hair) solid var(--line);
+}
+.check:first-child { border-top: var(--hair) solid var(--line); }
+
+.checkNum {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--brass-text);
+}
+.checkBody { color: var(--text-mid); text-wrap: pretty; }
+.checkBody b { color: var(--text-hi); font-weight: 500; }
+
+/* ── caveat ─────────────────────────────────────────────────────────────── */
+
+.caveat {
+  border: var(--hair) solid var(--line);
+  padding: var(--pad-sm);
+  max-width: 68ch;
+}
+.caveat p { color: var(--text-mid); margin: 0; text-wrap: pretty; }
+.caveat p + p { margin-top: 10px; }
+
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.foot {
+  font-family: var(--font-data);
+  font-size: var(--t-data);
+  color: var(--text-lo);
+  margin: 0;
+  padding-top: var(--pad-sm);
+  border-top: var(--hair) solid var(--line);
+}
+.foot a { color: var(--text-mid); }
+
+/* ── the lookup page ────────────────────────────────────────────────────── */
+
+.lookup { display: flex; flex-direction: column; gap: 10px; max-width: 30rem; }
+
+.lookupRow { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.input {
+  flex: 1 1 16rem;
+  min-height: 48px;
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border: var(--hair) solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-hi);
+  font-family: var(--font-data);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* 16px: anything less and iOS zooms the page on focus. */
+  font-size: 16px;
+}
+.input::placeholder { color: var(--text-lo); letter-spacing: 0.06em; }
+.input:focus { outline: var(--hair) solid var(--text-hi); outline-offset: -1px; }
+
+.result { color: var(--text-mid); margin: 0; font-size: var(--t-data); }
+.miss { color: var(--signal-text); }

@@ -89,7 +89,14 @@ function normalise(raw: unknown): Product | null {
     // render as a report that says nothing rather than no report at all.
     condition: str(r.condition) || undefined,
     boxNote: str(r.boxNote) || undefined,
-    flaws: flaws && flaws.length ? flaws : undefined,
+    /*
+     * Three states, and the empty one is the whole point: `undefined` is
+     * "nobody looked", `[]` is "looked, found nothing", a list is what was
+     * found. This used to read `flaws.length ? flaws : undefined`, which
+     * folded the middle state into the first and quietly threw away the only
+     * positive statement the condition report can make.
+     */
+    flaws,
     verifiedOn: str(r.verifiedOn) || undefined,
     verifiedBy: str(r.verifiedBy) || undefined,
   };

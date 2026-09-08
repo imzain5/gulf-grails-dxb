@@ -16,6 +16,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ["/grail-index", "weekly", 0.7],
     ["/sell", "monthly", 0.7],
     ["/size-guide", "monthly", 0.6],
+    // /verify itself, not the records under it — those are noindex on purpose.
+    ["/verify", "monthly", 0.5],
     ["/about", "monthly", 0.5],
     ["/faq", "monthly", 0.5],
     ["/shipping-returns", "monthly", 0.4],

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { Product } from "@/data/products";
 import { useCatalogue } from "@/context/CatalogueContext";
 import { useStore } from "@/context/StoreContext";
+import { certificateRef, hasRecord } from "@/lib/certificate";
 import { euToUk, euToUs, sizePrice, VIEWS } from "@/lib/sizes";
 import { money } from "@/lib/money";
 import { waLink } from "@/lib/whatsapp";
@@ -50,6 +51,7 @@ export default function ProductClient({ product }: { product: Product }) {
   const selected = size ?? null;
   const price = selected ? sizePrice(product, selected) : product.price;
   const wished = isWished(product.id);
+  const record = hasRecord(product);
 
   const related = catalogue
     .filter((p) => p.id !== product.id && p.fam === product.fam)
@@ -226,7 +228,26 @@ export default function ProductClient({ product }: { product: Product }) {
                   stitching density, midsole and paint, glue and smell, insole and print, then
                   photographed and logged.
                 </p>
-                <Button variant="link" href="/authentication">How we authenticate</Button>
+                {/*
+                 * The public record, but only where one was actually written.
+                 * A "view certificate" link on a pair nobody has checked would
+                 * be the exact claim this whole section exists to avoid.
+                 */}
+                {record && (
+                  <p className={s.recordLine}>
+                    This pair has a record you can read, under{" "}
+                    <b>{certificateRef(product.id)}</b> — the same reference as the card
+                    in the box.
+                  </p>
+                )}
+                <div className={s.foldActions}>
+                  {record && (
+                    <Button variant="link" href={`/verify/${product.id}`}>
+                      Read the record
+                    </Button>
+                  )}
+                  <Button variant="link" href="/authentication">How we authenticate</Button>
+                </div>
               </Fold>
 
               <Fold title="Provenance">

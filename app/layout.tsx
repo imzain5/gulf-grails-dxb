@@ -92,6 +92,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       className={`${archivo.variable} ${display.variable} ${ui.variable} ${data.variable}`}
+      /*
+       * The theme script below stamps data-theme on this element before paint,
+       * so for any visitor who has picked a theme the client's <html> differs
+       * from the server's by exactly that attribute — and React logged a
+       * hydration mismatch on every page for every returning visitor. The
+       * divergence is the intended behaviour (the server cannot know the
+       * theme), and this is the attribute that exists to say so. It suppresses
+       * the warning for this element's own attributes only, not for its
+       * subtree, so a real mismatch anywhere below still surfaces.
+       */
+      suppressHydrationWarning
     >
       <head>
         {/* Applies a saved theme before first paint so a dark-mode visitor

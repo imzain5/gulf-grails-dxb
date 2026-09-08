@@ -143,10 +143,7 @@ export async function saveProductAction(
     // "not recorded" from "recorded as nothing".
     condition: text(formData, "condition") || undefined,
     boxNote: text(formData, "boxNote") || undefined,
-    flaws: text(formData, "flaws")
-      .split("\n")
-      .map((f) => f.trim())
-      .filter(Boolean) as string[],
+    flaws: readFlaws(formData),
     verifiedOn: text(formData, "verifiedOn") || undefined,
     verifiedBy: text(formData, "verifiedBy").toUpperCase() || undefined,
     photos: photos.length ? photos : null,
@@ -317,4 +314,30 @@ export async function duplicateProductAction(formData: FormData): Promise<void> 
   }
 
   redirect("/admin/" + copy.id + "?copied=1");
+}
+
+/**
+ * The three states of a flaw report.
+ *
+ * An empty textarea cannot mean "no flaws" on its own: on a form nobody has
+ * touched, that would have the site tell a customer we checked this pair and
+ * found nothing wrong — the strongest claim on the product page — because
+ * somebody left a box blank. So the checkbox is what asserts the check
+ * happened, and the textarea only says what it turned up.
+ *
+ *   unticked          → undefined  → "Flaws have not been logged for this pair"
+ *   ticked, empty     → []         → "Checked and no flaws found"
+ *   ticked, with text → [...]      → the list
+ *
+ * Text without the tick is still a report — someone typed what they found and
+ * missed the box — so it counts as one rather than being discarded.
+ */
+function readFlaws(formData: FormData): string[] | undefined {
+  const listed = text(formData, "flaws")
+    .split("\n")
+    .map((f) => f.trim())
+    .filter(Boolean);
+
+  if (listed.length > 0) return listed;
+  return formData.get("flawsChecked") === "on" ? [] : undefined;
 }
