@@ -226,7 +226,7 @@ export default function ProductClient({ product }: { product: Product }) {
                   stitching density, midsole and paint, glue and smell, insole and print, then
                   photographed and logged.
                 </p>
-                <Button variant="link" href="/trust">How we authenticate</Button>
+                <Button variant="link" href="/authentication">How we authenticate</Button>
               </Fold>
 
               <Fold title="Provenance">

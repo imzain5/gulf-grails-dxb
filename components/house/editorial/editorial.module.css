@@ -1,0 +1,302 @@
+/*
+ * The long-form pages: authentication, the index, sell, about, and the policy
+ * set.
+ *
+ * One measure, one rhythm, one set of rules. These pages differ from the
+ * commerce surfaces in that the words are the product, so the column is narrow
+ * enough to read (around 68 characters) and nothing competes with it.
+ */
+
+.page { max-width: var(--shell); margin: 0 auto; padding-inline: var(--gutter); }
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+
+.head {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--pad-lg);
+  align-items: end;
+  padding-block: var(--beat-editorial);
+  border-bottom: var(--hair) solid var(--line);
+}
+@media (max-width: 900px) { .head { grid-template-columns: 1fr; gap: var(--pad-md); align-items: start; } }
+
+.headPlain { grid-template-columns: 1fr; }
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-hero);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 14px 0 0;
+  text-wrap: balance;
+}
+.titleSm { font-size: var(--t-section); }
+
+.standfirst {
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.55;
+  color: var(--text-mid);
+  max-width: 52ch;
+  margin: var(--pad-sm) 0 0;
+  text-wrap: pretty;
+}
+
+/* ── body ───────────────────────────────────────────────────────────────── */
+
+.body { padding-block: var(--beat-editorial); }
+.bodyTight { padding-block: var(--beat-compact); }
+
+/* The reading column. Everything that is words sits inside this. */
+.measure { max-width: 68ch; }
+
+.section { padding-block: var(--pad-md) 0; }
+.section:first-child { padding-top: 0; }
+
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0 0 var(--pad-sm);
+  text-wrap: balance;
+}
+
+.h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  line-height: 1.2;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0 0 8px;
+}
+
+.p { color: var(--text-mid); margin: 0 0 1.1em; text-wrap: pretty; }
+.p:last-child { margin-bottom: 0; }
+.p strong { color: var(--text-hi); font-weight: 500; }
+.p a { color: var(--text-hi); text-decoration: underline; text-underline-offset: 3px; }
+
+.list { color: var(--text-mid); margin: 0 0 1.1em; padding-inline-start: 1.2em; }
+.list li { margin-bottom: 8px; }
+
+/* ── numbered steps ─────────────────────────────────────────────────────── */
+
+.steps { display: flex; flex-direction: column; }
+
+.step {
+  display: grid;
+  grid-template-columns: 8ch minmax(0, 1fr);
+  gap: var(--pad-sm);
+  padding-block: var(--pad-md);
+  border-top: var(--hair) solid var(--line);
+}
+.step:last-child { border-bottom: var(--hair) solid var(--line); }
+@media (max-width: 700px) { .step { grid-template-columns: 1fr; gap: 12px; } }
+
+.stepNum {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 3.4vw, 52px);
+  line-height: 0.9;
+  letter-spacing: var(--track-display);
+  color: var(--brass-text);
+}
+
+.stepBody { max-width: 62ch; }
+
+/* ── fact rows ──────────────────────────────────────────────────────────── */
+
+.facts { margin: 0; }
+.fact {
+  display: grid;
+  grid-template-columns: 16ch minmax(0, 1fr);
+  gap: var(--pad-sm);
+  padding-block: 13px;
+  border-bottom: var(--hair) solid var(--line);
+}
+.fact:first-child { border-top: var(--hair) solid var(--line); }
+@media (max-width: 640px) { .fact { grid-template-columns: 1fr; gap: 4px; } }
+
+.fact dt {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+.fact dd { margin: 0; color: var(--text-hi); }
+.fact dd small { display: block; color: var(--text-mid); font-size: var(--t-data); margin-top: 4px; }
+
+/* ── size table ─────────────────────────────────────────────────────────── */
+
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+}
+.table th,
+.table td { padding: 11px 14px 11px 0; text-align: start; border-bottom: var(--hair) solid var(--line); }
+.table th {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+.table td { color: var(--text-hi); }
+.table tbody tr:hover td { background: var(--surface-raised); }
+
+/* ── model fit list ─────────────────────────────────────────────────────── */
+
+.fits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--pad-lg); }
+@media (max-width: 860px) { .fits { grid-template-columns: 1fr; } }
+
+.fit { padding-block: 15px; border-bottom: var(--hair) solid var(--line); }
+.fitName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+.fitNote { color: var(--text-mid); margin: 5px 0 0; }
+
+/* ── the index ──────────────────────────────────────────────────────────── */
+
+.indexRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--pad-sm);
+  align-items: baseline;
+  padding-block: 20px;
+  border-bottom: var(--hair) solid var(--line);
+}
+.indexRow:first-child { border-top: var(--hair) solid var(--line); }
+
+.indexName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+.indexFigure {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-body);
+  color: var(--text-hi);
+}
+.indexDelta {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+  color: var(--text-mid);
+  min-width: 7ch;
+  text-align: end;
+}
+.indexDown { color: var(--signal-text); }
+
+/* A note the page is honest about rather than a chart it cannot draw. */
+.gap {
+  border: var(--hair) solid var(--line-strong);
+  border-inline-start: 2px solid var(--brass);
+  padding: var(--pad-sm);
+  margin-top: var(--pad-md);
+  max-width: 68ch;
+}
+.gap p { margin: 0; color: var(--text-mid); }
+.gap p + p { margin-top: 10px; }
+
+/* ── sell ───────────────────────────────────────────────────────────────── */
+
+.form { display: flex; flex-direction: column; gap: var(--pad-sm); max-width: 44rem; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.fieldRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--pad-sm); }
+
+.fieldLabel {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+
+.input,
+.select,
+.area {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border: var(--hair) solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-hi);
+  font-family: var(--font-ui);
+  /* 16px: anything less and iOS zooms the page on focus. */
+  font-size: 16px;
+}
+.input::placeholder, .area::placeholder { color: var(--text-lo); }
+.input:focus, .select:focus, .area:focus { outline: var(--hair) solid var(--text-hi); outline-offset: -1px; }
+.area { min-height: 96px; resize: vertical; line-height: 1.6; }
+.select { appearance: none; cursor: pointer; }
+.select option { background: var(--surface); color: var(--text-hi); }
+
+.hint { color: var(--text-lo); font-size: var(--t-data); margin: 0; }
+
+/* The indicative band. Deliberately not called an offer. */
+.band {
+  border: var(--hair) solid var(--brass);
+  padding: var(--pad-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bandFigure {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-section);
+  color: var(--text-hi);
+}
+.bandNote { color: var(--text-mid); margin: 0; font-size: var(--t-data); }
+
+/* ── faq ────────────────────────────────────────────────────────────────── */
+
+.qa { border-top: var(--hair) solid var(--line); }
+.qa:last-of-type { border-bottom: var(--hair) solid var(--line); }
+.qaQ {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0;
+  padding-block: var(--pad-sm) 8px;
+}
+.qaA { color: var(--text-mid); margin: 0; padding-bottom: var(--pad-sm); max-width: 68ch; text-wrap: pretty; }
+
+/* ── closing call ───────────────────────────────────────────────────────── */
+
+.close {
+  border-top: var(--hair) solid var(--line);
+  padding-block: var(--beat-editorial);
+  display: flex;
+  gap: var(--pad-md);
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.closeText { max-width: 52ch; margin-right: auto; }
+.closeActions { display: flex; gap: 12px; flex-wrap: wrap; }

@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /**
+   * /trust and /authentication said the same thing. One page wins and the
+   * other redirects permanently, so the links already in the wild — the
+   * footer, product pages, anything shared on WhatsApp — keep working and
+   * search engines fold the two together rather than seeing duplicate copy.
+   */
+  async redirects() {
+    return [{ source: "/trust", destination: "/authentication", permanent: true }];
+  },
+
   images: {
     remotePatterns: [
       // Product photography uploaded from /admin lives in the project's Vercel
