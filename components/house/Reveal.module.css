@@ -1,0 +1,54 @@
+/*
+ * The house's one motion idea: a slow clip wipe upward, staggered per item.
+ *
+ * The clip lives on an inner span, never on the observed element. A clipped
+ * element reports zero visible area, so an IntersectionObserver watching it
+ * would never fire and the content would stay hidden forever — a bug this
+ * codebase has already shipped once, when nine image masks went invisible on
+ * the homepage.
+ *
+ * The outer element is therefore always full-size and unclipped; only the
+ * layer inside it moves.
+ */
+
+.outer { display: block; }
+
+.inner {
+  display: block;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path var(--slow) var(--ease);
+  will-change: clip-path;
+}
+
+.on .inner { clip-path: inset(0 0 0 0); }
+
+/* A gentler variant for text, where a hard wipe reads as a gimmick. */
+.rise .inner {
+  clip-path: none;
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity var(--med) var(--ease),
+    transform var(--med) var(--ease);
+  will-change: opacity, transform;
+}
+.rise.on .inner { opacity: 1; transform: none; }
+
+/*
+ * Without scripts nothing would ever reveal these, so the effect turns itself
+ * off entirely rather than hiding the page.
+ */
+@media (scripting: none) {
+  .inner,
+  .rise .inner { clip-path: none; opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner,
+  .rise .inner {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

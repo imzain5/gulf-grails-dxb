@@ -12,7 +12,7 @@ export default async function TrustPage() {
   return (
     <div data-screen-label="Authenticity">
       <div className="gg-split" style={{ borderBottom: "2px solid var(--color-text)", "--split": "1fr .8fr" } as React.CSSProperties}>
-        <div style={{ padding: "clamp(34px,4vw,56px) clamp(18px,3vw,44px) clamp(34px,4vw,56px) var(--gutter)" }}>
+        <div style={{ padding: "clamp(34px,4vw,56px) clamp(18px,3vw,44px) clamp(34px,4vw,56px) var(--gg-gutter)" }}>
           <div className="gg-kicker" style={{ marginBottom: 14 }}>Authenticity</div>
           <h1 className="gg-display" style={{ fontSize: "clamp(32px,4.6vw,68px)", lineHeight: 0.94 }}>
             We stake the<br />business on<br />every pair.
@@ -30,7 +30,7 @@ export default async function TrustPage() {
         />
       </div>
 
-      <div className="gg-wrap" style={{ padding: "clamp(34px,4vw,48px) var(--gutter) 20px" }}>
+      <div className="gg-wrap" style={{ padding: "clamp(34px,4vw,48px) var(--gg-gutter) 20px" }}>
         <h2 className="gg-display gg-d3" style={{ marginBottom: 28 }}>The six checks</h2>
         <div className="gg-grid" style={{ borderTop: "2px solid var(--color-text)", borderLeft: "2px solid var(--color-text)", "--cols": 3, "--cols-sm": 2, "--cols-xs": 1 } as React.CSSProperties}>
           {CHECKS.map((c) => (
@@ -43,7 +43,7 @@ export default async function TrustPage() {
         </div>
       </div>
 
-      <div className="gg-wrap" style={{ padding: "clamp(28px,3vw,36px) var(--gutter) clamp(40px,5vw,56px)" }}>
+      <div className="gg-wrap" style={{ padding: "clamp(28px,3vw,36px) var(--gg-gutter) clamp(40px,5vw,56px)" }}>
         <h2 className="gg-display gg-d3" style={{ marginBottom: 22 }}>Delivery, returns &amp; questions</h2>
         <FaqAccordion />
       </div>

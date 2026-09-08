@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
       // localStorage and are empty for a crawler — plus the owner's
       // stockroom, which is behind a password and has no business in a
       // search index.
-      disallow: ["/cart", "/checkout", "/order", "/wishlist", "/admin", "/api"],
+      disallow: ["/cart", "/checkout", "/order", "/wishlist", "/admin", "/api", "/styleguide"],
     },
     sitemap: `${SITE_CONFIG.siteUrl}/sitemap.xml`,
   };

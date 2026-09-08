@@ -16,7 +16,7 @@ export default async function AboutPage() {
   return (
     <div data-screen-label="About">
       <div className="gg-split" style={{ borderBottom: "2px solid var(--color-text)", "--split": "1fr .8fr" } as React.CSSProperties}>
-        <div style={{ padding: "clamp(34px,4vw,56px) clamp(18px,3vw,44px) clamp(34px,4vw,56px) var(--gutter)" }}>
+        <div style={{ padding: "clamp(34px,4vw,56px) clamp(18px,3vw,44px) clamp(34px,4vw,56px) var(--gg-gutter)" }}>
           <div className="gg-kicker" style={{ marginBottom: 14 }}>About Gulf Grails</div>
           <h1 className="gg-display" style={{ fontSize: "clamp(32px,4.6vw,64px)", lineHeight: 0.94 }}>
             A stockroom<br />in Jumeirah,<br />not a<br />warehouse.
@@ -36,7 +36,7 @@ export default async function AboutPage() {
           style={{ borderLeft: "2px solid var(--color-text)", minHeight: 520 }}
         />
       </div>
-      <div className="gg-wrap" style={{ padding: "clamp(30px,4vw,44px) var(--gutter) clamp(44px,5vw,64px)" }}>
+      <div className="gg-wrap" style={{ padding: "clamp(30px,4vw,44px) var(--gg-gutter) clamp(44px,5vw,64px)" }}>
         <div className="gg-grid" style={{ borderTop: "2px solid var(--color-text)", "--cols": 4, "--cols-sm": 2 } as React.CSSProperties}>
           {STATS.map(([big, small], i) => (
             <div key={big} style={{ padding: i === 0 ? "24px 24px 28px 0" : "24px", borderRight: i < 3 ? "2px solid var(--color-divider)" : undefined }}>

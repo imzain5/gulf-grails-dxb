@@ -321,7 +321,7 @@ export default function SiteHeader() {
           position: "absolute", left: 0, right: 0, top: 68, background: "var(--color-bg)",
           borderBottom: "1px solid var(--gg-hair)", boxShadow: "var(--shadow-lg)", animation: "gg-fade .14s ease",
         }}>
-          <div className="gg-wrap" style={{ padding: "32px var(--gutter) 36px", display: "grid", gridTemplateColumns: "repeat(4,1fr) 1.1fr", gap: 34 }}>
+          <div className="gg-wrap" style={{ padding: "32px var(--gg-gutter) 36px", display: "grid", gridTemplateColumns: "repeat(4,1fr) 1.1fr", gap: 34 }}>
             {activeMenu.cols.map((col, ci) => (
               <div key={col.title + ci}>
                 <div style={{
@@ -370,7 +370,7 @@ export default function SiteHeader() {
       <>
         <div className="gg-scrim" onClick={() => setDrawer(false)} aria-hidden />
         <nav className="gg-drawer" aria-label="Main menu">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px var(--gutter)", borderBottom: "2px solid var(--color-text)", flex: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px var(--gg-gutter)", borderBottom: "2px solid var(--color-text)", flex: "none" }}>
             <span style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 20, letterSpacing: "-0.035em", textTransform: "uppercase" }}>Menu</span>
             <button onClick={() => setDrawer(false)} aria-label="Close menu" style={{ appearance: "none", width: 40, height: 40, border: "2px solid var(--color-text)", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "inherit" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="m6 6 12 12" /><path d="m18 6-12 12" /></svg>
@@ -380,7 +380,7 @@ export default function SiteHeader() {
           <form
             onSubmit={submitSearch}
             role="search"
-            style={{ display: "flex", alignItems: "center", gap: 8, border: "2px solid var(--color-text)", padding: "0 12px", height: 46, margin: "18px var(--gutter) 6px", flex: "none" }}
+            style={{ display: "flex", alignItems: "center", gap: 8, border: "2px solid var(--color-text)", padding: "0 12px", height: 46, margin: "18px var(--gg-gutter) 6px", flex: "none" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <input
@@ -393,7 +393,7 @@ export default function SiteHeader() {
           </form>
 
           {suggestions.length > 0 && (
-            <div style={{ margin: "6px var(--gutter) 0", borderTop: "2px solid var(--color-divider)" }}>
+            <div style={{ margin: "6px var(--gg-gutter) 0", borderTop: "2px solid var(--color-divider)" }}>
               {suggestions.slice(0, 4).map((p) => (
                 <button
                   key={p.id}
@@ -414,7 +414,7 @@ export default function SiteHeader() {
             {MENUS.map((m) => {
               const open = openGroup === m.key;
               return (
-                <div key={m.key} style={{ borderBottom: "2px solid var(--color-divider)", margin: "0 var(--gutter)" }}>
+                <div key={m.key} style={{ borderBottom: "2px solid var(--color-divider)", margin: "0 var(--gg-gutter)" }}>
                   <button
                     onClick={() => setOpenGroup(open ? null : m.key)}
                     aria-expanded={open}
@@ -447,7 +447,7 @@ export default function SiteHeader() {
               );
             })}
 
-            <div style={{ margin: "0 var(--gutter)", display: "flex", flexDirection: "column" }}>
+            <div style={{ margin: "0 var(--gg-gutter)", display: "flex", flexDirection: "column" }}>
               {[["Sell to us", "/sell"], ["Authenticity", "/trust"], ["About", "/about"], ["Saved pairs", "/wishlist"]].map(([label, href]) => (
                 <button
                   key={href}
@@ -463,7 +463,7 @@ export default function SiteHeader() {
               ))}
             </div>
 
-            <div style={{ margin: "26px var(--gutter) 0", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ margin: "26px var(--gg-gutter) 0", display: "flex", flexDirection: "column", gap: 10 }}>
               {TRUST_BAR.map((t, i) => (
                 <span key={t} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   {TRUST_ICONS[i]}{t}

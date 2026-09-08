@@ -97,7 +97,15 @@ export default function ProductGallery({ product }: { product: Product }) {
               src={src}
               alt={`${product.name} — ${labels[i] ?? "view"}`}
               fill
-              sizes="(max-width: 980px) 100vw, 60vw"
+              /*
+               * Zoom magnifies 2.4×, so the frame's normal source — picked for
+               * a 60vw box — would be stretched well past its own pixels and
+               * look soft exactly where a customer is inspecting the leather.
+               * Turning zoom on therefore asks for a source sized to the
+               * magnified box instead. Browsing stays cheap; only someone who
+               * actually zooms pays for the larger file.
+               */
+              sizes={zoomOn ? "(max-width: 980px) 240vw, 145vw" : "(max-width: 980px) 100vw, 60vw"}
               priority={i === 0}
               style={{ objectFit: "contain" }}
             />

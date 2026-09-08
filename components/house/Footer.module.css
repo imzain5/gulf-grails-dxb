@@ -1,0 +1,97 @@
+/*
+ * Four columns and a wide brand column, then a hairline and the legal line.
+ *
+ * The trade licence number belongs here. In the UAE it is a serious
+ * credibility signal for a high-ticket purchase and it costs nothing — a house
+ * that publishes its registration is a house you can find if something goes
+ * wrong.
+ */
+
+.footer {
+  border-top: var(--hair) solid var(--line);
+  background: var(--surface);
+}
+
+.in {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--pad-lg) var(--gutter) var(--pad-md);
+  display: grid;
+  gap: var(--pad-lg) var(--pad-md);
+  grid-template-columns: 1.6fr repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 1100px) { .in { grid-template-columns: 1fr 1fr 1fr; } }
+@media (max-width: 620px) { .in { grid-template-columns: 1fr 1fr; } }
+
+.brand { display: flex; flex-direction: column; gap: 18px; }
+@media (max-width: 1100px) { .brand { grid-column: 1 / -1; } }
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+
+.line { color: var(--text-mid); max-width: 34ch; text-wrap: pretty; margin: 0; }
+
+.col { display: flex; flex-direction: column; gap: 12px; }
+
+.colLink {
+  font-family: var(--font-ui);
+  font-size: var(--t-body);
+  color: var(--text-mid);
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+.colLink:hover { color: var(--text-hi); }
+
+/* ── legal strip ────────────────────────────────────────────────────────── */
+
+.legal {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--pad-sm) var(--gutter) var(--pad-md);
+  border-top: var(--hair) solid var(--line);
+  display: flex;
+  gap: 14px var(--pad-sm);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.legalItem {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-lo);
+}
+
+.legalSpacer { margin-inline-start: auto; }
+
+.pays { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pay {
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-lo);
+  border: var(--hair) solid var(--line-strong);
+  padding: 3px 7px;
+}
+
+.utilityBtn {
+  min-height: 32px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--text-lo);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.utilityBtn:hover { color: var(--text-hi); }

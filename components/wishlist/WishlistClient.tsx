@@ -12,7 +12,7 @@ export default function WishlistClient() {
 
   return (
     <div data-screen-label="Saved">
-      <div className="gg-wrap" style={{ padding: "clamp(28px,4vw,44px) var(--gutter) clamp(48px,6vw,72px)" }}>
+      <div className="gg-wrap" style={{ padding: "clamp(28px,4vw,44px) var(--gg-gutter) clamp(48px,6vw,72px)" }}>
         <div className="gg-kicker" style={{ marginBottom: 14 }}>Saved pairs</div>
         <h1 className="gg-display gg-d1" style={{ marginBottom: 30, fontSize: "clamp(32px,4vw,56px)" }}>Your shortlist</h1>
 

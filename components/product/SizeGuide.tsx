@@ -42,7 +42,7 @@ export default function SizeGuide({ product, onClose }: { product: Product; onCl
     <div
       className="gg-scrim"
       onClick={onClose}
-      style={{ display: "grid", placeItems: "center", padding: "var(--gutter)" }}
+      style={{ display: "grid", placeItems: "center", padding: "var(--gg-gutter)" }}
     >
       <div
         className="gg-modal"

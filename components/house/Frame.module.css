@@ -1,0 +1,103 @@
+/*
+ * The media box.
+ *
+ * Two kinds of photograph exist in this shop and they cannot be treated the
+ * same way.
+ *
+ * **Studio cut-outs** — all 94 catalogue shots — are opaque JPEGs with a pure
+ * white background baked in (verified: corner pixels are 255,255,255). They are
+ * made to sit on a coloured ground by `mix-blend-mode: multiply`, which turns
+ * white transparent. That trick only works over a *light* ground: multiply the
+ * same photo over #0A0A0B and every pixel goes to near-black and the shoe
+ * disappears. So on the dark house ground these get an explicit light plate to
+ * sit on, and the blend happens against the plate rather than the page.
+ *
+ * This is the single biggest practical constraint on going dark, and it is
+ * exactly what the reshoot in §3.4 removes: photographed on a dark seamless
+ * ground, a pair needs no plate and no blend and can bleed straight onto the
+ * page. Until then, `plate` is the honest default.
+ *
+ * **Campaign photography** — real scenes with their own backgrounds — must
+ * never carry the blend. It has nothing to make transparent and would only
+ * dirty the image. Those use `bleed`.
+ */
+
+.frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+  /* A stacking context here would break the blend below, so nothing that
+     creates one (transform, opacity, filter) may live on this element. */
+}
+
+.frame img { display: block; width: 100%; height: 100%; }
+
+/* ── studio cut-out on a plate ──────────────────────────────────────────── */
+
+.plate { background: var(--plate, #f4f1ea); }
+.plate img { object-fit: contain; mix-blend-mode: multiply; padding: var(--frame-pad, 8%); }
+
+/* A plate is always light, so its caption ink is fixed rather than themed. */
+.plate .caption { color: rgb(20 20 15 / 0.62); }
+
+/* ── real photography, full bleed ───────────────────────────────────────── */
+
+.bleed { background: var(--surface-card); }
+.bleed img { object-fit: cover; }
+.bleed .caption { color: var(--text-mid); }
+
+/* ── the hover swap ─────────────────────────────────────────────────────── */
+
+/*
+ * A second angle cross-fades in on hover. Both images are stacked rather than
+ * swapped so there is no reflow and no second network request mid-interaction.
+ */
+.alt {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--med) var(--ease);
+}
+.frame:hover .alt,
+.frame:focus-visible .alt { opacity: 1; }
+
+/* The scale is on the image, never the frame — a transform on the frame would
+   create a stacking context and kill the multiply. */
+.zoom img { transition: transform 0.85s var(--ease); }
+.frame:hover .zoom img,
+a:hover .zoom img { transform: scale(1.04); }
+
+.caption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ── ratios ─────────────────────────────────────────────────────────────── */
+
+.r45 { aspect-ratio: 4 / 5; }
+.r11 { aspect-ratio: 1 / 1; }
+.r43 { aspect-ratio: 4 / 3; }
+.r169 { aspect-ratio: 16 / 9; }
+.r23 { aspect-ratio: 2 / 3; }
+.fill { height: 100%; }
+
+/* ── empty state ────────────────────────────────────────────────────────── */
+
+.empty {
+  display: grid;
+  place-items: center;
+  background: var(--surface-card);
+  color: var(--text-lo);
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

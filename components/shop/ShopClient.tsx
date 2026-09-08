@@ -136,7 +136,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
 
   return (
     <div data-screen-label="Shop">
-      <div className="gg-wrap" style={{ borderBottom: "2px solid var(--color-text)", padding: "clamp(26px,3.4vw,38px) var(--gutter) 26px" }}>
+      <div className="gg-wrap" style={{ borderBottom: "2px solid var(--color-text)", padding: "clamp(26px,3.4vw,38px) var(--gg-gutter) 26px" }}>
         <div className="gg-kicker" style={{ marginBottom: 14 }}>{shopKicker}</div>
         <h1 className="gg-display" style={{ fontSize: "clamp(30px,4vw,60px)" }}>{resultLabel}</h1>
         {filters.q && (
@@ -155,7 +155,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
 
       {/* — desktop filter bar — */}
       <div className="gg-desktop" style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-        <div className="gg-wrap" style={{ padding: "20px var(--gutter)", display: "flex", flexDirection: "column", gap: 14 }}>
+        <div className="gg-wrap" style={{ padding: "20px var(--gg-gutter)", display: "flex", flexDirection: "column", gap: 14 }}>
           <FilterGroups filters={filters} update={update} layout="bar" families={families} sizes={sizes} />
           <div style={{ display: "flex", justifyContent: "flex-end", marginTop: -8 }}>
             <button onClick={clear} className="btn btn-ghost" style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" }}>
@@ -167,7 +167,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
 
       {/* — mobile filter bar: a summary that opens the drawer — */}
       <div className="gg-mobile" style={{ position: "sticky", top: 76, zIndex: 40, borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-        <div className="gg-wrap" style={{ padding: "10px var(--gutter)", display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="gg-wrap" style={{ padding: "10px var(--gg-gutter)", display: "flex", alignItems: "center", gap: 10 }}>
           <button
             onClick={() => setSheet(true)}
             style={{ appearance: "none", flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, border: "2px solid var(--color-text)", background: "transparent", cursor: "pointer", font: "inherit", fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", padding: "0 14px", height: 44, color: "inherit" }}
@@ -192,16 +192,16 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
         <>
           <div className="gg-scrim" onClick={() => setSheet(false)} aria-hidden />
           <div className="gg-drawer" role="dialog" aria-modal="true" aria-label="Filter and sort">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px var(--gutter)", borderBottom: "2px solid var(--color-text)", flex: "none" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px var(--gg-gutter)", borderBottom: "2px solid var(--color-text)", flex: "none" }}>
               <span style={{ fontFamily: "var(--font-heading)", fontWeight: 900, fontSize: 20, letterSpacing: "-0.03em", textTransform: "uppercase" }}>Filter &amp; sort</span>
               <button onClick={() => setSheet(false)} aria-label="Close filters" style={{ appearance: "none", width: 40, height: 40, border: "2px solid var(--color-text)", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "inherit" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="m6 6 12 12" /><path d="m18 6-12 12" /></svg>
               </button>
             </div>
-            <div style={{ padding: "22px var(--gutter)", display: "flex", flexDirection: "column", gap: 26, flex: 1 }}>
+            <div style={{ padding: "22px var(--gg-gutter)", display: "flex", flexDirection: "column", gap: 26, flex: 1 }}>
               <FilterGroups filters={filters} update={update} layout="stack" families={families} sizes={sizes} />
             </div>
-            <div style={{ padding: "14px var(--gutter) 22px", borderTop: "2px solid var(--color-text)", display: "flex", gap: 10, flex: "none", position: "sticky", bottom: 0, background: "var(--color-bg)" }}>
+            <div style={{ padding: "14px var(--gg-gutter) 22px", borderTop: "2px solid var(--color-text)", display: "flex", gap: 10, flex: "none", position: "sticky", bottom: 0, background: "var(--color-bg)" }}>
               <button onClick={clear} className="gg-btn gg-btn-outline" style={{ flex: "0 0 auto" }}>Clear</button>
               <button onClick={() => setSheet(false)} className="gg-btn" style={{ flex: 1, justifyContent: "center" }}>
                 Show {list.length} {list.length === 1 ? "pair" : "pairs"}
@@ -211,7 +211,7 @@ export default function ShopClient({ initialFilters }: { initialFilters: ShopFil
         </>
       )}
 
-      <div className="gg-wrap" style={{ padding: "28px var(--gutter) clamp(44px,5vw,64px)" }}>
+      <div className="gg-wrap" style={{ padding: "28px var(--gg-gutter) clamp(44px,5vw,64px)" }}>
         {list.length > 0 && (
           <div className="gg-cardgrid">
             {list.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 4} />)}

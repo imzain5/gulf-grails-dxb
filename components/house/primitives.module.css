@@ -1,0 +1,144 @@
+/*
+ * The small pieces: Button, Tag, Label, Price, Hairline.
+ *
+ * These are the vocabulary every other component is built from, and they exist
+ * so that the 720 inline style objects in the legacy tree have somewhere to go.
+ * Everything reads from styles/tokens.css — a literal value here that isn't a
+ * token is a bug.
+ */
+
+/* ── button ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7em;
+  min-height: 48px;
+  padding-inline: var(--pad-sm);
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--fast) var(--ease),
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    opacity var(--fast) var(--ease);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] { opacity: 0.4; cursor: default; pointer-events: none; }
+
+/*
+ * Primary is the page's ink inverted — never the signal colour. That single
+ * rule is most of what stops the palette reading as a sale rather than a house.
+ */
+.primary { background: var(--surface-inverse); color: var(--text-inverse); }
+.primary:hover { opacity: 0.86; }
+
+.ghost { background: transparent; color: var(--text-hi); border-color: var(--line-strong); }
+.ghost:hover { border-color: var(--text-hi); }
+
+/* An inline link that still reads as an action. */
+.link {
+  min-height: 0;
+  padding: 0;
+  background: none;
+  color: var(--text-hi);
+  border: 0;
+  border-bottom: var(--hair) solid var(--line-strong);
+  border-radius: 0;
+}
+.link:hover { border-bottom-color: var(--text-hi); }
+
+.block { width: 100%; }
+
+.btn svg { flex: none; }
+
+/* ── tag ────────────────────────────────────────────────────────────────── */
+
+/*
+ * Hairline and mono, never a filled coloured pill. A pill reads as a discount
+ * badge; a rule and a monospace word reads as a catalogue annotation.
+ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 4px 9px;
+  border: var(--hair) solid var(--line-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-data);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+
+.tagBrass { border-color: var(--brass); color: var(--brass-text); }
+.tagSignal { border-color: var(--signal-text); color: var(--signal-text); }
+
+/* ── label ──────────────────────────────────────────────────────────────── */
+
+.label {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+.labelHi { color: var(--text-hi); }
+.labelBrass { color: var(--brass-text); }
+
+/* ── price ──────────────────────────────────────────────────────────────── */
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.65em;
+  flex-wrap: wrap;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.priceNow { font-size: var(--t-lot); letter-spacing: -0.01em; color: var(--text-hi); }
+.priceSm .priceNow { font-size: var(--t-data); }
+.priceLg .priceNow { font-size: var(--t-section); }
+
+/*
+ * The market figure, struck through — but no percentage anywhere. A discount
+ * percentage is the loudest thing a luxury card can say, and it says "sale".
+ */
+.priceWas {
+  font-size: var(--t-data);
+  color: var(--text-lo);
+  text-decoration: line-through;
+  text-decoration-thickness: from-font;
+}
+
+.priceInstalment {
+  display: block;
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: var(--t-data);
+  color: var(--text-mid);
+}
+
+/* ── hairline ───────────────────────────────────────────────────────────── */
+
+.hair { height: var(--hair); background: var(--line); border: 0; margin: 0; }
+.hairStrong { height: var(--hair); background: var(--line-strong); border: 0; margin: 0; }
+.hairBrass { height: var(--hair); background: var(--brass); border: 0; margin: 0; }
