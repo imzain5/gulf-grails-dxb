@@ -212,8 +212,8 @@ textarea.input { min-height: 90px; resize: vertical; }
      screens so the layout doesn't read as a cage on a phone. */
   --rule: 2px;
   --rule-hair: 1px;
-  --gutter: 28px;
-  --shell: 1560px;
+  --gg-gutter: 28px;
+  --gg-shell: 1560px;
 
   /* Editorial display sizes, fluid between phone and desktop. */
   --d1: clamp(38px, 6.6vw, 96px);
@@ -226,10 +226,10 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 
 @media (max-width: 900px) {
-  :root { --rule: 2px; --gutter: 18px; }
+  :root { --rule: 2px; --gg-gutter: 18px; }
 }
 @media (max-width: 520px) {
-  :root { --gutter: 14px; }
+  :root { --gg-gutter: 14px; }
 }
 
 body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
@@ -254,10 +254,10 @@ body { overflow-x: hidden; -webkit-font-smoothing: antialiased; text-rendering: 
 
 /* — the page shell every section aligns to — */
 .gg-wrap {
-  max-width: var(--shell);
+  max-width: var(--gg-shell);
   margin-inline: auto;
   width: 100%;
-  padding-inline: var(--gutter);
+  padding-inline: var(--gg-gutter);
   box-sizing: border-box;
 }
 

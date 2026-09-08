@@ -12,7 +12,7 @@ export default async function SellPage() {
   return (
     <div data-screen-label="Sell to us">
       <div className="gg-split" style={{ borderBottom: "2px solid var(--color-text)", "--split": "1fr .8fr" } as React.CSSProperties}>
-        <div style={{ padding: "clamp(34px,4vw,56px) clamp(18px,3vw,44px) clamp(34px,4vw,56px) var(--gutter)" }}>
+        <div style={{ padding: "clamp(34px,4vw,56px) clamp(18px,3vw,44px) clamp(34px,4vw,56px) var(--gg-gutter)" }}>
           <div className="gg-kicker" style={{ marginBottom: 14 }}>Sell or trade</div>
           <h1 className="gg-display" style={{ fontSize: "clamp(32px,4.6vw,64px)", lineHeight: 0.94 }}>
             Got a pair<br />sitting unworn?

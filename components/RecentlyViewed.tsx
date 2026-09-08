@@ -33,7 +33,7 @@ export default function RecentlyViewed({ excludeId }: { excludeId?: string }) {
 
   return (
     <section style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-      <div className="gg-wrap" style={{ padding: "clamp(28px,3vw,38px) var(--gutter) clamp(28px,3vw,40px)" }}>
+      <div className="gg-wrap" style={{ padding: "clamp(28px,3vw,38px) var(--gg-gutter) clamp(28px,3vw,40px)" }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 20, flexWrap: "wrap", marginBottom: 18 }}>
           <div className="gg-kicker">Recently viewed</div>
           <span className="gg-eyebrow" style={{ color: "var(--color-neutral-600)" }}>Saved to this device only</span>

@@ -1,0 +1,262 @@
+/*
+ * The styleguide's own layout, plus the first primitives written as CSS
+ * Modules rather than inline `style={{}}`.
+ *
+ * CSS Modules over Tailwind, deliberately: it is native to Next with no new
+ * dependency and no build config, and — the deciding factor — it coexists with
+ * `app/globals.css` untouched, so the legacy `gg-*` storefront keeps working
+ * while the house system is built beside it. A Tailwind preflight would have
+ * to fight 1,090 lines of existing base styles from the first commit.
+ *
+ * Everything below reads only from styles/tokens.css. If a value is hard-coded
+ * here that isn't a token, it is a bug.
+ */
+
+.page {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+  padding-block: var(--pad-md) var(--pad-xl);
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: var(--pad-sm);
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding-block: var(--pad-sm);
+  margin-bottom: var(--pad-md);
+  background: var(--surface);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: var(--t-lot);
+  letter-spacing: var(--track-display);
+  margin-right: auto;
+}
+
+.section { padding-block: var(--pad-lg) 0; }
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pad-sm);
+  padding-bottom: var(--pad-sm);
+  margin-bottom: var(--pad-sm);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  margin: 0;
+}
+
+.note {
+  color: var(--text-mid);
+  max-width: 68ch;
+  margin: 0 0 var(--pad-sm);
+}
+
+/* ── primitives ─────────────────────────────────────────────────────────── */
+
+.label {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+}
+
+.data {
+  font-family: var(--font-data);
+  font-size: var(--t-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.price {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-lot);
+  letter-spacing: -0.01em;
+}
+
+.hairline { height: var(--hair); background: var(--line); border: 0; margin: 0; }
+.hairlineStrong { height: var(--hair); background: var(--line-strong); border: 0; margin: 0; }
+
+/*
+ * Buttons. The primary is ink-on-surface inverted — never the signal colour,
+ * which is the single rule that stops the palette reading as a sale.
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 48px;
+  padding-inline: var(--pad-sm);
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease), opacity var(--fast) var(--ease);
+}
+
+.btnPrimary {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+}
+.btnPrimary:hover { opacity: 0.86; }
+
+.btnGhost {
+  background: transparent;
+  color: var(--text-hi);
+  border-color: var(--line-strong);
+}
+.btnGhost:hover { border-color: var(--text-hi); }
+
+.btnLink {
+  min-height: 0;
+  padding: 0;
+  background: none;
+  color: var(--text-hi);
+  border: 0;
+  border-bottom: var(--hair) solid var(--line-strong);
+  border-radius: 0;
+}
+.btnLink:hover { border-bottom-color: var(--text-hi); }
+
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+/* Tags: hairline and mono. Never a filled coloured pill. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 4px 9px;
+  border: var(--hair) solid var(--line-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+.tagBrass { border-color: var(--brass); color: var(--brass-text); }
+.tagSignal { border-color: var(--signal-text); color: var(--signal-text); }
+
+/* ── lot card ───────────────────────────────────────────────────────────── */
+
+.lot {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-decoration: none;
+  /* No border. Separation is space, not a box. */
+}
+
+.lotFrame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--surface-card);
+  overflow: hidden;
+}
+
+.lotFrame::after {
+  /* Stand-in for photography, so the card reads at the right value. */
+  content: "";
+  position: absolute;
+  inset: 22%;
+  background: var(--surface-hover);
+}
+
+.lotMeta { display: flex; flex-direction: column; gap: 6px; }
+
+.lotName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-lot);
+  line-height: 1.15;
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+}
+
+.lotRow { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+/* ── the signature move ─────────────────────────────────────────────────── */
+
+/*
+ * One motion idea, used everywhere: a slow clip wipe upward. The clip lives on
+ * an inner layer because a clipped element reports zero visible area, and an
+ * IntersectionObserver watching it would never fire.
+ */
+.wipe > * {
+  clip-path: inset(0 0 100% 0);
+  animation: wipe var(--wipe) forwards;
+}
+.wipe > *:nth-child(2) { animation-delay: var(--stagger); }
+.wipe > *:nth-child(3) { animation-delay: calc(var(--stagger) * 2); }
+.wipe > *:nth-child(4) { animation-delay: calc(var(--stagger) * 3); }
+
+@keyframes wipe { to { clip-path: inset(0 0 0 0); } }
+
+/* ── styleguide scaffolding ─────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--pad-sm);
+}
+
+.swatch { display: flex; flex-direction: column; gap: 8px; }
+
+.chip {
+  height: 76px;
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius);
+}
+
+.row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+
+.stack { display: flex; flex-direction: column; gap: var(--pad-sm); }
+
+.toggle { display: inline-flex; border: var(--hair) solid var(--line-strong); }
+.toggle button {
+  min-height: 40px;
+  padding-inline: 14px;
+  background: none;
+  border: 0;
+  color: var(--text-lo);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.toggle button[data-on] { background: var(--surface-inverse); color: var(--text-inverse); }
+
+.ratio {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--text-lo);
+  font-variant-numeric: tabular-nums;
+}
+
+.specimen { display: grid; gap: 4px; padding-block: 14px; border-bottom: var(--hair) solid var(--line); }

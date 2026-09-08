@@ -1,0 +1,243 @@
+/*
+ * Gulf Grails — the house design system.
+ *
+ * This is the foundation layer for the redesign. It exists alongside the two
+ * systems it replaces (`gg-*` and `hp-*` in app/globals.css) until Phase 2
+ * retires them; nothing in here reads or writes a legacy token, and the legacy
+ * `--gutter` / `--shell` were renamed to `--gg-*` so the names below could take
+ * their proper place without moving a pixel on the live site.
+ *
+ * Three rules the system exists to enforce:
+ *
+ *   1. Dark is the default expression, light is a complete mirror — not an
+ *      afterthought. Both are defined semantically, so a component never asks
+ *      which mode it is in.
+ *   2. Brass is the only decorative colour, and it marks status: authenticated,
+ *      lot number, provenance. Three appearances per viewport, at most.
+ *   3. Signal is a status colour, never a brand colour. It may not be the
+ *      background of a button or the colour of a link.
+ *
+ * Every text pairing below was computed against WCAG, not chosen by eye — see
+ * the ratios noted inline. The brief's proposed `--text-lo: .38` measured
+ * 3.25:1 on the page ground and would have shipped failing contrast, so the
+ * alphas here are the lowest that clear 4.5:1 with headroom, and they differ
+ * per mode because light grounds need more.
+ */
+
+:root {
+  /* ── raw palette ─────────────────────────────────────────────────────── */
+
+  /* Surfaces — dark */
+  --ink-900: #0a0a0b;   /* page ground */
+  --ink-800: #101012;   /* raised surface */
+  --ink-700: #17171a;   /* card */
+  --ink-600: #202024;   /* hover */
+
+  /* Surfaces — light */
+  --bone-50: #faf8f4;   /* page ground */
+  --bone-100: #f2efe9;  /* raised surface */
+  --bone-200: #e6e1d8;  /* card */
+  --bone-300: #d5cfc3;  /* hover */
+
+  /* Ink used *on* each ground. */
+  --on-dark: 244 241 235;   /* #F4F1EB */
+  --on-light: 20 20 15;     /* #14140F */
+
+  /*
+   * Metallic. `--brass-400/500/600` are for rules, marks and fills — anything
+   * that isn't read. `--brass-text` is the variant that carries words, and it
+   * differs per mode because #94743F only reaches 4.10:1 on bone-50.
+   */
+  --brass-400: #d9be85;
+  --brass-500: #b8965a;
+  --brass-600: #94743f;
+
+  /*
+   * Signal. Status only: live countdown, sold, price drop, error. Never a
+   * button background, never a link colour. `--signal` is the mark; the
+   * `--signal-text` mirror is what any wording uses, since the raw #E0431F
+   * measures 3.97:1 on a light ground.
+   */
+  --signal: #e0431f;
+
+  /* ── typography ──────────────────────────────────────────────────────── */
+
+  --font-display: var(--font-instrument-serif), "Bodoni Moda", Georgia, serif;
+  --font-ui: var(--font-geist), "Inter Tight", system-ui, -apple-system, sans-serif;
+  --font-data: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --t-hero: clamp(44px, 7.5vw, 128px);
+  --t-section: clamp(28px, 3.6vw, 56px);
+  --t-lot: clamp(19px, 1.5vw, 26px);
+  --t-body: clamp(15px, 1.05vw, 17px);
+  --t-label: 11px;
+  --t-data: 13px;
+
+  /* Display is set at 400 and never bolder; that is the whole point of it. */
+  --lh-display: 0.94;
+  --lh-body: 1.65;
+  --track-display: -0.02em;
+  --track-label: 0.18em;
+
+  /* ── space ───────────────────────────────────────────────────────────── */
+
+  --hair: 1px;
+  --gutter: clamp(20px, 4vw, 88px);
+  --shell: 1680px;
+
+  --pad-xl: clamp(96px, 11vw, 200px);   /* between major acts */
+  --pad-lg: clamp(64px, 7vw, 120px);
+  --pad-md: clamp(40px, 4.5vw, 72px);
+  --pad-sm: clamp(20px, 2vw, 32px);
+
+  --radius: 0px;   /* the one brutalist decision that survives */
+
+  /* ── motion ──────────────────────────────────────────────────────────── */
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --slow: 0.9s;
+  --med: 0.5s;
+  --fast: 0.24s;
+
+  /* The signature move: a clip wipe on section imagery, staggered per item. */
+  --wipe: var(--slow) var(--ease);
+  --stagger: 60ms;
+}
+
+/* ── semantic layer: dark (default) ─────────────────────────────────────── */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface: var(--ink-900);
+  --surface-raised: var(--ink-800);
+  --surface-card: var(--ink-700);
+  --surface-hover: var(--ink-600);
+
+  /* Inverse pair, for the light-on-dark blocks a dark theme still needs. */
+  --surface-inverse: var(--bone-50);
+  --text-inverse: rgb(var(--on-light));
+
+  --text-hi: rgb(var(--on-dark));                /* 18.7:1 */
+  --text-mid: rgb(var(--on-dark) / 0.68);        /* 8.24:1 page · 7.81:1 card */
+  --text-lo: rgb(var(--on-dark) / 0.52);         /* 5.16:1 page · 5.07:1 card */
+
+  --line: rgb(var(--on-dark) / 0.10);
+  --line-strong: rgb(var(--on-dark) / 0.20);
+
+  --brass: var(--brass-400);
+  --brass-text: var(--brass-400);                /* 10.98:1 page · 9.93:1 card */
+
+  --signal-text: #f2603d;                        /* 6.14:1 */
+
+  --focus: rgb(var(--on-dark) / 0.9);
+}
+
+/* ── semantic layer: light ──────────────────────────────────────────────── */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --surface: var(--bone-50);
+  --surface-raised: var(--bone-100);
+  --surface-card: var(--bone-200);
+  --surface-hover: var(--bone-300);
+
+  --surface-inverse: var(--ink-900);
+  --text-inverse: rgb(var(--on-dark));
+
+  --text-hi: rgb(var(--on-light));                /* 17.8:1 */
+  --text-mid: rgb(var(--on-light) / 0.72);        /* 7.18:1 page · 6.49:1 card */
+  --text-lo: rgb(var(--on-light) / 0.62);         /* 5.05:1 page · 4.69:1 card */
+
+  --line: rgb(var(--on-light) / 0.12);
+  --line-strong: rgb(var(--on-light) / 0.24);
+
+  --brass: var(--brass-600);
+  --brass-text: #75592f;                          /* 6.14:1 page · 5.00:1 card */
+
+  --signal-text: #b4300f;                         /* 5.87:1 page · 4.78:1 card */
+
+  --focus: rgb(var(--on-light) / 0.9);
+}
+
+/*
+ * Following the operating system is opt-in, not the default.
+ *
+ * The brief asks for two things that pull against each other: dark as the
+ * house's default expression, and respect for `prefers-color-scheme`. Most
+ * machines report light, so honouring the system automatically would mean the
+ * brand's own expression is the one almost nobody ever sees. So dark is what
+ * you get, light is one tap away, and "system" is a third explicit choice that
+ * does defer to the OS — which is respect offered rather than assumed.
+ *
+ * Flip this by moving the rule to `:root:not([data-theme])` if the call ever
+ * goes the other way; nothing else in the system needs to change.
+ */
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    color-scheme: light;
+
+    --surface: var(--bone-50);
+    --surface-raised: var(--bone-100);
+    --surface-card: var(--bone-200);
+    --surface-hover: var(--bone-300);
+
+    --surface-inverse: var(--ink-900);
+    --text-inverse: rgb(var(--on-dark));
+
+    --text-hi: rgb(var(--on-light));
+    --text-mid: rgb(var(--on-light) / 0.72);
+    --text-lo: rgb(var(--on-light) / 0.62);
+
+    --line: rgb(var(--on-light) / 0.12);
+    --line-strong: rgb(var(--on-light) / 0.24);
+
+    --brass: var(--brass-600);
+    --brass-text: #75592f;
+
+    --signal-text: #b4300f;
+
+    --focus: rgb(var(--on-light) / 0.9);
+  }
+}
+
+/* ── the one thing this layer paints ────────────────────────────────────── */
+
+/*
+ * Scoped to `.house` rather than `body` so the new system can be adopted a
+ * route at a time while the legacy storefront keeps its own ground. Phase 2
+ * promotes this to `body` and the class disappears.
+ */
+.house {
+  background: var(--surface);
+  color: var(--text-hi);
+  font-family: var(--font-ui);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.house *,
+.house *::before,
+.house *::after { box-sizing: border-box; }
+
+.house :where(a) { color: inherit; }
+
+.house :where(:focus-visible) {
+  outline: var(--hair) solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .house *,
+  .house *::before,
+  .house *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

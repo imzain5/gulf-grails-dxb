@@ -1,7 +1,45 @@
 import type { Metadata } from "next";
-import { Archivo } from "next/font/google";
+import { Archivo, Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import "../styles/tokens.css";
 import { SITE_CONFIG } from "@/lib/config";
+import { THEME_SCRIPT } from "@/components/house/ThemeToggle";
+
+/*
+ * Three faces, three jobs — the split that separates an auction house from a
+ * sneaker store. A price set in a mono face reads as a valuation; the same
+ * price in a heavy grotesk reads as a sale.
+ *
+ * Archivo stays only because the legacy `gg-*` storefront is still live and
+ * still asks for six weights of it. It goes with that system in Phase 2, which
+ * is also when the six-weight load stops being paid for.
+ */
+
+/** Display — house names, statements, lot titles. Regular weight, never bold. */
+const display = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+/** Interface — nav, body, buttons, labels. */
+const ui = Geist({
+  variable: "--font-geist",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+/** Data — prices, sizes, lot numbers, the Grail Index. Tabular by default. */
+const data = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+  // Nothing on this site needs a monospace italic.
+  style: "normal",
+  // Not preloaded: data type appears below the fold on most routes.
+  preload: false,
+});
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -51,8 +89,16 @@ export const metadata: Metadata = {
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={archivo.variable}>
+    <html
+      lang="en"
+      className={`${archivo.variable} ${display.variable} ${ui.variable} ${data.variable}`}
+    >
       <head>
+        {/* Applies a saved theme before first paint so a dark-mode visitor
+            never sees a white flash. Only sets an attribute; the legacy
+            storefront doesn't read it yet. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+
         {/* Scroll-reveal ships hidden so it can't flicker on load (see
             components/Reveal.tsx). Without scripts nothing would ever reveal
             it, so turn the effect off entirely in that case. */}

@@ -101,7 +101,7 @@ export default function ProductClient({ product: prod }: { product: Product }) {
 
   return (
     <div data-screen-label="Product">
-      <div className="gg-wrap" style={{ borderBottom: "2px solid var(--color-divider)", padding: "14px var(--gutter)", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-neutral-600)", display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div className="gg-wrap" style={{ borderBottom: "2px solid var(--color-divider)", padding: "14px var(--gg-gutter)", fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-neutral-600)", display: "flex", gap: 8, flexWrap: "wrap" }}>
         <Link href="/shop" style={{ color: "var(--color-accent)" }}>Shop</Link>
         <span>/</span>
         <Link href={`/shop?fam=${encodeURIComponent(prod.fam)}`} style={{ color: "inherit" }}>{prod.brand}</Link>
@@ -230,7 +230,7 @@ export default function ProductClient({ product: prod }: { product: Product }) {
 
       {showMatrix && (
         <div style={{ borderBottom: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-          <div className="gg-wrap" style={{ padding: "clamp(26px,3vw,36px) var(--gutter) clamp(30px,3vw,40px)" }}>
+          <div className="gg-wrap" style={{ padding: "clamp(26px,3vw,36px) var(--gg-gutter) clamp(30px,3vw,40px)" }}>
             <div className="gg-kicker" style={{ marginBottom: 14 }}>Size, stock &amp; price</div>
             <h2 className="gg-display gg-d3" style={{ marginBottom: 20 }}>What we hold, size by size</h2>
             <div style={{ overflowX: "auto" }}>
@@ -262,7 +262,7 @@ export default function ProductClient({ product: prod }: { product: Product }) {
 
       <div
         className="gg-wrap gg-grid"
-        style={{ padding: "clamp(34px,4vw,48px) var(--gutter) clamp(38px,4vw,56px)", gap: "clamp(28px,4vw,56px)", "--cols": 2, "--cols-sm": 1 } as React.CSSProperties}
+        style={{ padding: "clamp(34px,4vw,48px) var(--gg-gutter) clamp(38px,4vw,56px)", gap: "clamp(28px,4vw,56px)", "--cols": 2, "--cols-sm": 1 } as React.CSSProperties}
       >
         <div>
           <div className="gg-kicker" style={{ marginBottom: 14 }}>The pair</div>
@@ -290,7 +290,7 @@ export default function ProductClient({ product: prod }: { product: Product }) {
 
       {bundle.length > 0 && (
         <div style={{ borderTop: "2px solid var(--color-text)", background: "var(--color-neutral-100)" }}>
-          <div className="gg-wrap" style={{ padding: "clamp(30px,3.4vw,40px) var(--gutter) clamp(34px,4vw,48px)" }}>
+          <div className="gg-wrap" style={{ padding: "clamp(30px,3.4vw,40px) var(--gg-gutter) clamp(34px,4vw,48px)" }}>
             <div className="gg-kicker" style={{ marginBottom: 14 }}>Complete the look</div>
             <h2 className="gg-display gg-d3" style={{ marginBottom: 22 }}>Add one of these and delivery is on us</h2>
             <div
@@ -303,7 +303,7 @@ export default function ProductClient({ product: prod }: { product: Product }) {
         </div>
       )}
 
-      <div className="gg-wrap" style={{ borderTop: "2px solid var(--color-text)", padding: "clamp(30px,3.4vw,40px) var(--gutter) clamp(44px,5vw,72px)" }}>
+      <div className="gg-wrap" style={{ borderTop: "2px solid var(--color-text)", padding: "clamp(30px,3.4vw,40px) var(--gg-gutter) clamp(44px,5vw,72px)" }}>
         <h2 className="gg-display gg-d3" style={{ marginBottom: 22 }}>Also in the stockroom</h2>
         <Reveal className="gg-cardgrid" style={{ "--card": "236px" } as React.CSSProperties}>
           {related.map((p) => <RelatedCard key={p.id} product={p} />)}
@@ -316,7 +316,7 @@ export default function ProductClient({ product: prod }: { product: Product }) {
 
       {stuck && (
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 55, background: "var(--color-bg)", borderTop: "2px solid var(--color-text)", boxShadow: "0 -6px 24px color-mix(in srgb, #2d2b2b 16%, transparent)", animation: "gg-rise .2s ease" }}>
-          <div className="gg-wrap" style={{ padding: "12px var(--gutter)", display: "flex", alignItems: "center", gap: "clamp(10px,2vw,20px)" }}>
+          <div className="gg-wrap" style={{ padding: "12px var(--gg-gutter)", display: "flex", alignItems: "center", gap: "clamp(10px,2vw,20px)" }}>
             <div className="gg-plate gg-plate-flat gg-desktop" style={{ width: 56, height: 56, border: "2px solid var(--color-divider)", flex: "none", position: "relative" }}>
               <ProductCardPhoto product={prod} padding={4} sizes="56px" />
             </div>

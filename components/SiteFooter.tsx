@@ -38,7 +38,7 @@ export default function SiteFooter() {
       </div>
       <div
         className="gg-wrap gg-cols"
-        style={{ padding: "clamp(30px,3.6vw,44px) var(--gutter) clamp(34px,4vw,48px)", gap: "clamp(26px,3.4vw,44px)", "--cols": "1.1fr .7fr .7fr 1.3fr", "--cols-md": "1.2fr .8fr .8fr", "--cols-sm": "1fr 1fr", "--cols-xs": "minmax(0, 1fr)" } as React.CSSProperties}
+        style={{ padding: "clamp(30px,3.6vw,44px) var(--gg-gutter) clamp(34px,4vw,48px)", gap: "clamp(26px,3.4vw,44px)", "--cols": "1.1fr .7fr .7fr 1.3fr", "--cols-md": "1.2fr .8fr .8fr", "--cols-sm": "1fr 1fr", "--cols-xs": "minmax(0, 1fr)" } as React.CSSProperties}
       >
         <div>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-neutral-500)", marginBottom: 14 }}>
@@ -104,7 +104,7 @@ export default function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="gg-wrap" style={{ padding: "18px var(--gutter) 32px", borderTop: "1px solid var(--gg-hair-light)", display: "flex", justifyContent: "space-between", gap: 20, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-neutral-500)", flexWrap: "wrap" }}>
+      <div className="gg-wrap" style={{ padding: "18px var(--gg-gutter) 32px", borderTop: "1px solid var(--gg-hair-light)", display: "flex", justifyContent: "space-between", gap: 20, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-neutral-500)", flexWrap: "wrap" }}>
         <span>© 2026 Gulf Grails · Dubai, UAE</span>
         <span>Not affiliated with Nike, adidas, Balenciaga or Dior. All pairs sourced on the secondary market.</span>
       </div>

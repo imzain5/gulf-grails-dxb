@@ -18,7 +18,7 @@ export default function CartClient() {
 
   return (
     <div data-screen-label="Bag">
-      <div className="gg-wrap" style={{ maxWidth: 1180, padding: "clamp(28px,4vw,44px) var(--gutter) clamp(48px,6vw,72px)" }}>
+      <div className="gg-wrap" style={{ maxWidth: 1180, padding: "clamp(28px,4vw,44px) var(--gg-gutter) clamp(48px,6vw,72px)" }}>
         <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-accent)", marginBottom: 12 }}>Step 1 of 3</div>
         <h1 className="gg-display" style={{ marginBottom: 30, fontSize: "clamp(28px,4vw,56px)", lineHeight: 0.95 }}>Your bag</h1>
 
