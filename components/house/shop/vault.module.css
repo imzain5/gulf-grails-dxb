@@ -1,0 +1,88 @@
+/*
+ * The Vault.
+ *
+ * One lot per row, alternating side. Three across a grid would make single
+ * holdings read as a product listing, which is precisely what a vault is not.
+ */
+
+.page {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+  padding-bottom: var(--beat-cinematic);
+}
+
+.head { padding-block: var(--beat-editorial) 0; }
+
+.meta {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+  color: var(--text-lo);
+}
+
+.empty { color: var(--text-mid); max-width: 46ch; padding-block: var(--pad-lg); }
+
+.lots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+.lot {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: var(--pad-lg);
+  align-items: center;
+  padding-block: var(--beat-editorial);
+  border-bottom: var(--hair) solid var(--line);
+}
+/* Alternate the side so a long page does not become a column of identical rows. */
+.lots > li:nth-child(even) .lot > *:first-child { order: 2; }
+@media (max-width: 900px) {
+  .lot { grid-template-columns: 1fr; gap: var(--pad-md); }
+  .lots > li:nth-child(even) .lot > *:first-child { order: 0; }
+}
+
+.lotMedia { display: block; }
+
+.lotBody { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+
+.lotTop { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.lotName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  text-decoration: none;
+  text-wrap: pretty;
+}
+.lotName:hover { text-decoration: underline; text-underline-offset: 5px; }
+
+.lotLine { color: var(--text-mid); margin: 0; max-width: 46ch; text-wrap: pretty; }
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px var(--pad-sm);
+  margin: 4px 0 0;
+  width: 100%;
+  max-width: 46ch;
+}
+.facts dt {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+  margin-bottom: 4px;
+}
+.facts dd {
+  margin: 0;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+  color: var(--text-hi);
+}
+
+.lotActions { margin-top: 6px; }

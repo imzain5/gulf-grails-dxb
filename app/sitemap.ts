@@ -11,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages: [string, MetadataRoute.Sitemap[number]["changeFrequency"], number][] = [
     ["", "daily", 1],
     ["/shop", "daily", 0.9],
+    ["/vault", "weekly", 0.85],
     ["/trust", "monthly", 0.7],
     ["/about", "monthly", 0.5],
     ["/sell", "monthly", 0.6],

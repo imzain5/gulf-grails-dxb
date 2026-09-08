@@ -1,0 +1,285 @@
+/*
+ * The shop: a sticky left rail and a grid with no card borders.
+ *
+ * The rail is the change that matters. A row of pills across the top can hold
+ * two filters before it wraps into noise; a rail holds six and stays legible,
+ * which is what makes a catalogue feel navigable rather than long.
+ */
+
+.page {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.head { padding-block: var(--beat-compact) var(--pad-md); }
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-hi);
+  margin: 0;
+}
+
+.count {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-data);
+  color: var(--text-lo);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--pad-lg);
+  align-items: start;
+  padding-bottom: var(--beat-cinematic);
+}
+@media (max-width: 980px) { .body { grid-template-columns: minmax(0, 1fr); gap: var(--pad-md); } }
+
+/* ── the rail ───────────────────────────────────────────────────────────── */
+
+/*
+ * Dense on purpose. Six filter groups at editorial spacing runs to 1,400px,
+ * which means Size, Price and Availability sit below the rail's own scroll on
+ * every laptop — invisible filters. The order is deliberate too: size is the
+ * first thing anyone buying a sneaker narrows by.
+ */
+.rail {
+  position: sticky;
+  top: calc(68px + var(--pad-sm));
+  display: flex;
+  flex-direction: column;
+  gap: var(--pad-sm);
+  max-height: calc(100vh - 68px - var(--pad-md));
+  overflow-y: auto;
+  padding-bottom: var(--pad-sm);
+}
+@media (max-width: 980px) { .rail { display: none; } }
+
+.group { display: flex; flex-direction: column; gap: 6px; }
+
+.groupHead {
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-lo);
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.opt {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 27px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--text-mid);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+  transition: color var(--fast) var(--ease);
+}
+.opt:hover { color: var(--text-hi); }
+.opt[aria-pressed="true"] { color: var(--text-hi); }
+.opt[aria-pressed="true"]::before { content: "—"; color: var(--brass-text); }
+
+.optCount {
+  margin-inline-start: auto;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--text-lo);
+}
+
+/* Sizes are a small grid of squares, not a list. */
+.sizes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+
+/* "+4 more" on a long facet list, so House and Model cannot push the rest of
+   the rail out of sight. */
+.more {
+  align-self: flex-start;
+  min-height: 26px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--brass-text);
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+.more:hover { text-decoration: underline; }
+
+.size {
+  min-height: 34px;
+  border: var(--hair) solid var(--line-strong);
+  background: none;
+  color: var(--text-mid);
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.size:hover { border-color: var(--text-hi); color: var(--text-hi); }
+.size[aria-pressed="true"] { background: var(--surface-inverse); color: var(--text-inverse); border-color: var(--surface-inverse); }
+
+.price { display: flex; gap: 8px; align-items: center; }
+.priceField {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 10px;
+  background: var(--surface-raised);
+  border: var(--hair) solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-hi);
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+.priceField::placeholder { color: var(--text-lo); }
+.priceDash { color: var(--text-lo); }
+
+/* ── results ────────────────────────────────────────────────────────────── */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--pad-sm);
+  flex-wrap: wrap;
+  padding-bottom: var(--pad-sm);
+  margin-bottom: var(--pad-md);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.applied { display: flex; gap: 8px; flex-wrap: wrap; margin-right: auto; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: var(--hair) solid var(--line-strong);
+  background: none;
+  color: var(--text-mid);
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--text-hi); color: var(--text-hi); }
+
+.select {
+  min-height: 40px;
+  padding: 0 30px 0 12px;
+  background: none;
+  border: var(--hair) solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-hi);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  appearance: none;
+  /* The arrow is drawn rather than left to the platform, which renders it in
+     a colour the palette has no say over. */
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 14px center, right 9px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.select option { background: var(--surface); color: var(--text-hi); }
+
+/* Present to a screen reader, absent to everyone else. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--pad-lg) var(--pad-md);
+}
+@media (max-width: 1200px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pad-md) var(--pad-sm); } }
+
+.empty {
+  padding: var(--pad-lg) 0;
+  color: var(--text-mid);
+  max-width: 46ch;
+}
+
+/* ── mobile sheet ───────────────────────────────────────────────────────── */
+
+.sheetBtn { display: none; }
+@media (max-width: 980px) { .sheetBtn { display: inline-flex; } }
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgb(10 10 11 / 0.55);
+}
+
+.sheet {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 85;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-top: var(--hair) solid var(--line-strong);
+  animation: up var(--med) var(--ease);
+}
+@keyframes up { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { .sheet { animation: none; } }
+
+.sheetTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pad-sm);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+.sheetBody {
+  overflow-y: auto;
+  padding: var(--pad-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pad-md);
+}
+
+.sheetFoot {
+  padding: var(--pad-sm);
+  border-top: var(--hair) solid var(--line);
+  display: flex;
+  gap: 10px;
+  padding-bottom: calc(var(--pad-sm) + env(safe-area-inset-bottom, 0px));
+}
+.sheetFoot > * { flex: 1; }

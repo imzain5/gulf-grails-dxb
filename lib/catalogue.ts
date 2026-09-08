@@ -60,6 +60,9 @@ function normalise(raw: unknown): Product | null {
   const views = Array.isArray(r.views)
     ? r.views.filter((v): v is string => typeof v === "string")
     : undefined;
+  const flaws = Array.isArray(r.flaws)
+    ? r.flaws.filter((f): f is string => typeof f === "string" && f.trim().length > 0)
+    : undefined;
 
   return {
     id,
@@ -81,6 +84,14 @@ function normalise(raw: unknown): Product | null {
     premium: r.premium === true,
     photos: photos && photos.length ? photos : null,
     views: views && views.length === (photos?.length ?? 0) ? views : undefined,
+
+    // The condition report. Absent stays absent — an empty string here would
+    // render as a report that says nothing rather than no report at all.
+    condition: str(r.condition) || undefined,
+    boxNote: str(r.boxNote) || undefined,
+    flaws: flaws && flaws.length ? flaws : undefined,
+    verifiedOn: str(r.verifiedOn) || undefined,
+    verifiedBy: str(r.verifiedBy) || undefined,
   };
 }
 

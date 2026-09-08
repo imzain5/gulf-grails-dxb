@@ -19,8 +19,28 @@ const EU_US: Record<number, string> = {
   46: "12",
 };
 
+/**
+ * UK runs a size below US for men's, which is the conversion a Gulf customer
+ * buying an imported pair actually needs — a lot of stock here is bought
+ * against UK sizing.
+ */
+const EU_UK: Record<number, string> = {
+  39: "6",
+  40: "6.5",
+  41: "7",
+  42: "8",
+  43: "8.5",
+  44: "9.5",
+  45: "10",
+  46: "11",
+};
+
 export function euToUs(eu: number): string {
   return EU_US[eu] ?? String(Math.round((eu - 33) * 10) / 10);
+}
+
+export function euToUk(eu: number): string {
+  return EU_UK[eu] ?? String(Math.round((eu - 34) * 10) / 10);
 }
 
 /** Sizes 42–44 run AED-a-bit-more on premium (collab/luxury) pairs — the hot middle of the curve. */
