@@ -33,7 +33,7 @@ const SERVICES = [
 
 const HOUSE = [
   ["About", "/about"],
-  ["The Grail Index", "/index"],
+  ["The Grail Index", "/grail-index"],
   ["Privacy", "/privacy"],
   ["Terms of sale", "/terms"],
 ] as const;

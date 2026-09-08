@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "The Grail Index",
   description:
     "Our own reading of UAE sneaker resale, taken from what we are asked for and what we pay. Updated weekly from our own trading.",
-  alternates: { canonical: "/index" },
+  alternates: { canonical: "/grail-index" },
 };
 
 /**
@@ -27,6 +27,13 @@ export const metadata: Metadata = {
  * whose value is being believable about prices would be the whole point
  * thrown away. The gap is stated on the page instead, and the shape is ready
  * for the day a real series exists.
+ *
+ * The route is /grail-index, not /index. A route segment literally named
+ * `index` builds fine but breaks Vercel's output adapter: it writes the page
+ * to .next/server/app/index/index.segments/... while the adapter normalises
+ * `index` back to `/` and goes looking for the root route's segment layout
+ * inside that directory. The lstat misses and the deploy fails after a
+ * successful compile. Do not rename this back.
  */
 export default async function GrailIndexPage() {
   const catalogue = await getCatalogue();
