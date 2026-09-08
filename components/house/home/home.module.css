@@ -1,8 +1,8 @@
 /*
  * The homepage, eight acts.
  *
- * One stylesheet for all of them because they are one page with one rhythm —
- * `--pad-xl` between acts, a hairline where two meet, and nothing else drawn.
+ * One stylesheet for all of them because they are one page with one rhythm — a
+ * beat between acts, a hairline where two meet, and nothing else drawn.
  * Splitting this into seven modules would hide that rhythm across seven files.
  */
 
@@ -13,7 +13,17 @@
 }
 
 .act { border-bottom: var(--hair) solid var(--line); }
-.actIn { padding-block: var(--pad-xl); }
+
+/*
+ * Three paces rather than one. `--beat-*` is defined in styles/tokens.css with
+ * the reasoning; here is where the page decides which act gets which.
+ */
+.actIn { padding-block: var(--beat, var(--beat-editorial)); }
+
+/* Modifiers set the variable rather than the property, so which one wins does
+   not depend on the order these rules happen to appear in. */
+.cinematic { --beat: var(--beat-cinematic); }
+.compact { --beat: var(--beat-compact); }
 
 /* ── 1 · hero ───────────────────────────────────────────────────────────── */
 

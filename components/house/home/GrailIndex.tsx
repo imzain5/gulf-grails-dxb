@@ -22,7 +22,7 @@ import s from "./home.module.css";
 export default function GrailIndex() {
   return (
     <section className={s.act}>
-      <div className={`${s.shell} ${s.actIn}`}>
+      <div className={`${s.shell} ${s.actIn} ${s.compact}`}>
         <SectionHeader
           kicker="The Grail Index"
           title="What the market did this week"

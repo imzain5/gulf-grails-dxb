@@ -21,7 +21,7 @@ export default function Vault({ lots }: { lots: Product[] }) {
 
   return (
     <section className={`${s.act} ${s.vault}`}>
-      <div className={`${s.shell} ${s.actIn}`}>
+      <div className={`${s.shell} ${s.actIn} ${s.cinematic}`}>
         <SectionHeader
           kicker="The Vault"
           title="Nothing here comes back."

@@ -21,7 +21,7 @@ export default function CurrentlyHeld({
 }) {
   return (
     <section className={s.act}>
-      <div className={`${s.shell} ${s.actIn}`}>
+      <div className={`${s.shell} ${s.actIn} ${s.cinematic}`}>
         <SectionHeader
           kicker="Currently held"
           title="In the Jumeirah stockroom"
