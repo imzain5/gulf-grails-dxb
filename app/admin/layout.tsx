@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Archivo } from "next/font/google";
 import "./admin.css";
 
 /**
@@ -25,6 +26,20 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
 
+/**
+ * The stockroom's own typeface, loaded here rather than in the root layout.
+ *
+ * Six weights of Archivo used to ship to every visitor for the sake of these
+ * screens. Scoping the import to this layout means a customer browsing the
+ * shop never downloads it.
+ */
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <div className="ad">{children}</div>;
+  return <div className={`ad ${archivo.variable}`}>{children}</div>;
 }

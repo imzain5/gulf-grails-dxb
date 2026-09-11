@@ -1,0 +1,57 @@
+/*
+ * The document, before the house system starts.
+ *
+ * This replaces app/globals.css, which was the original storefront's entire
+ * stylesheet — 685 lines of `gg-*` components, a second colour system and a
+ * second set of type scales, all still being shipped to every visitor long
+ * after the pages that used it were rebuilt. What was actually still load
+ * bearing was the handful of rules below.
+ *
+ * Everything with an opinion lives in styles/tokens.css under `.house`, or in
+ * a CSS module beside the component that uses it. Nothing here should grow:
+ * a rule that belongs to a component belongs in that component's module.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /*
+   * Dark is the house default. Saying so here, before any token loads, is what
+   * stops the browser painting a white canvas behind the page for one frame on
+   * a slow connection — and it makes form controls and scrollbars match.
+   */
+  color-scheme: dark light;
+}
+
+body {
+  margin: 0;
+  background: var(--surface, #0a0a0b);
+  color: var(--text-hi, #f5f3ef);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg, video { display: block; max-width: 100%; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 400; }
+p { margin: 0; }
+
+a { color: inherit; text-decoration: none; text-underline-offset: 3px; }
+
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--brass, #b08d4f); outline-offset: 2px; }
+
+::selection { background: color-mix(in srgb, var(--brass, #b08d4f) 32%, transparent); }
+
+/* Honour the system setting everywhere, not per-component. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

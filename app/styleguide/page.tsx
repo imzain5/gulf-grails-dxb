@@ -233,7 +233,7 @@ export default function StyleguidePage() {
         <SectionHeader
           kicker="Currently held"
           title="Lot card"
-          note="One implementation, replacing gg-card and hp-card. No border, no discount percentage — separation by space, and the size run as mono chips."
+          note="One implementation, replacing the three the site used to have. No border, no discount percentage — separation by space, and the size run as mono chips."
           action={{ label: "All inventory", href: "/shop" }}
         />
         <div className={s.grid} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>

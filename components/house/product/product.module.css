@@ -283,3 +283,7 @@
 .recordLine b { color: var(--brass-text); font-family: var(--font-data); font-weight: 400; letter-spacing: 0.05em; }
 
 .foldActions { display: flex; gap: var(--pad-sm); flex-wrap: wrap; }
+
+/* Instalment line under the price. Rendered only where a provider is live. */
+.instalment { font-family: var(--font-data); font-size: var(--t-data); color: var(--text-mid); }
+.instalment b { color: var(--brass-text); font-weight: 400; }

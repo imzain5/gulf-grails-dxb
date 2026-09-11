@@ -1,7 +1,13 @@
 "use server";
 
 import { getCatalogue, saveCatalogue } from "@/lib/catalogue";
-import { getOrders, newRef, saveOrders, type Order, type OrderLine } from "@/lib/orders";
+import {
+  getOrders, newRef, saveOrders, HOLD_MINUTES, isOnline,
+  type Order, type OrderLine, type PayMethod,
+} from "@/lib/orders";
+import { releaseExpiredHolds } from "@/lib/order-flow";
+import { providerFor, returnUrls } from "@/lib/payments";
+import { TabbyRejected } from "@/lib/payments/tabby";
 import { sizePrice } from "@/lib/sizes";
 import { SITE_CONFIG } from "@/lib/config";
 import type { OrderForm, PlacedOrder } from "@/context/StoreContext";
@@ -15,10 +21,12 @@ import type { OrderForm, PlacedOrder } from "@/context/StoreContext";
  * costs money is recomputed here from the catalogue, because a browser that
  * can send `{ amount: 1 }` will.
  *
- * Stock is drawn down as the order is written. Under cash on delivery an order
- * is a commitment rather than a payment, so the alternative — waiting for the
- * shop to confirm on WhatsApp — means selling the same last pair twice in the
- * meantime. Cancelling an order in the stockroom puts the pairs straight back.
+ * Stock is drawn down as the order is written, whatever the payment method.
+ * Under cash on delivery an order is a commitment, so the alternative — wait
+ * for the shop to confirm on WhatsApp — sells the same last pair twice in the
+ * meantime. Under card or instalments the customer is about to disappear onto
+ * somebody else's domain, where they may pay, fail, or close the tab; the
+ * pairs are held for HOLD_MINUTES and then go back automatically.
  */
 
 /** What the browser is allowed to tell us. */
@@ -30,6 +38,8 @@ export interface OrderRequestLine {
 
 export type PlaceOrderResult =
   | { ok: true; order: PlacedOrder }
+  /** An online method: the order exists, unpaid, and the customer must go here. */
+  | { ok: true; redirectTo: string; order: PlacedOrder }
   | { ok: false; error: string };
 
 /** No single order may take more than this many of one pair, or this many lines. */
@@ -56,10 +66,24 @@ function phoneKey(phone: string): string {
   return phone.replace(/\D/g, "").slice(-9);
 }
 
+function placed(order: Order): PlacedOrder {
+  return {
+    ref: order.ref,
+    date: new Date(order.placedAt).toLocaleDateString("en-GB", {
+      day: "2-digit", month: "short", year: "numeric",
+    }),
+    lines: order.lines.map(({ name, size, qty, amount }) => ({ name, size, qty, amount })),
+    total: order.total,
+    discount: order.discount,
+    pay: order.pay,
+    form: order.customer,
+  };
+}
+
 export async function placeOrderAction(
   requested: OrderRequestLine[],
   rawForm: OrderForm,
-  pay: "cod" | "bank",
+  pay: PayMethod,
   referralApplied: boolean,
 ): Promise<PlaceOrderResult> {
   const form = cleanForm(rawForm);
@@ -74,11 +98,25 @@ export async function placeOrderAction(
     return { ok: false, error: "That is more pairs than one order can take. Message us instead." };
   }
 
+  const provider = isOnline(pay) ? providerFor(pay) : null;
+  if (isOnline(pay) && !provider?.configured()) {
+    return { ok: false, error: "That payment method is not available right now. Try another." };
+  }
+
+  /*
+   * Before anything is priced: give back the pairs that abandoned checkouts
+   * are still sitting on. Doing it here means the customer about to be told
+   * "sold out" gets the truth rather than a stale hold's shadow.
+   */
+  await releaseExpiredHolds();
+
   const catalogue = await getCatalogue();
   const orders = await getOrders();
 
   const openForPhone = orders.filter(
-    (o) => o.status === "new" && phoneKey(o.customer.phone) === phoneKey(form.phone),
+    (o) =>
+      (o.status === "new" || o.status === "awaiting_payment") &&
+      phoneKey(o.customer.phone) === phoneKey(form.phone),
   ).length;
   if (openForPhone >= MAX_OPEN_PER_PHONE) {
     return {
@@ -135,10 +173,13 @@ export async function placeOrderAction(
     deliveryFee,
     discount,
     total,
-    pay: pay === "bank" ? "bank" : "cod",
+    pay,
     customer: form,
-    status: "new",
+    status: provider ? "awaiting_payment" : "new",
     holdsStock: true,
+    holdExpiresAt: provider
+      ? new Date(Date.now() + HOLD_MINUTES * 60_000).toISOString()
+      : undefined,
   };
 
   try {
@@ -160,18 +201,34 @@ export async function placeOrderAction(
     };
   }
 
-  return {
-    ok: true,
-    order: {
-      ref: order.ref,
-      date: new Date(order.placedAt).toLocaleDateString("en-GB", {
-        day: "2-digit", month: "short", year: "numeric",
-      }),
-      lines: order.lines.map(({ name, size, qty, amount }) => ({ name, size, qty, amount })),
-      total: order.total,
-      discount: order.discount,
-      pay: order.pay,
-      form,
-    },
-  };
+  if (!provider) return { ok: true, order: placed(order) };
+
+  /*
+   * The order exists and is holding its pairs, so from here every failure has
+   * to hand them back rather than leave them held for half an hour on a
+   * checkout that was never going to happen.
+   */
+  try {
+    const { returnUrl, cancelUrl } = returnUrls(order.ref);
+    const session = await provider.createSession({ order, returnUrl, cancelUrl });
+
+    await saveOrders([
+      { ...order, payment: { sessionId: session.sessionId } },
+      ...orders,
+    ]);
+
+    return { ok: true, redirectTo: session.redirectUrl, order: placed(order) };
+  } catch (err) {
+    const { failPayment } = await import("@/lib/order-flow");
+    await failPayment(order.ref, "The payment session could not be opened.");
+
+    if (err instanceof TabbyRejected) {
+      return { ok: false, error: err.message };
+    }
+    console.error("[checkout] payment session failed:", err);
+    return {
+      ok: false,
+      error: "We couldn't open the payment page. Try another method, or send it to us on WhatsApp.",
+    };
+  }
 }

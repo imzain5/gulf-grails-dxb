@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_CONFIG } from "@/lib/config";
+import { liveProviders } from "@/lib/payments";
 import { waLink } from "@/lib/whatsapp";
 import ThemeToggle from "./ThemeToggle";
 import { Label } from "./primitives";
@@ -105,9 +106,17 @@ export default function Footer({
         <span className={s.legalItem}>Jumeirah 1, Dubai, UAE</span>
 
         <span className={`${s.pays} ${s.legalSpacer}`}>
-          {/* Only what the shop can actually take today. */}
+          {/*
+            * Only what the shop can actually take today. Cash and transfer
+            * need nobody's API; the rest appear as their credentials are set,
+            * so this strip cannot drift out of step with the checkout page —
+            * both read the same registry.
+            */}
           <span className={s.pay}>Cash on delivery</span>
           <span className={s.pay}>Bank transfer</span>
+          {liveProviders().map((p) => (
+            <span key={p.method} className={s.pay}>{p.label}</span>
+          ))}
         </span>
 
         <button type="button" className={s.utilityBtn} lang="ar" dir="rtl">العربية</button>

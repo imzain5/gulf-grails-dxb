@@ -40,7 +40,56 @@ export const ORDERS_PATH = "catalogue/orders.json";
  */
 const MAX_ORDERS = 400;
 
-export type OrderStatus = "new" | "confirmed" | "delivered" | "cancelled";
+/**
+ * Where an order is.
+ *
+ * `awaiting_payment` is the one online payment adds, and it is the reason the
+ * rest of this file grew a hold expiry. Cash on delivery lets an order be a
+ * commitment the moment it is placed; a card payment does not, because the
+ * customer is now on somebody else's domain and may simply close the tab. The
+ * pairs are still held — otherwise two people pay for the same shoe — but only
+ * for as long as a payment could plausibly still be completed.
+ */
+export type OrderStatus =
+  | "awaiting_payment"
+  | "new"
+  | "confirmed"
+  | "delivered"
+  | "cancelled";
+
+const ORDER_STATUSES: readonly OrderStatus[] = [
+  "awaiting_payment", "new", "confirmed", "delivered", "cancelled",
+];
+
+/** How the customer is paying. */
+export type PayMethod = "cod" | "bank" | "card" | "tabby" | "tamara";
+
+const PAY_METHODS: readonly PayMethod[] = ["cod", "bank", "card", "tabby", "tamara"];
+
+/** Everything that needs a redirect to somebody else's checkout. */
+export function isOnline(pay: PayMethod): boolean {
+  return pay === "card" || pay === "tabby" || pay === "tamara";
+}
+
+/**
+ * How long an unpaid online order keeps its pairs.
+ *
+ * Long enough to find a card, re-send an OTP and argue with a bank app; short
+ * enough that an abandoned checkout does not hold the last pair of something
+ * overnight. Released by `releaseExpiredHolds`, not by a timer.
+ */
+export const HOLD_MINUTES = 30;
+
+export interface OrderPayment {
+  /** The provider's own id for the session or order, for reconciliation. */
+  sessionId: string;
+  /** Provider's payment/transaction id once captured, where it differs. */
+  paymentId?: string;
+  /** ISO timestamp payment was confirmed. Absent until it is. */
+  paidAt?: string;
+  /** What the provider last told us, verbatim, for the stockroom to read. */
+  note?: string;
+}
 
 export interface OrderLine {
   pid: string;
@@ -71,7 +120,7 @@ export interface Order {
   deliveryFee: number;
   discount: number;
   total: number;
-  pay: "cod" | "bank";
+  pay: PayMethod;
   customer: OrderCustomer;
   status: OrderStatus;
   /**
@@ -80,6 +129,23 @@ export interface Order {
    * many times the button is pressed.
    */
   holdsStock: boolean;
+  /**
+   * When an unpaid online order stops holding its pairs. Only set while the
+   * status is `awaiting_payment`; cleared the moment payment lands.
+   */
+  holdExpiresAt?: string;
+  /** Provider bookkeeping for card and instalment orders. */
+  payment?: OrderPayment;
+}
+
+/** An order still sitting on somebody's payment page, past its hold. */
+export function holdExpired(o: Order, now = Date.now()): boolean {
+  return (
+    o.status === "awaiting_payment" &&
+    o.holdsStock &&
+    Boolean(o.holdExpiresAt) &&
+    new Date(o.holdExpiresAt as string).getTime() <= now
+  );
 }
 
 function asOrder(raw: unknown): Order | null {
@@ -89,9 +155,7 @@ function asOrder(raw: unknown): Order | null {
 
   const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
   const str = (v: unknown) => (typeof v === "string" ? v : "");
-  const status: OrderStatus = ["new", "confirmed", "delivered", "cancelled"].includes(
-    String(r.status),
-  )
+  const status: OrderStatus = ORDER_STATUSES.includes(r.status as OrderStatus)
     ? (r.status as OrderStatus)
     : "new";
 
@@ -119,7 +183,7 @@ function asOrder(raw: unknown): Order | null {
     deliveryFee: num(r.deliveryFee),
     discount: num(r.discount),
     total: num(r.total),
-    pay: r.pay === "bank" ? "bank" : "cod",
+    pay: PAY_METHODS.includes(r.pay as PayMethod) ? (r.pay as PayMethod) : "cod",
     customer: {
       name: str(c.name), phone: str(c.phone), emirate: str(c.emirate),
       area: str(c.area), address: str(c.address), window: str(c.window),
@@ -127,6 +191,22 @@ function asOrder(raw: unknown): Order | null {
     },
     status,
     holdsStock: r.holdsStock === true,
+    holdExpiresAt: str(r.holdExpiresAt) || undefined,
+    payment: asPayment(r.payment),
+  };
+}
+
+function asPayment(raw: unknown): OrderPayment | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const p = raw as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === "string" ? v : "");
+  const sessionId = str(p.sessionId);
+  if (!sessionId) return undefined;
+  return {
+    sessionId,
+    paymentId: str(p.paymentId) || undefined,
+    paidAt: str(p.paidAt) || undefined,
+    note: str(p.note) || undefined,
   };
 }
 

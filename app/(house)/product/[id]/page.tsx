@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findIn, type Product } from "@/data/products";
 import { getCatalogue } from "@/lib/catalogue";
+import { instalmentsLive } from "@/lib/payments";
 import ProductClient from "@/components/house/product/ProductClient";
 
 export async function generateStaticParams() {
@@ -79,7 +80,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         // Built from the catalogue — shop-authored copy, not visitor input.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd(product)) }}
       />
-      <ProductClient key={product.id} product={product} />
+      <ProductClient key={product.id} product={product} instalments={instalmentsLive()} />
     </>
   );
 }

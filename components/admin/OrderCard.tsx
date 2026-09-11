@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Order, OrderStatus } from "@/lib/orders";
+import type { Order, OrderStatus, PayMethod } from "@/lib/orders";
 import { setOrderStatusAction } from "@/app/admin/actions";
 import { money } from "@/lib/money";
 
@@ -19,10 +19,19 @@ import { money } from "@/lib/money";
  */
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
+  awaiting_payment: "Awaiting payment",
   new: "New",
   confirmed: "Confirmed",
   delivered: "Delivered",
   cancelled: "Cancelled",
+};
+
+const PAY_LABEL: Record<PayMethod, string> = {
+  cod: "Cash on delivery",
+  bank: "Bank transfer",
+  card: "Card",
+  tabby: "Tabby",
+  tamara: "Tamara",
 };
 
 function waHref(phone: string, ref: string): string {
@@ -72,7 +81,11 @@ export default function OrderCard({ order }: { order: Order }) {
         <div>
           {order.customer.window}
           {" · "}
-          {order.pay === "cod" ? `Cash on delivery — collect ${money(order.total)}` : "Bank transfer"}
+          {order.pay === "cod"
+            ? `Cash on delivery — collect ${money(order.total)}`
+            : order.status === "awaiting_payment"
+              ? `${PAY_LABEL[order.pay]} — not paid yet, pairs held`
+              : `${PAY_LABEL[order.pay]}${order.payment?.paidAt ? " — paid" : ""}`}
           {order.discount > 0 && ` · referral −${money(order.discount)}`}
           {order.deliveryFee > 0 && ` · delivery ${money(order.deliveryFee)}`}
         </div>

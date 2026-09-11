@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Archivo, Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
-import "./globals.css";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import "../styles/base.css";
 import "../styles/tokens.css";
 import { SITE_CONFIG } from "@/lib/config";
 import { THEME_SCRIPT } from "@/components/house/ThemeToggle";
@@ -10,9 +10,10 @@ import { THEME_SCRIPT } from "@/components/house/ThemeToggle";
  * sneaker store. A price set in a mono face reads as a valuation; the same
  * price in a heavy grotesk reads as a sale.
  *
- * Archivo stays only because the legacy `gg-*` storefront is still live and
- * still asks for six weights of it. It goes with that system in Phase 2, which
- * is also when the six-weight load stops being paid for.
+ * Archivo is no longer here. It was loaded for the legacy storefront, in six
+ * weights, on every page — and when that storefront was deleted the only thing
+ * still asking for it was /admin. It now loads in the admin layout instead, so
+ * a customer stops paying for a typeface only the owner ever sees.
  */
 
 /** Display — house names, statements, lot titles. Regular weight, never bold. */
@@ -39,13 +40,6 @@ const data = Geist_Mono({
   style: "normal",
   // Not preloaded: data type appears below the fold on most routes.
   preload: false,
-});
-
-const archivo = Archivo({
-  variable: "--font-archivo",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  display: "swap",
 });
 
 const DESCRIPTION =
@@ -91,7 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${display.variable} ${ui.variable} ${data.variable}`}
+      className={`${display.variable} ${ui.variable} ${data.variable}`}
       /*
        * The theme script below stamps data-theme on this element before paint,
        * so for any visitor who has picked a theme the client's <html> differs
@@ -110,12 +104,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             storefront doesn't read it yet. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
 
-        {/* Scroll-reveal ships hidden so it can't flicker on load (see
-            components/Reveal.tsx). Without scripts nothing would ever reveal
-            it, so turn the effect off entirely in that case. */}
-        <noscript>
-          <style>{".gg-reveal{opacity:1!important;transform:none!important}"}</style>
-        </noscript>
       </head>
       <body>{children}</body>
     </html>

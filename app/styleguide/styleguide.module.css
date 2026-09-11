@@ -1,12 +1,12 @@
 /*
- * The styleguide's own layout, plus the first primitives written as CSS
- * Modules rather than inline `style={{}}`.
+ * The styleguide's own layout, and the regression check for the house system.
  *
- * CSS Modules over Tailwind, deliberately: it is native to Next with no new
- * dependency and no build config, and — the deciding factor — it coexists with
- * `app/globals.css` untouched, so the legacy `gg-*` storefront keeps working
- * while the house system is built beside it. A Tailwind preflight would have
- * to fight 1,090 lines of existing base styles from the first commit.
+ * CSS Modules over Tailwind, deliberately: native to Next with no new
+ * dependency and no build config, and — the deciding factor at the time — it
+ * could be built beside the legacy `gg-*` storefront without a preflight
+ * fighting a thousand lines of existing base styles. That storefront is now
+ * gone, along with app/globals.css; styles/base.css is the whole of what
+ * replaced it.
  *
  * Everything below reads only from styles/tokens.css. If a value is hard-coded
  * here that isn't a token, it is a bug.

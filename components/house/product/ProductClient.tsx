@@ -35,7 +35,14 @@ const ASSURANCES: [string, string][] = [
   ["Pay at the door", "Cash to the courier or bank transfer. No card, no account."],
 ];
 
-export default function ProductClient({ product }: { product: Product }) {
+export default function ProductClient({
+  product,
+  instalments,
+}: {
+  product: Product;
+  /** True only when an instalment provider is actually connected. */
+  instalments: boolean;
+}) {
   const catalogue = useCatalogue();
   const { addToBag, isWished, toggleWish } = useStore();
 
@@ -117,6 +124,18 @@ export default function ProductClient({ product }: { product: Product }) {
             <div className={s.priceRow}>
               <Price amount={price} was={product.market} size="lg" />
             </div>
+            {/*
+              * Only where the shop can genuinely put an instalment plan
+              * through. "From" and "subject to approval" because the real
+              * offer is the provider's to make, not ours — a flat "4 × AED x"
+              * is a quote we are not in a position to give.
+              */}
+            {instalments && !soldOut && (
+              <span className={s.instalment}>
+                From <b>{money(Math.ceil(price / 4))}</b> × 4 with Tabby or Tamara, subject to
+                approval at checkout.
+              </span>
+            )}
             <span className={`${s.stockLine}${soldOut ? ` ${s.stockOut}` : ""}`}>
               {soldOut
                 ? "Sold — message us and we will source it"

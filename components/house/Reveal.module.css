@@ -52,3 +52,20 @@
     transition: none;
   }
 }
+
+/*
+ * No JavaScript, no reveal — so show everything rather than nothing.
+ *
+ * This used to be a <noscript> style block in the root layout targeting a
+ * global class name. These are CSS-module class names, hashed at build time,
+ * so nothing outside this file can name them: the rule has to live here. The
+ * `scripting` media feature is what asks the question directly.
+ */
+@media (scripting: none) {
+  .inner {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

@@ -7,6 +7,7 @@ import { sizePrice } from "@/lib/sizes";
 import { money } from "@/lib/money";
 import { SITE_CONFIG } from "@/lib/config";
 import { createPersistedStore } from "@/lib/persistedStore";
+import type { PayMethod } from "@/lib/orders";
 
 export interface CartLine {
   pid: string;
@@ -37,7 +38,7 @@ export interface PlacedOrder {
   lines: PlacedOrderLine[];
   total: number;
   discount: number;
-  pay: "cod" | "bank";
+  pay: PayMethod;
   form: OrderForm;
 }
 
@@ -54,7 +55,7 @@ interface Persisted {
   form: OrderForm;
   ref: string;
   refOk: boolean;
-  pay: "cod" | "bank";
+  pay: PayMethod;
   receipt: string;
   confirmSize: boolean;
   lastOrder: PlacedOrder | null;
@@ -84,7 +85,7 @@ interface StoreContextValue {
   form: OrderForm;
   ref: string;
   refOk: boolean;
-  pay: "cod" | "bank";
+  pay: PayMethod;
   receipt: string;
   confirmSize: boolean;
   lastOrder: PlacedOrder | null;
@@ -107,10 +108,12 @@ interface StoreContextValue {
   setForm: (patch: Partial<OrderForm>) => void;
   setRef: (v: string) => void;
   applyRef: () => void;
-  setPay: (p: "cod" | "bank") => void;
+  setPay: (p: PayMethod) => void;
   setReceipt: (name: string) => void;
   setConfirmSize: (v: boolean) => void;
   commitOrder: (order: PlacedOrder) => void;
+  rememberOrder: (order: PlacedOrder) => void;
+  clearBag: () => void;
   orderMessageText: (o: PlacedOrder) => string;
 }
 
@@ -203,7 +206,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, [showToast]);
 
-  const setPay = useCallback((p: "cod" | "bank") => store.set((s) => ({ ...s, pay: p })), []);
+  const setPay = useCallback((p: PayMethod) => store.set((s) => ({ ...s, pay: p })), []);
   const setReceipt = useCallback((name: string) => store.set((s) => ({ ...s, receipt: name })), []);
   const setConfirmSize = useCallback((v: boolean) => store.set((s) => ({ ...s, confirmSize: v })), []);
 
@@ -215,6 +218,25 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
    * pair costs or whether it is still on the shelf. All that happens here is
    * that the bag empties and the receipt page gets something to render.
    */
+  /**
+   * Record an order without touching the bag.
+   *
+   * The online payment path needs this: the customer is about to leave for
+   * somebody else's page and may come back having paid nothing. Emptying the
+   * bag on the way out would leave them with no order and no bag to retry
+   * from. The confirmation page clears it once payment is confirmed.
+   */
+  const rememberOrder = useCallback((order: PlacedOrder) => {
+    store.set((s) => ({ ...s, lastOrder: order }));
+  }, []);
+
+  const clearBag = useCallback(() => {
+    store.set((s) => ({
+      ...s, cart: [], receipt: "", confirmSize: false, ref: "", refOk: false,
+    }));
+  }, []);
+
+  /** Cash on delivery and bank transfer: placed is final, so the bag goes. */
   const commitOrder = useCallback((order: PlacedOrder) => {
     store.set((s) => ({
       ...s, cart: [], lastOrder: order, receipt: "", confirmSize: false, ref: "", refOk: false,
@@ -270,10 +292,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setReceipt,
     setConfirmSize,
     commitOrder,
+    rememberOrder,
+    clearBag,
     orderMessageText,
   }), [state, toast, showToast, stickyBar, lines, subtotal, deliveryFee, discount, total, cartCount,
     addToBag, setQty, removeLine, toggleWish, isWished, setForm, setRef, applyRef, setPay, setReceipt,
-    setConfirmSize, commitOrder, orderMessageText]);
+    setConfirmSize, commitOrder, rememberOrder, clearBag, orderMessageText]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

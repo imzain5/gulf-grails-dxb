@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/admin-auth";
 import { storageWritable } from "@/lib/catalogue";
+import { releaseExpiredHolds } from "@/lib/order-flow";
 import { getOrders } from "@/lib/orders";
 import { money } from "@/lib/money";
 import AdminBar from "@/components/admin/AdminBar";
@@ -18,6 +19,13 @@ export default async function AdminOrdersPage({
   searchParams: Promise<{ done?: string; error?: string }>;
 }) {
   if (!(await isAdmin())) redirect("/admin/login");
+
+  /*
+   * Sweep before listing. An expired hold left in place shows the stockroom a
+   * pair as sold that is actually available, which is the one direction of
+   * error that loses a sale rather than causing one.
+   */
+  await releaseExpiredHolds();
 
   const [orders, flags] = await Promise.all([getOrders(), searchParams]);
   const fresh = orders.filter((o) => o.status === "new");
