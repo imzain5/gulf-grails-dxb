@@ -13,7 +13,7 @@
   border-bottom: var(--hair) solid var(--line);
 }
 
-.titles { display: flex; flex-direction: column; gap: 10px; margin-right: auto; }
+.titles { display: flex; flex-direction: column; gap: 10px; margin-inline-end: auto; }
 
 .title {
   font-family: var(--font-display);

@@ -227,7 +227,7 @@
   font-size: var(--t-lot);
   letter-spacing: var(--track-display);
   color: var(--text-hi);
-  margin-right: auto;
+  margin-inline-end: auto;
 }
 
 .resultMeta { font-family: var(--font-data); font-size: 11px; color: var(--text-lo); }

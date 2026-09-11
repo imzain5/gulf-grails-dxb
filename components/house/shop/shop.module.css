@@ -163,7 +163,7 @@
   border-bottom: var(--hair) solid var(--line);
 }
 
-.applied { display: flex; gap: 8px; flex-wrap: wrap; margin-right: auto; }
+.applied { display: flex; gap: 8px; flex-wrap: wrap; margin-inline-end: auto; }
 
 .chip {
   display: inline-flex;

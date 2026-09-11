@@ -42,7 +42,7 @@
 .shotLabel {
   position: absolute;
   bottom: 10px;
-  left: 12px;
+  inset-inline-start: 12px;
   font-family: var(--font-data);
   font-size: 10px;
   letter-spacing: 0.1em;
@@ -275,7 +275,7 @@
     border-top: var(--hair) solid var(--line);
     margin-inline: calc(var(--gutter) * -1);
   }
-  .barPrice { margin-right: auto; }
+  .barPrice { margin-inline-end: auto; }
 }
 
 /* The link to the public authentication record, where one exists. */

@@ -122,8 +122,8 @@ export default function Header({
         onMouseLeave={closeMega}
       >
         <div className={s.utility}>
-          <button type="button" className={s.utilityBtn} lang="ar" dir="rtl">العربية</button>
-          <button type="button" className={s.utilityBtn}>AED</button>
+          {/* No locale or currency buttons: see the note in Footer.tsx. */}
+          <span className={s.utilityBtn}>AED</span>
           <ThemeToggle className={s.utilityBtn} compact />
         </div>
 
@@ -244,8 +244,7 @@ export default function Header({
             </div>
 
             <div className={s.drawerFoot}>
-              <button type="button" className={s.utilityBtn} lang="ar" dir="rtl">العربية</button>
-              <button type="button" className={s.utilityBtn}>AED</button>
+              <span className={s.utilityBtn}>AED</span>
               <ThemeToggle className={s.utilityBtn} compact />
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useStore } from "@/context/StoreContext";
 import { money } from "@/lib/money";
 import { waLink } from "@/lib/whatsapp";
 import { Button, Label, Price, Tag } from "../primitives";
+import OrderLookup from "./OrderLookup";
 import s from "./flow.module.css";
 
 /**
@@ -21,14 +22,10 @@ export default function LocalOrderBody() {
   if (!o) {
     return (
       <>
-        <h1 className={`${s.title} ${s.titleSm}`}>No recent order on this device.</h1>
-        <div className={s.empty}>
-          <span className={s.emptyTitle}>Nothing to show here.</span>
-          <p className={s.emptyBody}>
-            Orders are remembered in the browser they were placed from. If you have an
-            order with us, message us on WhatsApp with your name and we will find it.
-          </p>
-          <Button href="/shop">See what we are holding</Button>
+        <h1 className={`${s.title} ${s.titleSm}`}>Find your order.</h1>
+        <OrderLookup />
+        <div className={s.actions}>
+          <Button variant="ghost" href="/shop">See what we are holding</Button>
         </div>
       </>
     );
@@ -51,6 +48,11 @@ export default function LocalOrderBody() {
         </Button>
         <Button variant="ghost" href="/shop">Keep looking</Button>
       </div>
+
+      <details className={s.lookupToggle}>
+        <summary>Looking for a different order?</summary>
+        <OrderLookup />
+      </details>
 
       <div className={s.split} style={{ marginTop: "var(--pad-lg)" }}>
         <div>

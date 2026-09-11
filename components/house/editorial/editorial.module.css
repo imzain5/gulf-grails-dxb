@@ -298,5 +298,5 @@
   align-items: baseline;
   flex-wrap: wrap;
 }
-.closeText { max-width: 52ch; margin-right: auto; }
+.closeText { max-width: 52ch; margin-inline-end: auto; }
 .closeActions { display: flex; gap: 12px; flex-wrap: wrap; }

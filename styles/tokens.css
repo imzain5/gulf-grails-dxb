@@ -257,3 +257,26 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Right-to-left readiness.
+ *
+ * The house layer uses logical properties throughout — padding-inline,
+ * margin-inline-end, inset-inline-start, text-align: start — so the whole site
+ * mirrors from this one attribute with nothing else to change. Verified by
+ * rendering every major surface under dir="rtl": the grid flips, the product
+ * panel swaps sides, facet rails and card badges follow, and no page overflows
+ * its viewport at any width.
+ *
+ * What is missing is Arabic copy, not Arabic layout. When it arrives, set
+ * lang and dir on <html> and the pages below are already correct.
+ */
+[dir="rtl"] .house {
+  /* Latin figures stay left-to-right inside Arabic sentences: a price or a
+     size run must not be reordered by the bidi algorithm. */
+  --num-dir: ltr;
+}
+[dir="rtl"] .house :is(.price, [data-numeric]) {
+  direction: ltr;
+  unicode-bidi: isolate;
+}

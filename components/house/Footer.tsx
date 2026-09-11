@@ -27,6 +27,7 @@ const SHOP = [
 const SERVICES = [
   ["Authentication", "/authentication"],
   ["Check a record", "/verify"],
+  ["Track an order", "/order"],
   ["Sell to us", "/sell"],
   ["Size & fit", "/size-guide"],
   ["Delivery & returns", "/shipping-returns"],
@@ -119,8 +120,22 @@ export default function Footer({
           ))}
         </span>
 
-        <button type="button" className={s.utilityBtn} lang="ar" dir="rtl">العربية</button>
-        <button type="button" className={s.utilityBtn}>AED</button>
+        {/*
+          * There was an العربية button here that did nothing.
+          *
+          * The layout is ready for it — the house CSS uses logical properties
+          * throughout, and the whole site mirrors correctly under dir="rtl"
+          * with no overflow at any width. What does not exist is the Arabic
+          * copy, and this is a luxury house whose entire proposition is how it
+          * writes: machine-translated body text would do more damage than no
+          * Arabic at all. So the button is gone until a native writer has been
+          * through it, rather than sitting there as a promise.
+          *
+          * Same for currency. Everything is priced in AED because that is what
+          * the shop charges; a switcher implying we settle in anything else
+          * would be decoration.
+          */}
+        <span className={s.utilityBtn}>AED</span>
         <ThemeToggle className={s.utilityBtn} compact />
       </div>
     </footer>
