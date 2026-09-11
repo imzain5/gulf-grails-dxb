@@ -1,4 +1,4 @@
-import { list, put } from "@vercel/blob";
+import { del, get, list, put } from "@vercel/blob";
 import { unstable_cache, revalidatePath, revalidateTag } from "next/cache";
 import { blobConfigured } from "./catalogue";
 import { localStoreEnabled, readLocal, writeLocal } from "./local-store";
@@ -20,6 +20,14 @@ import { localStoreEnabled, readLocal, writeLocal } from "./local-store";
  * arrive as `new` and the shop moves them along by hand. Stock is held from
  * the moment the order is placed, because the alternative is selling the same
  * last pair twice while waiting for a WhatsApp reply.
+ *
+ * This document is PRIVATE and must stay that way. It holds every customer's
+ * name, WhatsApp number and home address. It was originally written with
+ * `access: "public"` and a fixed pathname, which put all of that at a URL
+ * anyone could fetch — and the store's hostname is not a secret either, since
+ * every product photograph on the site is served from it. `readStored` heals
+ * that on the first read after deploy: it copies any public copy into a
+ * private one and deletes the public original.
  */
 
 export const ORDERS_TAG = "gg-orders";
@@ -122,23 +130,77 @@ function asOrder(raw: unknown): Order | null {
   };
 }
 
+function parseOrders(raw: unknown): Order[] | null {
+  if (!Array.isArray(raw)) return null;
+  return raw.map(asOrder).filter((o): o is Order => o !== null);
+}
+
+/**
+ * Move an existing public orders document to a private one and delete it.
+ *
+ * Runs at most once per store: after it has succeeded there is no public blob
+ * left to find. It is deliberately best-effort — a shop that cannot reach
+ * storage should still serve pages — but a failure here leaves customer
+ * addresses readable, so it is loud in the log rather than silent.
+ */
+async function healPublicOrders(): Promise<Order[] | null> {
+  const { blobs } = await list({ prefix: ORDERS_PATH, limit: 1 });
+  const exposed = blobs.find((b) => b.pathname === ORDERS_PATH);
+  if (!exposed) return null;
+
+  console.warn(
+    "[orders] found a PUBLIC orders document holding customer addresses; moving it to private storage",
+  );
+
+  const res = await fetch(exposed.url, { cache: "no-store" });
+  const orders = res.ok ? parseOrders(await res.json()) : null;
+
+  /*
+   * Delete only what we have successfully copied.
+   *
+   * `list` reports the private document at this pathname too, so an
+   * unreadable private blob would land here with `exposed` pointing at it —
+   * and an unconditional delete would then destroy the orders rather than a
+   * public duplicate of them. Fetching it without credentials fails, which is
+   * exactly the signal that this is not the public copy.
+   */
+  if (!orders) {
+    console.error(
+      `[orders] could not read ${exposed.url} (${res.status}); leaving it in place`,
+    );
+    return null;
+  }
+
+  // Write the private copy first. Deleting before writing would lose the
+  // orders outright if the write then failed.
+  await put(ORDERS_PATH, JSON.stringify(orders, null, 2), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+    cacheControlMaxAge: 0,
+  });
+  await del(exposed.url);
+  console.warn("[orders] public orders document deleted");
+
+  return orders;
+}
+
 async function readStored(): Promise<Order[] | null> {
   if (localStoreEnabled()) {
-    const raw = await readLocal<unknown>("orders.json");
-    return Array.isArray(raw) ? raw.map(asOrder).filter((o): o is Order => o !== null) : null;
+    return parseOrders(await readLocal<unknown>("orders.json"));
   }
   if (!blobConfigured()) return null;
   try {
-    const { blobs } = await list({ prefix: ORDERS_PATH, limit: 1 });
-    const doc = blobs.find((b) => b.pathname === ORDERS_PATH);
-    if (!doc) return null;
-
-    const res = await fetch(doc.url, { cache: "no-store" });
-    if (!res.ok) return null;
-
-    const parsed: unknown = await res.json();
-    if (!Array.isArray(parsed)) return null;
-    return parsed.map(asOrder).filter((o): o is Order => o !== null);
+    // useCache: false — an order placed a second ago must be visible to the
+    // admin screen now, and to the stock arithmetic of the next order.
+    const found = await get(ORDERS_PATH, { access: "private", useCache: false });
+    if (found?.stream) {
+      const parsed: unknown = await new Response(found.stream).json();
+      const orders = parseOrders(parsed);
+      if (orders) return orders;
+    }
+    return await healPublicOrders();
   } catch (err) {
     console.error("[orders] read failed:", err);
     return null;
@@ -174,7 +236,8 @@ export async function saveOrders(orders: Order[]): Promise<void> {
   }
 
   await put(ORDERS_PATH, JSON.stringify(trimmed, null, 2), {
-    access: "public",
+    // Private, always. See the note at the top of this file.
+    access: "private",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
